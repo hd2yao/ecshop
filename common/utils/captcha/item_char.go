@@ -179,6 +179,10 @@ func (item *ItemChar) drawBeeline(point1 point, point2 point, lineColor color.RG
 }
 
 func (item *ItemChar) drawNoise(noiseText string, fonts []*truetype.Font) error {
+	if len(fonts) == 0 {
+		return errors.New("no fonts available for noise")
+	}
+
 	// 噪点字符
 	c := freetype.NewContext()
 	c.SetDPI(72)
@@ -193,10 +197,14 @@ func (item *ItemChar) drawNoise(noiseText string, fonts []*truetype.Font) error 
 		fontSize := rawFontSize/2 + float64(rand.Intn(5))
 		c.SetSrc(image.NewUniform(color.RGBA{uint8(rand.Intn(200)), uint8(rand.Intn(200)), uint8(rand.Intn(200)), 255}))
 		c.SetFontSize(fontSize)
-		c.SetFont(fonts[0]) // 简化处理，随便取一个字体
+		
+		// 随机选择字体
+		fontIndex := rand.Intn(len(fonts))
+		c.SetFont(fonts[fontIndex])
+		
 		pt := freetype.Pt(rw, rh)
 		if _, err := c.DrawString(string(char), pt); err != nil {
-			log.Println(err)
+			log.Printf("绘制噪点字符失败: %v", err)
 		}
 	}
 	return nil
@@ -206,6 +214,10 @@ func (item *ItemChar) drawText(text string, fonts []*truetype.Font) error {
 	if len(text) == 0 {
 		return errors.New("text must not be empty")
 	}
+	if len(fonts) == 0 {
+		return errors.New("no fonts available")
+	}
+
 	c := freetype.NewContext()
 	c.SetDPI(72)
 	c.SetClip(item.nrgba.Bounds())
@@ -217,7 +229,11 @@ func (item *ItemChar) drawText(text string, fonts []*truetype.Font) error {
 		fontSize := item.height * (rand.Intn(7) + 7) / 16
 		c.SetSrc(image.NewUniform(color.RGBA{uint8(rand.Intn(150)), uint8(rand.Intn(150)), uint8(rand.Intn(150)), 255}))
 		c.SetFontSize(float64(fontSize))
-		c.SetFont(fonts[0])
+		
+		// 随机选择字体
+		fontIndex := rand.Intn(len(fonts))
+		c.SetFont(fonts[fontIndex])
+		
 		x := fontWidth*i + fontWidth/fontSize
 		y := item.height/2 + fontSize/2 - rand.Intn(item.height/16*3)
 		pt := freetype.Pt(x, y)
