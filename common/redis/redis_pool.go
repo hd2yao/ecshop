@@ -29,7 +29,33 @@ type RedisPoolConfig struct {
 	Database int
 }
 
-// InitRedisPool 初始化 Redis 连接池（全局单例）
+// InitRedisPoolFromGoZero 从go-zero配置初始化Redis连接池
+func InitRedisPoolFromGoZero(config redis.RedisConf) error {
+	var err error
+	redisPoolOnce.Do(func() {
+		// 直接使用go-zero的redis配置创建客户端
+		client := redis.New(config.Host, func(r *redis.Redis) {
+			r.Type = config.Type
+			r.Pass = config.Pass
+		})
+
+		// 测试连接
+		if !client.Ping() {
+			err = fmt.Errorf("Redis连接测试失败，请检查配置: Host=%s, Type=%s", config.Host, config.Type)
+			return
+		}
+
+		globalRedisPool = &RedisPool{
+			client:      client,
+			config:      config,
+			initialized: true,
+		}
+	})
+
+	return err
+}
+
+// InitRedisPool 初始化 Redis 连接池（全局单例）- 向后兼容
 func InitRedisPool(config RedisPoolConfig) error {
 	var err error
 	redisPoolOnce.Do(func() {

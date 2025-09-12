@@ -1,0 +1,89 @@
+syntax = "v1"
+
+info (
+	title:   "用户服务API"
+	desc:    "用户相关的API接口"
+	author:  "ecshop"
+	email:   "hd2yao@ecshop.com"
+	version: "v1.0.0"
+)
+
+// ===== 验证码相关结构体 =====
+type (
+	// 验证码配置
+	DriverConfig {
+		Width   int    `json:"width,optional"`
+		Height  int    `json:"height,optional"`
+		Length  int    `json:"length,optional"`
+		BgColor string `json:"bg_color,optional"`
+	}
+	// 绘制选项
+	DrawOptions {
+		UseCustomDraw bool   `json:"use_custom_draw,optional"`
+		DrawText      bool   `json:"draw_text,optional"`
+		DrawHollow    bool   `json:"draw_hollow,optional"`
+		DrawSine      bool   `json:"draw_sine,optional"`
+		DrawSlimLine  int    `json:"draw_slim_line,optional"`
+		DrawNoiseText string `json:"draw_noise_text,optional"`
+	}
+	// 验证码生成请求
+	CaptchaRequest {
+		CaptchaType string       `json:"captcha_type,optional"` // string, math, chinese
+		Config      DriverConfig `json:"config,optional"`
+		DrawOpts    DrawOptions  `json:"draw_options,optional"`
+	}
+	// 验证码生成响应
+	CaptchaResponse {
+		Code      int    `json:"code"`
+		Message   string `json:"message"`
+		CaptchaId string `json:"captcha_id"`
+		ImageData string `json:"image_data"`
+		Answer    string `json:"answer,optional"` // 仅用于测试，生产环境不返回
+	}
+	// 验证码验证请求
+	VerifyRequest {
+		CaptchaId string `json:"captcha_id"`
+		Answer    string `json:"answer"`
+	}
+	// 验证码验证响应
+	VerifyResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Valid   bool   `json:"valid"`
+	}
+	// 错误响应
+	ErrorResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Error   string `json:"error,optional"`
+	}
+	// 验证码类型信息
+	CaptchaTypeInfo {
+		Type        string   `json:"type"`
+		Name        string   `json:"name"`
+		Description string   `json:"description"`
+		Examples    []string `json:"examples"`
+	}
+	// 预设配置
+	PresetConfig {
+		Name        string         `json:"name"`
+		Description string         `json:"description"`
+		Request     CaptchaRequest `json:"request"`
+	}
+)
+
+// ===== 验证码服务 =====
+@server (
+	group:  captcha
+	prefix: /api/captcha
+)
+service user-api {
+	@doc "生成验证码"
+	@handler GenerateCaptcha
+	post /generate (CaptchaRequest) returns (CaptchaResponse)
+
+	@doc "验证验证码"
+	@handler VerifyCaptcha
+	post /verify (VerifyRequest) returns (VerifyResponse)
+}
+
