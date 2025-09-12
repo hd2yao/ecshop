@@ -1,0 +1,16 @@
+Name: user-api
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+
+# Redis配置
+Redis:
+  Host: 127.0.0.1:6379
+  Type: node
+  Pass: ""
+
+# 验证码配置
+Captcha:
+  StoreType: redis      # memory 或 redis
+  Expiration: 600       # 10分钟过期
+  Prefix: "captcha:"    # Redis键前缀

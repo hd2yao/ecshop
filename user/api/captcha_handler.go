@@ -3,10 +3,11 @@ package api
 import (
 	"image/color"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/hd2yao/ecshop/common/utils/captcha"
+	"github.com/hd2yao/ecshop/common/captcha"
 )
 
 // CaptchaHandler 验证码处理器
@@ -48,7 +49,7 @@ func (h *CaptchaHandler) GenerateCaptcha(c *gin.Context) {
 	}
 
 	// 生成验证码
-	id, b64s, answer, err := captcha.Generate(req)
+	id, b64s, answer, err := captcha.NewCaptchaWithConfig("user", 5*time.Minute, req).Generate()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Code:    500,
@@ -97,7 +98,7 @@ func (h *CaptchaHandler) VerifyCaptcha(c *gin.Context) {
 	}
 
 	// 验证验证码
-	isValid := captcha.Verify(req.CaptchaId, req.Answer)
+	isValid := captcha.NewCaptcha("user", 5*time.Minute).Verify(req.CaptchaId, req.Answer, true)
 
 	c.JSON(http.StatusOK, VerifyResponse{
 		Code:    200,
@@ -307,4 +308,10 @@ type PresetsResponse struct {
 	Code    int            `json:"code"`
 	Message string         `json:"message"`
 	Presets []PresetConfig `json:"presets"`
+}
+
+type StoreInfoResponse struct {
+	Code    int                    `json:"code"`
+	Message string                 `json:"message"`
+	Info    map[string]interface{} `json:"info"`
 }
