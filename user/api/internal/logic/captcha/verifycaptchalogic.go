@@ -2,13 +2,12 @@ package captcha
 
 import (
 	"context"
-	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
-	"github.com/hd2yao/ecshop/common/captcha"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
+	"github.com/hd2yao/ecshop/user/rpc/types/user"
 )
 
 type VerifyCaptchaLogic struct {
@@ -27,29 +26,25 @@ func NewVerifyCaptchaLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ver
 }
 
 func (l *VerifyCaptchaLogic) VerifyCaptcha(req *types.VerifyRequest) (resp *types.VerifyResponse, err error) {
-	if req.CaptchaId == "" || req.Answer == "" {
-		l.Error("验证码ID或答案为空")
+	// 调用user-rpc服务验证验证码
+	rpcReq := &user.VerifyCaptchaReq{
+		CaptchaId: req.CaptchaId,
+		Answer:    req.Answer,
+	}
+
+	rpcResp, err := l.svcCtx.UserRpc.VerifyCaptcha(l.ctx, rpcReq)
+	if err != nil {
+		l.Errorf("调用RPC验证验证码失败: %v", err)
 		return &types.VerifyResponse{
-			Code:    400,
-			Message: "验证码ID和答案不能为空",
+			Code:    500,
+			Message: "验证码验证失败",
 			Valid:   false,
 		}, nil
 	}
 
-	// 创建验证码实例并验证
-	c := captcha.NewCaptcha("user", 5*time.Minute)
-	isValid := c.Verify(req.CaptchaId, req.Answer, true)
-
-	message := "验证失败"
-	if isValid {
-		message = "验证通过"
-	}
-
-	l.Infof("验证码验证结果: ID=%s, 结果=%v", req.CaptchaId, isValid)
-
 	return &types.VerifyResponse{
-		Code:    200,
-		Message: message,
-		Valid:   isValid,
+		Code:    int(rpcResp.Code),
+		Message: rpcResp.Message,
+		Valid:   rpcResp.Valid,
 	}, nil
 }

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package user;
+option go_package = "./user";
+
+// 验证码服务
+service User {
+  // 图形验证码
+  rpc GenerateCaptcha(GenerateCaptchaReq) returns (GenerateCaptchaResp);
+  rpc VerifyCaptcha(VerifyCaptchaReq) returns (VerifyCaptchaResp);
+  
+  // 邮件验证码
+  rpc SendMailCode(SendMailCodeReq) returns (SendMailCodeResp);
+  rpc VerifyMailCode(VerifyMailCodeReq) returns (VerifyMailCodeResp);
+}
+
+// 图形验证码相关
+message GenerateCaptchaReq {
+  string captcha_type = 1;
+  CaptchaConfig config = 2;
+  DrawOptions draw_opts = 3;
+}
+
+message GenerateCaptchaResp {
+  int32 code = 1;
+  string message = 2;
+  string captcha_id = 3;
+  string image_data = 4;
+  string answer = 5; // 测试环境使用
+}
+
+message VerifyCaptchaReq {
+  string captcha_id = 1;
+  string answer = 2;
+}
+
+message VerifyCaptchaResp {
+  int32 code = 1;
+  string message = 2;
+  bool valid = 3;
+}
+
+// 邮件验证码相关
+message SendMailCodeReq {
+  string email = 1;
+  int32 code_length = 2;
+}
+
+message SendMailCodeResp {
+  int32 code = 1;
+  string message = 2;
+  string email = 3;
+  string code_id = 4; // 测试环境返回
+}
+
+message VerifyMailCodeReq {
+  string email = 1;
+  string code = 2;
+}
+
+message VerifyMailCodeResp {
+  int32 code = 1;
+  string message = 2;
+  bool valid = 3;
+}
+
+// 辅助结构
+message CaptchaConfig {
+  int32 width = 1;
+  int32 height = 2;
+  int32 length = 3;
+  string bg_color = 4;
+}
+
+message DrawOptions {
+  bool use_custom_draw = 1;
+  bool draw_text = 2;
+  bool draw_hollow = 3;
+  bool draw_sine = 4;
+  int32 draw_slim_line = 5;
+  string draw_noise_text = 6;
+}

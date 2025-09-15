@@ -1,0 +1,11 @@
+Name: user-api
+Host: 0.0.0.0
+Port: 8000
+Mode: dev
+
+# 用户RPC服务配置
+UserRpc:
+  Etcd:
+    Hosts:
+    - etcd:2379
+    Key: user.rpc
