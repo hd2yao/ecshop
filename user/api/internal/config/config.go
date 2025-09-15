@@ -7,5 +7,6 @@ import (
 
 type Config struct {
 	rest.RestConf
-	UserRpc zrpc.RpcClientConf // RPC客户端配置
+	UserRpc   zrpc.RpcClientConf
+	LogFormat string             `json:",optional,default=default"` // 日志格式: default, gin
 }
