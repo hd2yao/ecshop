@@ -72,6 +72,33 @@ type (
 	}
 )
 
+// ===== 邮件验证码相关结构体 =====
+type (
+	// 邮件验证码发送请求
+	SendMailCodeRequest {
+		Email string `json:"email"`               // 邮箱地址
+		CodeLength int `json:"code_length,optional"` // 验证码长度，默认6位
+	}
+	// 邮件验证码发送响应
+	SendMailCodeResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Email   string `json:"email"`
+		CodeId  string `json:"code_id,optional"` // 用于测试环境返回验证码
+	}
+	// 邮件验证码验证请求
+	VerifyMailCodeRequest {
+		Email string `json:"email"` // 邮箱地址
+		Code  string `json:"code"`  // 验证码
+	}
+	// 邮件验证码验证响应
+	VerifyMailCodeResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Valid   bool   `json:"valid"`
+	}
+)
+
 // ===== 验证码服务 =====
 @server (
 	group:  captcha
@@ -85,5 +112,20 @@ service user-api {
 	@doc "验证验证码"
 	@handler VerifyCaptcha
 	post /verify (VerifyRequest) returns (VerifyResponse)
+}
+
+// ===== 邮件验证码服务 =====
+@server (
+	group:  mail
+	prefix: /api/mail
+)
+service user-api {
+	@doc "发送邮件验证码"
+	@handler SendMailCode
+	post /send (SendMailCodeRequest) returns (SendMailCodeResponse)
+
+	@doc "验证邮件验证码"
+	@handler VerifyMailCode
+	post /verify (VerifyMailCodeRequest) returns (VerifyMailCodeResponse)
 }
 

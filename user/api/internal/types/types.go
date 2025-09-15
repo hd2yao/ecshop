@@ -62,3 +62,26 @@ type VerifyResponse struct {
 	Message string `json:"message"`
 	Valid   bool   `json:"valid"`
 }
+
+type SendMailCodeRequest struct {
+	Email      string `json:"email"`                // 邮箱地址
+	CodeLength int    `json:"code_length,optional"` // 验证码长度，默认6位
+}
+
+type SendMailCodeResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Email   string `json:"email"`
+	CodeId  string `json:"code_id,optional"` // 用于测试环境返回验证码
+}
+
+type VerifyMailCodeRequest struct {
+	Email string `json:"email"` // 邮箱地址
+	Code  string `json:"code"`  // 验证码
+}
+
+type VerifyMailCodeResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Valid   bool   `json:"valid"`
+}

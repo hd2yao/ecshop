@@ -1,0 +1,40 @@
+Name: user.rpc
+ListenOn: 0.0.0.0:9000
+Etcd:
+  Hosts:
+  - etcd:2379
+  Key: user.rpc
+
+# 数据存储Redis配置
+DataRedis:
+  Host: redis:6379
+  Type: node
+  Pass:
+
+# 验证码配置
+Captcha:
+  StoreType: redis
+  Expiration: 600
+  Prefix: "captcha:"
+
+# 邮件配置
+Mail:
+  smtp:
+    host: "smtp.qq.com"               # QQ邮箱SMTP服务器
+    port: 587                         # TLS端口
+    username: "1054290355@qq.com"     # 您的QQ邮箱，如：yourname@qq.com
+    password: "nyfatyyrgewwbfcc"      # QQ邮箱授权码（不是QQ密码）
+    from: "1054290355@qq.com"         # 发件人邮箱，同Username
+    from_name: "EcShop验证服务"       # 发件人显示名称
+  template:
+    verify_code_subject: "【EcShop】邮箱验证码"
+    verify_code_body: |
+      亲爱的用户，您好！
+      
+      您的邮箱验证码是：{{.Code}}
+      
+      验证码有效期为 {{.ExpireMinutes}} 分钟，请尽快完成验证。
+      
+      如果这不是您的操作，请忽略此邮件。
+      
+      感谢您使用 EcShop！

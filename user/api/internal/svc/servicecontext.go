@@ -1,23 +1,20 @@
 package svc
 
 import (
-	"log"
+	"github.com/zeromicro/go-zero/zrpc"
 
-	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/user/api/internal/config"
+	"github.com/hd2yao/ecshop/user/rpc/userclient"
 )
 
 type ServiceContext struct {
-	Config config.Config
+	Config  config.Config
+	UserRpc userclient.User
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	// 初始化Redis连接池
-	if err := redisPool.InitRedisPoolFromGoZero(c.Redis); err != nil {
-		log.Fatalf("初始化Redis连接池失败: %v", err)
-	}
-
 	return &ServiceContext{
-		Config: c,
+		Config:  c,
+		UserRpc: userclient.NewUser(zrpc.MustNewClient(c.UserRpc)),
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	captcha "github.com/hd2yao/ecshop/user/api/internal/handler/captcha"
+	mail "github.com/hd2yao/ecshop/user/api/internal/handler/mail"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -29,5 +30,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/captcha"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 发送邮件验证码
+				Method:  http.MethodPost,
+				Path:    "/send",
+				Handler: mail.SendMailCodeHandler(serverCtx),
+			},
+			{
+				// 验证邮件验证码
+				Method:  http.MethodPost,
+				Path:    "/verify",
+				Handler: mail.VerifyMailCodeHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/mail"),
 	)
 }
