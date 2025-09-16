@@ -76,8 +76,8 @@ type (
 type (
 	// 邮件验证码发送请求
 	SendMailCodeRequest {
-		Email string `json:"email"`               // 邮箱地址
-		CodeLength int `json:"code_length,optional"` // 验证码长度，默认6位
+		Email      string `json:"email"` // 邮箱地址
+		CodeLength int    `json:"code_length,optional"` // 验证码长度，默认6位
 	}
 	// 邮件验证码发送响应
 	SendMailCodeResponse {
@@ -89,13 +89,31 @@ type (
 	// 邮件验证码验证请求
 	VerifyMailCodeRequest {
 		Email string `json:"email"` // 邮箱地址
-		Code  string `json:"code"`  // 验证码
+		Code  string `json:"code"` // 验证码
 	}
 	// 邮件验证码验证响应
 	VerifyMailCodeResponse {
 		Code    int    `json:"code"`
 		Message string `json:"message"`
 		Valid   bool   `json:"valid"`
+	}
+)
+
+// ===== 文件上传相关结构体 =====
+type (
+	// 文件上传请求
+	UploadAvatarRequest {
+		UserId int64  `form:"user_id"` // 用户ID
+		Dir    string `form:"dir,optional"` // 上传目录，可选
+	}
+	// 文件上传响应
+	UploadResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Url     string `json:"url"` // 文件访问URL
+		CDNUrl  string `json:"cdn_url"` // CDN访问URL
+		Key     string `json:"key"` // 文件存储路径
+		Size    int64  `json:"size"` // 文件大小
 	}
 )
 
@@ -127,5 +145,16 @@ service user-api {
 	@doc "验证邮件验证码"
 	@handler VerifyMailCode
 	post /verify (VerifyMailCodeRequest) returns (VerifyMailCodeResponse)
+}
+
+// ===== 文件上传服务 =====
+@server (
+	group:  upload
+	prefix: /api/upload
+)
+service user-api {
+	@doc "上传用户头像"
+	@handler UploadAvatar
+	post /avatar (UploadAvatarRequest) returns (UploadResponse)
 }
 

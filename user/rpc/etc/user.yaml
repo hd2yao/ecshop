@@ -38,3 +38,20 @@ Mail:
       如果这不是您的操作，请忽略此邮件。
       
       感谢您使用 EcShop！
+
+# OSS配置
+Oss:
+  access_key_id: "LTAI5tCDRvGC2RLDAjU8Etmd"
+  access_key_secret: "TQgExQ3NO5PDHvKnVtFgLHnqw1Kt3m"
+  endpoint: "oss-cn-shanghai.aliyuncs.com"
+  default_bucket: "hd2yao"
+  cdn_domain: ""
+  enable_cdn: false
+  enable_https: true
+  max_file_size: 5242880
+  allowed_types:
+    - jpg
+    - jpeg
+    - png
+    - gif
+  upload_path: "avatars"                            # 上传路径前缀

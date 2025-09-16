@@ -5,6 +5,7 @@ import (
 	"time"
 	
 	"github.com/hd2yao/ecshop/common/mail"
+	"github.com/hd2yao/ecshop/common/oss"
 	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/user/rpc/internal/config"
 )
@@ -12,6 +13,7 @@ import (
 type ServiceContext struct {
 	Config      config.Config
 	MailService *mail.MailService
+	OssClient   *oss.Client
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -26,8 +28,15 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("初始化邮件服务失败: %v", err)
 	}
 
+	// 初始化OSS客户端
+	ossClient, err := oss.NewClient(&c.Oss)
+	if err != nil {
+		log.Fatalf("初始化OSS客户端失败: %v", err)
+	}
+
 	return &ServiceContext{
 		Config:      c,
 		MailService: mailService,
+		OssClient:   ossClient,
 	}
 }

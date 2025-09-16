@@ -6,11 +6,12 @@ package handler
 import (
 	"net/http"
 
+	"github.com/zeromicro/go-zero/rest"
+
 	captcha "github.com/hd2yao/ecshop/user/api/internal/handler/captcha"
 	mail "github.com/hd2yao/ecshop/user/api/internal/handler/mail"
+	upload "github.com/hd2yao/ecshop/user/api/internal/handler/upload"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
-
-	"github.com/zeromicro/go-zero/rest"
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
@@ -48,5 +49,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/mail"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 上传用户头像
+				Method:  http.MethodPost,
+				Path:    "/avatar",
+				Handler: upload.UploadAvatarHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/upload"),
 	)
 }

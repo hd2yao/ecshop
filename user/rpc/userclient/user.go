@@ -20,6 +20,8 @@ type (
 	GenerateCaptchaResp = user.GenerateCaptchaResp
 	SendMailCodeReq     = user.SendMailCodeReq
 	SendMailCodeResp    = user.SendMailCodeResp
+	UploadAvatarReq     = user.UploadAvatarReq
+	UploadAvatarResp    = user.UploadAvatarResp
 	VerifyCaptchaReq    = user.VerifyCaptchaReq
 	VerifyCaptchaResp   = user.VerifyCaptchaResp
 	VerifyMailCodeReq   = user.VerifyMailCodeReq
@@ -32,6 +34,8 @@ type (
 		// 邮件验证码
 		SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
+		// 文件上传
+		UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error)
 	}
 
 	defaultUser struct {
@@ -65,4 +69,10 @@ func (m *defaultUser) SendMailCode(ctx context.Context, in *SendMailCodeReq, opt
 func (m *defaultUser) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.VerifyMailCode(ctx, in, opts...)
+}
+
+// 文件上传
+func (m *defaultUser) UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UploadAvatar(ctx, in, opts...)
 }

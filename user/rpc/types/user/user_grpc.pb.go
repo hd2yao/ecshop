@@ -23,6 +23,7 @@ const (
 	User_VerifyCaptcha_FullMethodName   = "/user.User/VerifyCaptcha"
 	User_SendMailCode_FullMethodName    = "/user.User/SendMailCode"
 	User_VerifyMailCode_FullMethodName  = "/user.User/VerifyMailCode"
+	User_UploadAvatar_FullMethodName    = "/user.User/UploadAvatar"
 )
 
 // UserClient is the client API for User service.
@@ -37,6 +38,8 @@ type UserClient interface {
 	// 邮件验证码
 	SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 	VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
+	// 文件上传
+	UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error)
 }
 
 type userClient struct {
@@ -87,6 +90,16 @@ func (c *userClient) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, 
 	return out, nil
 }
 
+func (c *userClient) UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UploadAvatarResp)
+	err := c.cc.Invoke(ctx, User_UploadAvatar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -99,6 +112,8 @@ type UserServer interface {
 	// 邮件验证码
 	SendMailCode(context.Context, *SendMailCodeReq) (*SendMailCodeResp, error)
 	VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error)
+	// 文件上传
+	UploadAvatar(context.Context, *UploadAvatarReq) (*UploadAvatarResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -120,6 +135,9 @@ func (UnimplementedUserServer) SendMailCode(context.Context, *SendMailCodeReq) (
 }
 func (UnimplementedUserServer) VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyMailCode not implemented")
+}
+func (UnimplementedUserServer) UploadAvatar(context.Context, *UploadAvatarReq) (*UploadAvatarResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadAvatar not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -214,6 +232,24 @@ func _User_VerifyMailCode_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadAvatarReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UploadAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UploadAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UploadAvatar(ctx, req.(*UploadAvatarReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -236,6 +272,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyMailCode",
 			Handler:    _User_VerifyMailCode_Handler,
+		},
+		{
+			MethodName: "UploadAvatar",
+			Handler:    _User_UploadAvatar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
