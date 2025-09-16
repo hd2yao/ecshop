@@ -44,3 +44,9 @@ func (s *UserServer) VerifyMailCode(ctx context.Context, in *user.VerifyMailCode
 	l := logic.NewVerifyMailCodeLogic(ctx, s.svcCtx)
 	return l.VerifyMailCode(in)
 }
+
+// 文件上传
+func (s *UserServer) UploadAvatar(ctx context.Context, in *user.UploadAvatarReq) (*user.UploadAvatarResp, error) {
+	l := logic.NewUploadAvatarLogic(ctx, s.svcCtx)
+	return l.UploadAvatar(in)
+}

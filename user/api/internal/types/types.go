@@ -52,17 +52,6 @@ type PresetConfig struct {
 	Request     CaptchaRequest `json:"request"`
 }
 
-type VerifyRequest struct {
-	CaptchaId string `json:"captcha_id"`
-	Answer    string `json:"answer"`
-}
-
-type VerifyResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Valid   bool   `json:"valid"`
-}
-
 type SendMailCodeRequest struct {
 	Email      string `json:"email"`                // 邮箱地址
 	CodeLength int    `json:"code_length,optional"` // 验证码长度，默认6位
@@ -75,12 +64,37 @@ type SendMailCodeResponse struct {
 	CodeId  string `json:"code_id,optional"` // 用于测试环境返回验证码
 }
 
+type UploadAvatarRequest struct {
+	UserId int64  `form:"user_id"`      // 用户ID
+	Dir    string `form:"dir,optional"` // 上传目录，可选
+}
+
+type UploadResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Url     string `json:"url"`     // 文件访问URL
+	CDNUrl  string `json:"cdn_url"` // CDN访问URL
+	Key     string `json:"key"`     // 文件存储路径
+	Size    int64  `json:"size"`    // 文件大小
+}
+
 type VerifyMailCodeRequest struct {
 	Email string `json:"email"` // 邮箱地址
 	Code  string `json:"code"`  // 验证码
 }
 
 type VerifyMailCodeResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Valid   bool   `json:"valid"`
+}
+
+type VerifyRequest struct {
+	CaptchaId string `json:"captcha_id"`
+	Answer    string `json:"answer"`
+}
+
+type VerifyResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Valid   bool   `json:"valid"`

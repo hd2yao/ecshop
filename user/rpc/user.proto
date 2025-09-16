@@ -12,6 +12,9 @@ service User {
   // 邮件验证码
   rpc SendMailCode(SendMailCodeReq) returns (SendMailCodeResp);
   rpc VerifyMailCode(VerifyMailCodeReq) returns (VerifyMailCodeResp);
+  
+  // 文件上传
+  rpc UploadAvatar(UploadAvatarReq) returns (UploadAvatarResp);
 }
 
 // 图形验证码相关
@@ -79,4 +82,21 @@ message DrawOptions {
   bool draw_sine = 4;
   int32 draw_slim_line = 5;
   string draw_noise_text = 6;
+}
+
+// 头像上传相关
+message UploadAvatarReq {
+  int64 user_id = 1;      // 用户ID
+  bytes file_data = 2;    // 文件数据
+  string filename = 3;    // 文件名
+  int64 file_size = 4;    // 文件大小
+}
+
+message UploadAvatarResp {
+  int32 code = 1;
+  string message = 2;
+  string url = 3;         // 文件访问URL
+  string cdn_url = 4;     // CDN访问URL
+  string key = 5;         // 文件存储路径
+  int64 size = 6;         // 文件大小
 }
