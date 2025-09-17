@@ -8,6 +8,7 @@ package user
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,11 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_GenerateCaptcha_FullMethodName = "/user.User/GenerateCaptcha"
-	User_VerifyCaptcha_FullMethodName   = "/user.User/VerifyCaptcha"
-	User_SendMailCode_FullMethodName    = "/user.User/SendMailCode"
-	User_VerifyMailCode_FullMethodName  = "/user.User/VerifyMailCode"
-	User_UploadAvatar_FullMethodName    = "/user.User/UploadAvatar"
+	User_GenerateCaptcha_FullMethodName      = "/user.User/GenerateCaptcha"
+	User_VerifyCaptcha_FullMethodName        = "/user.User/VerifyCaptcha"
+	User_SendMailCode_FullMethodName         = "/user.User/SendMailCode"
+	User_VerifyMailCode_FullMethodName       = "/user.User/VerifyMailCode"
+	User_SendRegisterMailCode_FullMethodName = "/user.User/SendRegisterMailCode"
+	User_Register_FullMethodName             = "/user.User/Register"
+	User_UploadAvatar_FullMethodName         = "/user.User/UploadAvatar"
 )
 
 // UserClient is the client API for User service.
@@ -38,6 +41,9 @@ type UserClient interface {
 	// 邮件验证码
 	SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 	VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
+	SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
+	// 用户注册
+	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
 	// 文件上传
 	UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error)
 }
@@ -90,6 +96,26 @@ func (c *userClient) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, 
 	return out, nil
 }
 
+func (c *userClient) SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendMailCodeResp)
+	err := c.cc.Invoke(ctx, User_SendRegisterMailCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterResp)
+	err := c.cc.Invoke(ctx, User_Register_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UploadAvatarResp)
@@ -112,6 +138,9 @@ type UserServer interface {
 	// 邮件验证码
 	SendMailCode(context.Context, *SendMailCodeReq) (*SendMailCodeResp, error)
 	VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error)
+	SendRegisterMailCode(context.Context, *SendRegisterMailCodeReq) (*SendMailCodeResp, error)
+	// 用户注册
+	Register(context.Context, *RegisterReq) (*RegisterResp, error)
 	// 文件上传
 	UploadAvatar(context.Context, *UploadAvatarReq) (*UploadAvatarResp, error)
 	mustEmbedUnimplementedUserServer()
@@ -135,6 +164,12 @@ func (UnimplementedUserServer) SendMailCode(context.Context, *SendMailCodeReq) (
 }
 func (UnimplementedUserServer) VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyMailCode not implemented")
+}
+func (UnimplementedUserServer) SendRegisterMailCode(context.Context, *SendRegisterMailCodeReq) (*SendMailCodeResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendRegisterMailCode not implemented")
+}
+func (UnimplementedUserServer) Register(context.Context, *RegisterReq) (*RegisterResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
 func (UnimplementedUserServer) UploadAvatar(context.Context, *UploadAvatarReq) (*UploadAvatarResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadAvatar not implemented")
@@ -232,6 +267,42 @@ func _User_VerifyMailCode_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_SendRegisterMailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendRegisterMailCodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).SendRegisterMailCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_SendRegisterMailCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).SendRegisterMailCode(ctx, req.(*SendRegisterMailCodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).Register(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_Register_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).Register(ctx, req.(*RegisterReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_UploadAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UploadAvatarReq)
 	if err := dec(in); err != nil {
@@ -272,6 +343,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyMailCode",
 			Handler:    _User_VerifyMailCode_Handler,
+		},
+		{
+			MethodName: "SendRegisterMailCode",
+			Handler:    _User_SendRegisterMailCode_Handler,
+		},
+		{
+			MethodName: "Register",
+			Handler:    _User_Register_Handler,
 		},
 		{
 			MethodName: "UploadAvatar",

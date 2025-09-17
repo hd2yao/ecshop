@@ -97,6 +97,45 @@ type (
 		Message string `json:"message"`
 		Valid   bool   `json:"valid"`
 	}
+	// 注册时发送邮件验证码请求（需要先验证图形验证码）
+	SendRegisterMailCodeRequest {
+		CaptchaId   string `json:"captcha_id"`   // 图形验证码ID
+		CaptchaCode string `json:"captcha_code"` // 图形验证码
+		Email       string `json:"email"`        // 邮箱地址
+		CodeLength  int    `json:"code_length,optional"` // 验证码长度，默认6位
+	}
+)
+
+// ===== 用户注册相关结构体 =====
+type (
+	// 用户注册请求
+	RegisterRequest {
+		Email     string `json:"email" validate:"required,email"`       // 邮箱地址
+		EmailCode string `json:"email_code" validate:"required,len=6"`  // 邮箱验证码
+		Password  string `json:"password" validate:"required,min=6"`    // 密码
+		Name      string `json:"name" validate:"required,min=2,max=32"` // 用户昵称
+		Phone     string `json:"phone,optional"`                        // 手机号
+		Sex       int    `json:"sex,optional,default=1"`                // 性别：0女 1男
+	}
+	// 用户注册响应
+	RegisterResponse {
+		Code     int    `json:"code"`
+		Message  string `json:"message"`
+		UserId   int64  `json:"user_id,optional"`   // 用户ID
+		Token    string `json:"token,optional"`     // 访问令牌
+		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+	}
+	// 用户信息
+	UserInfo {
+		Id        int64  `json:"id"`
+		Name      string `json:"name"`
+		Avatar    string `json:"avatar"`
+		Email     string `json:"email"`
+		Phone     string `json:"phone"`
+		Sex       int    `json:"sex"`
+		Points    int    `json:"points"`
+		CreateTime string `json:"create_time"`
+	}
 )
 
 // ===== 文件上传相关结构体 =====
@@ -145,6 +184,21 @@ service user-api {
 	@doc "验证邮件验证码"
 	@handler VerifyMailCode
 	post /verify (VerifyMailCodeRequest) returns (VerifyMailCodeResponse)
+
+	@doc "注册时发送邮件验证码（需要先验证图形验证码）"
+	@handler SendRegisterMailCode
+	post /register/send (SendRegisterMailCodeRequest) returns (SendMailCodeResponse)
+}
+
+// ===== 用户注册服务 =====
+@server (
+	group:  user
+	prefix: /api/user
+)
+service user-api {
+	@doc "用户注册"
+	@handler Register
+	post /register (RegisterRequest) returns (RegisterResponse)
 }
 
 // ===== 文件上传服务 =====

@@ -45,6 +45,17 @@ func (s *UserServer) VerifyMailCode(ctx context.Context, in *user.VerifyMailCode
 	return l.VerifyMailCode(in)
 }
 
+func (s *UserServer) SendRegisterMailCode(ctx context.Context, in *user.SendRegisterMailCodeReq) (*user.SendMailCodeResp, error) {
+	l := logic.NewSendRegisterMailCodeLogic(ctx, s.svcCtx)
+	return l.SendRegisterMailCode(in)
+}
+
+// 用户注册
+func (s *UserServer) Register(ctx context.Context, in *user.RegisterReq) (*user.RegisterResp, error) {
+	l := logic.NewRegisterLogic(ctx, s.svcCtx)
+	return l.Register(in)
+}
+
 // 文件上传
 func (s *UserServer) UploadAvatar(ctx context.Context, in *user.UploadAvatarReq) (*user.UploadAvatarResp, error) {
 	l := logic.NewUploadAvatarLogic(ctx, s.svcCtx)

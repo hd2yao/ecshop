@@ -52,6 +52,23 @@ type PresetConfig struct {
 	Request     CaptchaRequest `json:"request"`
 }
 
+type RegisterRequest struct {
+	Email     string `json:"email" validate:"required,email"`       // 邮箱地址
+	EmailCode string `json:"email_code" validate:"required,len=6"`  // 邮箱验证码
+	Password  string `json:"password" validate:"required,min=6"`    // 密码
+	Name      string `json:"name" validate:"required,min=2,max=32"` // 用户昵称
+	Phone     string `json:"phone,optional"`                        // 手机号
+	Sex       int    `json:"sex,optional,default=1"`                // 性别：0女 1男
+}
+
+type RegisterResponse struct {
+	Code     int      `json:"code"`
+	Message  string   `json:"message"`
+	UserId   int64    `json:"user_id,optional"`   // 用户ID
+	Token    string   `json:"token,optional"`     // 访问令牌
+	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+}
+
 type SendMailCodeRequest struct {
 	Email      string `json:"email"`                // 邮箱地址
 	CodeLength int    `json:"code_length,optional"` // 验证码长度，默认6位
@@ -62,6 +79,13 @@ type SendMailCodeResponse struct {
 	Message string `json:"message"`
 	Email   string `json:"email"`
 	CodeId  string `json:"code_id,optional"` // 用于测试环境返回验证码
+}
+
+type SendRegisterMailCodeRequest struct {
+	CaptchaId   string `json:"captcha_id"`           // 图形验证码ID
+	CaptchaCode string `json:"captcha_code"`         // 图形验证码
+	Email       string `json:"email"`                // 邮箱地址
+	CodeLength  int    `json:"code_length,optional"` // 验证码长度，默认6位
 }
 
 type UploadAvatarRequest struct {
@@ -76,6 +100,17 @@ type UploadResponse struct {
 	CDNUrl  string `json:"cdn_url"` // CDN访问URL
 	Key     string `json:"key"`     // 文件存储路径
 	Size    int64  `json:"size"`    // 文件大小
+}
+
+type UserInfo struct {
+	Id         int64  `json:"id"`
+	Name       string `json:"name"`
+	Avatar     string `json:"avatar"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Sex        int    `json:"sex"`
+	Points     int    `json:"points"`
+	CreateTime string `json:"create_time"`
 }
 
 type VerifyMailCodeRequest struct {

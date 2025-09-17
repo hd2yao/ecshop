@@ -7,25 +7,29 @@ package userclient
 import (
 	"context"
 
-	"github.com/hd2yao/ecshop/user/rpc/types/user"
-
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
+
+	"github.com/hd2yao/ecshop/user/rpc/types/user"
 )
 
 type (
-	CaptchaConfig       = user.CaptchaConfig
-	DrawOptions         = user.DrawOptions
-	GenerateCaptchaReq  = user.GenerateCaptchaReq
-	GenerateCaptchaResp = user.GenerateCaptchaResp
-	SendMailCodeReq     = user.SendMailCodeReq
-	SendMailCodeResp    = user.SendMailCodeResp
-	UploadAvatarReq     = user.UploadAvatarReq
-	UploadAvatarResp    = user.UploadAvatarResp
-	VerifyCaptchaReq    = user.VerifyCaptchaReq
-	VerifyCaptchaResp   = user.VerifyCaptchaResp
-	VerifyMailCodeReq   = user.VerifyMailCodeReq
-	VerifyMailCodeResp  = user.VerifyMailCodeResp
+	CaptchaConfig           = user.CaptchaConfig
+	DrawOptions             = user.DrawOptions
+	GenerateCaptchaReq      = user.GenerateCaptchaReq
+	GenerateCaptchaResp     = user.GenerateCaptchaResp
+	RegisterReq             = user.RegisterReq
+	RegisterResp            = user.RegisterResp
+	SendMailCodeReq         = user.SendMailCodeReq
+	SendMailCodeResp        = user.SendMailCodeResp
+	SendRegisterMailCodeReq = user.SendRegisterMailCodeReq
+	UploadAvatarReq         = user.UploadAvatarReq
+	UploadAvatarResp        = user.UploadAvatarResp
+	UserInfo                = user.UserInfo
+	VerifyCaptchaReq        = user.VerifyCaptchaReq
+	VerifyCaptchaResp       = user.VerifyCaptchaResp
+	VerifyMailCodeReq       = user.VerifyMailCodeReq
+	VerifyMailCodeResp      = user.VerifyMailCodeResp
 
 	User interface {
 		// 图形验证码
@@ -34,6 +38,9 @@ type (
 		// 邮件验证码
 		SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
+		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
+		// 用户注册
+		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
 		// 文件上传
 		UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error)
 	}
@@ -69,6 +76,17 @@ func (m *defaultUser) SendMailCode(ctx context.Context, in *SendMailCodeReq, opt
 func (m *defaultUser) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.VerifyMailCode(ctx, in, opts...)
+}
+
+func (m *defaultUser) SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.SendRegisterMailCode(ctx, in, opts...)
+}
+
+// 用户注册
+func (m *defaultUser) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.Register(ctx, in, opts...)
 }
 
 // 文件上传
