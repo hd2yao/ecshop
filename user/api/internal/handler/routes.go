@@ -43,12 +43,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: mail.SendRegisterMailCodeHandler(serverCtx),
 			},
 			{
-				// 发送邮件验证码
-				Method:  http.MethodPost,
-				Path:    "/send",
-				Handler: mail.SendMailCodeHandler(serverCtx),
-			},
-			{
 				// 验证邮件验证码
 				Method:  http.MethodPost,
 				Path:    "/verify",

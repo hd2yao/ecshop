@@ -6,7 +6,7 @@ Etcd:
   Key: user.rpc
 
 # 数据库配置
-DataSource: "root:123456@tcp(mysql:3306)/ecshop?charset=utf8mb4&parseTime=true&loc=Local"
+DataSource: "admin:123456@tcp(mysql:3306)/ecshop?charset=utf8mb4&parseTime=true&loc=Local"
 
 # 统一的Redis配置（用于数据缓存和业务数据存储）
 CacheRedis:

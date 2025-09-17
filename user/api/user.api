@@ -74,11 +74,6 @@ type (
 
 // ===== 邮件验证码相关结构体 =====
 type (
-	// 邮件验证码发送请求
-	SendMailCodeRequest {
-		Email      string `json:"email"` // 邮箱地址
-		CodeLength int    `json:"code_length,optional"` // 验证码长度，默认6位
-	}
 	// 邮件验证码发送响应
 	SendMailCodeResponse {
 		Code    int    `json:"code"`
@@ -177,10 +172,6 @@ service user-api {
 	prefix: /api/mail
 )
 service user-api {
-	@doc "发送邮件验证码"
-	@handler SendMailCode
-	post /send (SendMailCodeRequest) returns (SendMailCodeResponse)
-
 	@doc "验证邮件验证码"
 	@handler VerifyMailCode
 	post /verify (VerifyMailCodeRequest) returns (VerifyMailCodeResponse)

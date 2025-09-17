@@ -10,7 +10,6 @@ service User {
   rpc VerifyCaptcha(VerifyCaptchaReq) returns (VerifyCaptchaResp);
   
   // 邮件验证码
-  rpc SendMailCode(SendMailCodeReq) returns (SendMailCodeResp);
   rpc VerifyMailCode(VerifyMailCodeReq) returns (VerifyMailCodeResp);
   rpc SendRegisterMailCode(SendRegisterMailCodeReq) returns (SendMailCodeResp);
   
@@ -48,11 +47,6 @@ message VerifyCaptchaResp {
 }
 
 // 邮件验证码相关
-message SendMailCodeReq {
-  string email = 1;
-  int32 code_length = 2;
-}
-
 message SendMailCodeResp {
   int32 code = 1;
   string message = 2;

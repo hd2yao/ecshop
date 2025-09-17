@@ -69,10 +69,6 @@ type RegisterResponse struct {
 	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 }
 
-type SendMailCodeRequest struct {
-	Email      string `json:"email"`                // 邮箱地址
-	CodeLength int    `json:"code_length,optional"` // 验证码长度，默认6位
-}
 
 type SendMailCodeResponse struct {
 	Code    int    `json:"code"`
