@@ -5,11 +5,11 @@ import (
 	"io"
 	"mime/multipart"
 
+	"github.com/zeromicro/go-zero/core/logx"
+
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type UploadAvatarLogic struct {
@@ -28,12 +28,12 @@ func NewUploadAvatarLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Uplo
 
 func (l *UploadAvatarLogic) UploadAvatar(req *types.UploadAvatarRequest, file multipart.File, fileHeader *multipart.FileHeader) (resp *types.UploadResponse, err error) {
 	// 参数验证
-	// if req.UserId <= 0 {
-	// 	return &types.UploadResponse{
-	// 		Code:    400,
-	// 		Message: "用户ID不能为空",
-	// 	}, nil
-	// }
+	if req.UserId <= 0 {
+		return &types.UploadResponse{
+			Code:    400,
+			Message: "用户ID不能为空",
+		}, nil
+	}
 
 	// 读取文件数据
 	fileData, err := io.ReadAll(file)

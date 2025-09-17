@@ -29,12 +29,12 @@ func NewUploadAvatarLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Uplo
 // UploadAvatar 文件上传
 func (l *UploadAvatarLogic) UploadAvatar(in *user.UploadAvatarReq) (*user.UploadAvatarResp, error) {
 	// 参数验证
-	// if in.UserId <= 0 {
-	// 	return &user.UploadAvatarResp{
-	// 		Code:    400,
-	// 		Message: "用户ID不能为空",
-	// 	}, nil
-	// }
+	if in.UserId <= 0 {
+		return &user.UploadAvatarResp{
+			Code:    400,
+			Message: "用户ID不能为空",
+		}, nil
+	}
 
 	if len(in.FileData) == 0 {
 		return &user.UploadAvatarResp{

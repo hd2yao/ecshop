@@ -7,10 +7,10 @@ package userclient
 import (
 	"context"
 
+	"github.com/hd2yao/ecshop/user/rpc/types/user"
+
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
-
-	"github.com/hd2yao/ecshop/user/rpc/types/user"
 )
 
 type (
@@ -20,7 +20,6 @@ type (
 	GenerateCaptchaResp     = user.GenerateCaptchaResp
 	RegisterReq             = user.RegisterReq
 	RegisterResp            = user.RegisterResp
-	SendMailCodeReq         = user.SendMailCodeReq
 	SendMailCodeResp        = user.SendMailCodeResp
 	SendRegisterMailCodeReq = user.SendRegisterMailCodeReq
 	UploadAvatarReq         = user.UploadAvatarReq
@@ -36,7 +35,6 @@ type (
 		GenerateCaptcha(ctx context.Context, in *GenerateCaptchaReq, opts ...grpc.CallOption) (*GenerateCaptchaResp, error)
 		VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, opts ...grpc.CallOption) (*VerifyCaptchaResp, error)
 		// 邮件验证码
-		SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
 		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		// 用户注册
@@ -68,11 +66,6 @@ func (m *defaultUser) VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, o
 }
 
 // 邮件验证码
-func (m *defaultUser) SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
-	client := user.NewUserClient(m.cli.Conn())
-	return client.SendMailCode(ctx, in, opts...)
-}
-
 func (m *defaultUser) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.VerifyMailCode(ctx, in, opts...)

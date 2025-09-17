@@ -94,9 +94,9 @@ type (
 	}
 	// 注册时发送邮件验证码请求（需要先验证图形验证码）
 	SendRegisterMailCodeRequest {
-		CaptchaId   string `json:"captcha_id"`   // 图形验证码ID
+		CaptchaId   string `json:"captcha_id"` // 图形验证码ID
 		CaptchaCode string `json:"captcha_code"` // 图形验证码
-		Email       string `json:"email"`        // 邮箱地址
+		Email       string `json:"email"` // 邮箱地址
 		CodeLength  int    `json:"code_length,optional"` // 验证码长度，默认6位
 	}
 )
@@ -105,30 +105,31 @@ type (
 type (
 	// 用户注册请求
 	RegisterRequest {
-		Email     string `json:"email" validate:"required,email"`       // 邮箱地址
-		EmailCode string `json:"email_code" validate:"required,len=6"`  // 邮箱验证码
-		Password  string `json:"password" validate:"required,min=6"`    // 密码
+		Email     string `json:"email" validate:"required,email"` // 邮箱地址
+		EmailCode string `json:"email_code" validate:"required,len=6"` // 邮箱验证码
+		Password  string `json:"password" validate:"required,min=6"` // 密码
 		Name      string `json:"name" validate:"required,min=2,max=32"` // 用户昵称
-		Phone     string `json:"phone,optional"`                        // 手机号
-		Sex       int    `json:"sex,optional,default=1"`                // 性别：0女 1男
+		Phone     string `json:"phone,optional"` // 手机号
+		Sex       int    `json:"sex,optional,default=1"` // 性别：0女 1男
+		Avatar    string `json:"avatar,optional"` // 头像OSS地址
 	}
 	// 用户注册响应
 	RegisterResponse {
-		Code     int    `json:"code"`
-		Message  string `json:"message"`
-		UserId   int64  `json:"user_id,optional"`   // 用户ID
-		Token    string `json:"token,optional"`     // 访问令牌
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		UserId   int64    `json:"user_id,optional"` // 用户ID
+		Token    string   `json:"token,optional"` // 访问令牌
 		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 	}
 	// 用户信息
 	UserInfo {
-		Id        int64  `json:"id"`
-		Name      string `json:"name"`
-		Avatar    string `json:"avatar"`
-		Email     string `json:"email"`
-		Phone     string `json:"phone"`
-		Sex       int    `json:"sex"`
-		Points    int    `json:"points"`
+		Id         int64  `json:"id"`
+		Name       string `json:"name"`
+		Avatar     string `json:"avatar"`
+		Email      string `json:"email"`
+		Phone      string `json:"phone"`
+		Sex        int    `json:"sex"`
+		Points     int    `json:"points"`
 		CreateTime string `json:"create_time"`
 	}
 )

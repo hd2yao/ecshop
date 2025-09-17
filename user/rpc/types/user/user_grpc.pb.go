@@ -8,7 +8,6 @@ package user
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,7 +21,6 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	User_GenerateCaptcha_FullMethodName      = "/user.User/GenerateCaptcha"
 	User_VerifyCaptcha_FullMethodName        = "/user.User/VerifyCaptcha"
-	User_SendMailCode_FullMethodName         = "/user.User/SendMailCode"
 	User_VerifyMailCode_FullMethodName       = "/user.User/VerifyMailCode"
 	User_SendRegisterMailCode_FullMethodName = "/user.User/SendRegisterMailCode"
 	User_Register_FullMethodName             = "/user.User/Register"
@@ -39,7 +37,6 @@ type UserClient interface {
 	GenerateCaptcha(ctx context.Context, in *GenerateCaptchaReq, opts ...grpc.CallOption) (*GenerateCaptchaResp, error)
 	VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, opts ...grpc.CallOption) (*VerifyCaptchaResp, error)
 	// 邮件验证码
-	SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 	VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
 	SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 	// 用户注册
@@ -70,16 +67,6 @@ func (c *userClient) VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VerifyCaptchaResp)
 	err := c.cc.Invoke(ctx, User_VerifyCaptcha_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SendMailCodeResp)
-	err := c.cc.Invoke(ctx, User_SendMailCode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +123,6 @@ type UserServer interface {
 	GenerateCaptcha(context.Context, *GenerateCaptchaReq) (*GenerateCaptchaResp, error)
 	VerifyCaptcha(context.Context, *VerifyCaptchaReq) (*VerifyCaptchaResp, error)
 	// 邮件验证码
-	SendMailCode(context.Context, *SendMailCodeReq) (*SendMailCodeResp, error)
 	VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error)
 	SendRegisterMailCode(context.Context, *SendRegisterMailCodeReq) (*SendMailCodeResp, error)
 	// 用户注册
@@ -158,9 +144,6 @@ func (UnimplementedUserServer) GenerateCaptcha(context.Context, *GenerateCaptcha
 }
 func (UnimplementedUserServer) VerifyCaptcha(context.Context, *VerifyCaptchaReq) (*VerifyCaptchaResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyCaptcha not implemented")
-}
-func (UnimplementedUserServer) SendMailCode(context.Context, *SendMailCodeReq) (*SendMailCodeResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendMailCode not implemented")
 }
 func (UnimplementedUserServer) VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyMailCode not implemented")
@@ -227,24 +210,6 @@ func _User_VerifyCaptcha_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).VerifyCaptcha(ctx, req.(*VerifyCaptchaReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_SendMailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SendMailCodeReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).SendMailCode(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: User_SendMailCode_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).SendMailCode(ctx, req.(*SendMailCodeReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -335,10 +300,6 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyCaptcha",
 			Handler:    _User_VerifyCaptcha_Handler,
-		},
-		{
-			MethodName: "SendMailCode",
-			Handler:    _User_SendMailCode_Handler,
 		},
 		{
 			MethodName: "VerifyMailCode",

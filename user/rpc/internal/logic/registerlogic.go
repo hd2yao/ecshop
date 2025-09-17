@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -129,10 +130,10 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		}, nil
 	}
 
-	// 10. 设置默认性别
-	sex := in.Sex
-	if sex != 0 && sex != 1 {
-		sex = 1 // 默认男性
+	// 10. 验证头像URL
+	var avatarUrl string
+	if in.Avatar != "" && isValidURL(in.Avatar) {
+		avatarUrl = in.Avatar
 	}
 
 	// 11. 插入用户信息
@@ -140,17 +141,14 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	newUser := &model.User{
 		Name:       sql.NullString{String: in.Name, Valid: true},
 		Pwd:        sql.NullString{String: string(hashedPassword), Valid: true},
-		Sex:        int64(sex),
+		Phone:      sql.NullString{String: in.Phone, Valid: true},
+		Avatar:     sql.NullString{String: avatarUrl, Valid: true},
+		Sex:        int64(in.Sex),
 		Points:     0,
 		Mail:       sql.NullString{String: in.Email, Valid: true},
 		Secret:     sql.NullString{String: secret, Valid: true},
 		CreateTime: sql.NullTime{Time: now, Valid: true},
 		UpdateTime: sql.NullTime{Time: now, Valid: true},
-	}
-
-	// 设置手机号（如果提供）
-	if in.Phone != "" {
-		newUser.Phone = sql.NullString{String: in.Phone, Valid: true}
 	}
 
 	result, err := l.svcCtx.UserModel.Insert(l.ctx, newUser)
@@ -178,10 +176,10 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	userInfo := &user.UserInfo{
 		Id:         userId,
 		Name:       in.Name,
-		Avatar:     "", // 默认头像为空
+		Avatar:     avatarUrl, // 头像URL
 		Email:      in.Email,
 		Phone:      in.Phone,
-		Sex:        sex,
+		Sex:        in.Sex,
 		Points:     0,
 		CreateTime: now.Format("2006-01-02 15:04:05"),
 	}
@@ -209,4 +207,9 @@ func generateSecret() (string, error) {
 // generateToken 生成访问令牌 (简单实现，实际项目应使用JWT)
 func generateToken(userId int64) string {
 	return fmt.Sprintf("token_%d_%d", userId, time.Now().Unix())
+}
+
+// isValidURL 简单的URL验证
+func isValidURL(str string) bool {
+	return strings.HasPrefix(str, "http://") || strings.HasPrefix(str, "https://")
 }

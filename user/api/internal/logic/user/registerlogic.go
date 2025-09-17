@@ -16,7 +16,6 @@ type RegisterLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-// 用户注册
 func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RegisterLogic {
 	return &RegisterLogic{
 		Logger: logx.WithContext(ctx),
@@ -25,6 +24,7 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 	}
 }
 
+// Register 用户注册
 func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.RegisterResponse, err error) {
 	// 1. 调用RPC服务处理用户注册
 	rpcResp, err := l.svcCtx.UserRpc.Register(l.ctx, &user.RegisterReq{
@@ -34,6 +34,7 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 		Name:      req.Name,
 		Phone:     req.Phone,
 		Sex:       int32(req.Sex),
+		Avatar:    req.Avatar,
 	})
 	if err != nil {
 		l.Errorf("RPC调用失败: %v", err)

@@ -59,6 +59,7 @@ type RegisterRequest struct {
 	Name      string `json:"name" validate:"required,min=2,max=32"` // 用户昵称
 	Phone     string `json:"phone,optional"`                        // 手机号
 	Sex       int    `json:"sex,optional,default=1"`                // 性别：0女 1男
+	Avatar    string `json:"avatar,optional"`                       // 头像OSS地址
 }
 
 type RegisterResponse struct {
@@ -68,7 +69,6 @@ type RegisterResponse struct {
 	Token    string   `json:"token,optional"`     // 访问令牌
 	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 }
-
 
 type SendMailCodeResponse struct {
 	Code    int    `json:"code"`

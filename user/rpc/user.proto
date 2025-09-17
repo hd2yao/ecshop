@@ -81,6 +81,7 @@ message RegisterReq {
   string name = 4;
   string phone = 5;
   int32 sex = 6;
+  string avatar = 7;  // 头像OSS地址
 }
 
 message RegisterResp {
