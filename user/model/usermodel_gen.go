@@ -23,8 +23,9 @@ var (
 	userRowsExpectAutoSet   = strings.Join(stringx.Remove(userFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
 	userRowsWithPlaceHolder = strings.Join(stringx.Remove(userFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
-	cacheUserIdPrefix   = "cache:user:id:"
-	cacheUserMailPrefix = "cache:user:mail:"
+	cacheUserIdPrefix    = "cache:user:id:"
+	cacheUserMailPrefix  = "cache:user:mail:"
+	cacheUserPhonePrefix = "cache:user:phone:"
 )
 
 type (
@@ -32,6 +33,7 @@ type (
 		Insert(ctx context.Context, data *User) (sql.Result, error)
 		FindOne(ctx context.Context, id uint64) (*User, error)
 		FindOneByMail(ctx context.Context, mail sql.NullString) (*User, error)
+		FindOneByPhone(ctx context.Context, phone sql.NullString) (*User, error)
 		Update(ctx context.Context, data *User) error
 		Delete(ctx context.Context, id uint64) error
 	}
@@ -49,6 +51,7 @@ type (
 		Sex        int64          `db:"sex"`         // 0 女，1 男
 		Points     int64          `db:"points"`      // 用户积分
 		Mail       sql.NullString `db:"mail"`        // 用户邮箱
+		Phone      sql.NullString `db:"phone"`       // 手机号
 		Secret     sql.NullString `db:"secret"`      // 用来个人敏感信息处理
 		CreateTime sql.NullTime   `db:"create_time"` // 创建时间
 		UpdateTime sql.NullTime   `db:"update_time"` // 更新时间
@@ -114,13 +117,34 @@ func (m *defaultUserModel) FindOneByMail(ctx context.Context, mail sql.NullStrin
 	}
 }
 
+func (m *defaultUserModel) FindOneByPhone(ctx context.Context, phone sql.NullString) (*User, error) {
+	userPhoneKey := fmt.Sprintf("%s%v", cacheUserPhonePrefix, phone)
+	var resp User
+	err := m.QueryRowIndexCtx(ctx, &resp, userPhoneKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v any) (i any, e error) {
+		query := fmt.Sprintf("select %s from %s where `phone` = ? limit 1", userRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, phone); err != nil {
+			return nil, err
+		}
+		return resp.Id, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultUserModel) Insert(ctx context.Context, data *User) (sql.Result, error) {
 	userIdKey := fmt.Sprintf("%s%v", cacheUserIdPrefix, data.Id)
 	userMailKey := fmt.Sprintf("%s%v", cacheUserMailPrefix, data.Mail)
+	userPhoneKey := fmt.Sprintf("%s%v", cacheUserPhonePrefix, data.Phone)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, userRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.Name, data.Pwd, data.Avatar, data.Sex, data.Points, data.Mail, data.Secret)
-	}, userIdKey, userMailKey)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, userRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Name, data.Pwd, data.Avatar, data.Sex, data.Points, data.Mail, data.Phone, data.Secret)
+	}, userIdKey, userMailKey, userPhoneKey)
 	return ret, err
 }
 
@@ -132,10 +156,11 @@ func (m *defaultUserModel) Update(ctx context.Context, newData *User) error {
 
 	userIdKey := fmt.Sprintf("%s%v", cacheUserIdPrefix, data.Id)
 	userMailKey := fmt.Sprintf("%s%v", cacheUserMailPrefix, data.Mail)
+	userPhoneKey := fmt.Sprintf("%s%v", cacheUserPhonePrefix, data.Phone)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.Name, newData.Pwd, newData.Avatar, newData.Sex, newData.Points, newData.Mail, newData.Secret, newData.Id)
-	}, userIdKey, userMailKey)
+		return conn.ExecCtx(ctx, query, newData.Name, newData.Pwd, newData.Avatar, newData.Sex, newData.Points, newData.Mail, newData.Phone, newData.Secret, newData.Id)
+	}, userIdKey, userMailKey, userPhoneKey)
 	return err
 }
 
