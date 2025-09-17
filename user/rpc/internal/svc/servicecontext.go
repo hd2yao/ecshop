@@ -2,8 +2,9 @@ package svc
 
 import (
 	"log"
+	"os"
 	"time"
-	
+
 	"github.com/hd2yao/ecshop/common/mail"
 	"github.com/hd2yao/ecshop/common/oss"
 	redisPool "github.com/hd2yao/ecshop/common/redis"
@@ -22,8 +23,19 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("初始化Redis连接池失败: %v", err)
 	}
 
-	// 初始化邮件服务
-	mailService, err := mail.NewMailService(c.Mail, "user", 10*time.Minute)
+	// 初始化邮件服务 - 从环境变量读取配置
+	mailConfig := c.Mail
+	if username := os.Getenv("MAIL_USERNAME"); username != "" {
+		mailConfig.SMTP.Username = username
+	}
+	if password := os.Getenv("MAIL_PASSWORD"); password != "" {
+		mailConfig.SMTP.Password = password
+	}
+	if from := os.Getenv("MAIL_FROM"); from != "" {
+		mailConfig.SMTP.From = from
+	}
+
+	mailService, err := mail.NewMailService(mailConfig, "user", 10*time.Minute)
 	if err != nil {
 		log.Fatalf("初始化邮件服务失败: %v", err)
 	}
