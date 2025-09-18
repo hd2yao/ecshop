@@ -112,10 +112,16 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 		// 不影响上传结果，只记录日志
 	}
 
-	// 8. 返回结果
-	previewUrl := result.CDNUrl
-	if previewUrl == "" {
-		previewUrl = result.Url // 如果没有CDN地址，使用原始地址
+	// 8. 生成带签名的预览URL（临时文件，30分钟有效期）
+	signedURL, err := l.svcCtx.OssClient.GetSignedURL(result.Key, 300)
+	previewUrl := signedURL
+	if err != nil {
+		l.Errorf("生成签名URL失败: %v", err)
+		// 如果签名失败，使用CDN或原始地址
+		previewUrl = result.CDNUrl
+		if previewUrl == "" {
+			previewUrl = result.Url
+		}
 	}
 
 	l.Infof("预览头像上传成功: tempKey=%s, url=%s", tempKey, result.Url)
@@ -138,4 +144,3 @@ func (l *UploadPreviewAvatarLogic) generateTempKey() (string, error) {
 	randomStr := hex.EncodeToString(randomBytes)
 	return fmt.Sprintf("%d_%s", timestamp, randomStr), nil
 }
-
