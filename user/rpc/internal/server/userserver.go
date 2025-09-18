@@ -51,8 +51,8 @@ func (s *UserServer) Register(ctx context.Context, in *user.RegisterReq) (*user.
 	return l.Register(in)
 }
 
-// 文件上传
-func (s *UserServer) UploadAvatar(ctx context.Context, in *user.UploadAvatarReq) (*user.UploadAvatarResp, error) {
-	l := logic.NewUploadAvatarLogic(ctx, s.svcCtx)
-	return l.UploadAvatar(in)
+// 头像上传
+func (s *UserServer) UploadPreviewAvatar(ctx context.Context, in *user.UploadPreviewAvatarReq) (*user.UploadPreviewAvatarResp, error) {
+	l := logic.NewUploadPreviewAvatarLogic(ctx, s.svcCtx)
+	return l.UploadPreviewAvatar(in)
 }

@@ -84,18 +84,11 @@ type SendRegisterMailCodeRequest struct {
 	CodeLength  int    `json:"code_length,optional"` // 验证码长度，默认6位
 }
 
-type UploadAvatarRequest struct {
-	UserId int64  `form:"user_id"`      // 用户ID
-	Dir    string `form:"dir,optional"` // 上传目录，可选
-}
-
-type UploadResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Url     string `json:"url"`     // 文件访问URL
-	CDNUrl  string `json:"cdn_url"` // CDN访问URL
-	Key     string `json:"key"`     // 文件存储路径
-	Size    int64  `json:"size"`    // 文件大小
+type UploadPreviewAvatarResponse struct {
+	Code       int    `json:"code"`
+	Message    string `json:"message"`
+	PreviewKey string `json:"preview_key"` // 临时标识，注册时使用
+	PreviewUrl string `json:"preview_url"` // 预览图片URL
 }
 
 type UserInfo struct {

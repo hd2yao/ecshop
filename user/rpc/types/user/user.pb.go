@@ -529,7 +529,7 @@ type RegisterReq struct {
 	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	Phone         string                 `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
 	Sex           int32                  `protobuf:"varint,6,opt,name=sex,proto3" json:"sex,omitempty"`
-	Avatar        string                 `protobuf:"bytes,7,opt,name=avatar,proto3" json:"avatar,omitempty"` // 头像（base64编码或URL）
+	Avatar        string                 `protobuf:"bytes,7,opt,name=avatar,proto3" json:"avatar,omitempty"` // 头像OSS地址
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -942,31 +942,30 @@ func (x *DrawOptions) GetDrawNoiseText() string {
 	return ""
 }
 
-// 头像上传相关
-type UploadAvatarReq struct {
+// 头像管理相关
+type UploadPreviewAvatarReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`       // 用户ID
-	FileData      []byte                 `protobuf:"bytes,2,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`  // 文件数据
-	Filename      string                 `protobuf:"bytes,3,opt,name=filename,proto3" json:"filename,omitempty"`                  // 文件名
-	FileSize      int64                  `protobuf:"varint,4,opt,name=file_size,json=fileSize,proto3" json:"file_size,omitempty"` // 文件大小
+	FileData      []byte                 `protobuf:"bytes,1,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`  // 文件数据
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`                  // 文件名
+	FileSize      int64                  `protobuf:"varint,3,opt,name=file_size,json=fileSize,proto3" json:"file_size,omitempty"` // 文件大小
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadAvatarReq) Reset() {
-	*x = UploadAvatarReq{}
+func (x *UploadPreviewAvatarReq) Reset() {
+	*x = UploadPreviewAvatarReq{}
 	mi := &file_rpc_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadAvatarReq) String() string {
+func (x *UploadPreviewAvatarReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadAvatarReq) ProtoMessage() {}
+func (*UploadPreviewAvatarReq) ProtoMessage() {}
 
-func (x *UploadAvatarReq) ProtoReflect() protoreflect.Message {
+func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
 	mi := &file_rpc_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -978,65 +977,56 @@ func (x *UploadAvatarReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadAvatarReq.ProtoReflect.Descriptor instead.
-func (*UploadAvatarReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use UploadPreviewAvatarReq.ProtoReflect.Descriptor instead.
+func (*UploadPreviewAvatarReq) Descriptor() ([]byte, []int) {
 	return file_rpc_user_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *UploadAvatarReq) GetUserId() int64 {
-	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-func (x *UploadAvatarReq) GetFileData() []byte {
+func (x *UploadPreviewAvatarReq) GetFileData() []byte {
 	if x != nil {
 		return x.FileData
 	}
 	return nil
 }
 
-func (x *UploadAvatarReq) GetFilename() string {
+func (x *UploadPreviewAvatarReq) GetFilename() string {
 	if x != nil {
 		return x.Filename
 	}
 	return ""
 }
 
-func (x *UploadAvatarReq) GetFileSize() int64 {
+func (x *UploadPreviewAvatarReq) GetFileSize() int64 {
 	if x != nil {
 		return x.FileSize
 	}
 	return 0
 }
 
-type UploadAvatarResp struct {
+type UploadPreviewAvatarResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`                     // 文件访问URL
-	CdnUrl        string                 `protobuf:"bytes,4,opt,name=cdn_url,json=cdnUrl,proto3" json:"cdn_url,omitempty"` // CDN访问URL
-	Key           string                 `protobuf:"bytes,5,opt,name=key,proto3" json:"key,omitempty"`                     // 文件存储路径
-	Size          int64                  `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`                  // 文件大小
+	PreviewKey    string                 `protobuf:"bytes,3,opt,name=preview_key,json=previewKey,proto3" json:"preview_key,omitempty"` // 临时标识，注册时使用
+	PreviewUrl    string                 `protobuf:"bytes,4,opt,name=preview_url,json=previewUrl,proto3" json:"preview_url,omitempty"` // 预览图片URL
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadAvatarResp) Reset() {
-	*x = UploadAvatarResp{}
+func (x *UploadPreviewAvatarResp) Reset() {
+	*x = UploadPreviewAvatarResp{}
 	mi := &file_rpc_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadAvatarResp) String() string {
+func (x *UploadPreviewAvatarResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadAvatarResp) ProtoMessage() {}
+func (*UploadPreviewAvatarResp) ProtoMessage() {}
 
-func (x *UploadAvatarResp) ProtoReflect() protoreflect.Message {
+func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
 	mi := &file_rpc_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1048,51 +1038,37 @@ func (x *UploadAvatarResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadAvatarResp.ProtoReflect.Descriptor instead.
-func (*UploadAvatarResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use UploadPreviewAvatarResp.ProtoReflect.Descriptor instead.
+func (*UploadPreviewAvatarResp) Descriptor() ([]byte, []int) {
 	return file_rpc_user_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *UploadAvatarResp) GetCode() int32 {
+func (x *UploadPreviewAvatarResp) GetCode() int32 {
 	if x != nil {
 		return x.Code
 	}
 	return 0
 }
 
-func (x *UploadAvatarResp) GetMessage() string {
+func (x *UploadPreviewAvatarResp) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-func (x *UploadAvatarResp) GetUrl() string {
+func (x *UploadPreviewAvatarResp) GetPreviewKey() string {
 	if x != nil {
-		return x.Url
+		return x.PreviewKey
 	}
 	return ""
 }
 
-func (x *UploadAvatarResp) GetCdnUrl() string {
+func (x *UploadPreviewAvatarResp) GetPreviewUrl() string {
 	if x != nil {
-		return x.CdnUrl
+		return x.PreviewUrl
 	}
 	return ""
-}
-
-func (x *UploadAvatarResp) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-func (x *UploadAvatarResp) GetSize() int64 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
 }
 
 var File_rpc_user_proto protoreflect.FileDescriptor
@@ -1176,26 +1152,25 @@ const file_rpc_user_proto_rawDesc = "" +
 	"drawHollow\x12\x1b\n" +
 	"\tdraw_sine\x18\x04 \x01(\bR\bdrawSine\x12$\n" +
 	"\x0edraw_slim_line\x18\x05 \x01(\x05R\fdrawSlimLine\x12&\n" +
-	"\x0fdraw_noise_text\x18\x06 \x01(\tR\rdrawNoiseText\"\x80\x01\n" +
-	"\x0fUploadAvatarReq\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1b\n" +
-	"\tfile_data\x18\x02 \x01(\fR\bfileData\x12\x1a\n" +
-	"\bfilename\x18\x03 \x01(\tR\bfilename\x12\x1b\n" +
-	"\tfile_size\x18\x04 \x01(\x03R\bfileSize\"\x91\x01\n" +
-	"\x10UploadAvatarResp\x12\x12\n" +
+	"\x0fdraw_noise_text\x18\x06 \x01(\tR\rdrawNoiseText\"n\n" +
+	"\x16UploadPreviewAvatarReq\x12\x1b\n" +
+	"\tfile_data\x18\x01 \x01(\fR\bfileData\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x1b\n" +
+	"\tfile_size\x18\x03 \x01(\x03R\bfileSize\"\x89\x01\n" +
+	"\x17UploadPreviewAvatarResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x10\n" +
-	"\x03url\x18\x03 \x01(\tR\x03url\x12\x17\n" +
-	"\acdn_url\x18\x04 \x01(\tR\x06cdnUrl\x12\x10\n" +
-	"\x03key\x18\x05 \x01(\tR\x03key\x12\x12\n" +
-	"\x04size\x18\x06 \x01(\x03R\x04size2\x96\x03\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1f\n" +
+	"\vpreview_key\x18\x03 \x01(\tR\n" +
+	"previewKey\x12\x1f\n" +
+	"\vpreview_url\x18\x04 \x01(\tR\n" +
+	"previewUrl2\xab\x03\n" +
 	"\x04User\x12F\n" +
 	"\x0fGenerateCaptcha\x12\x18.user.GenerateCaptchaReq\x1a\x19.user.GenerateCaptchaResp\x12@\n" +
 	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12C\n" +
 	"\x0eVerifyMailCode\x12\x17.user.VerifyMailCodeReq\x1a\x18.user.VerifyMailCodeResp\x12M\n" +
 	"\x14SendRegisterMailCode\x12\x1d.user.SendRegisterMailCodeReq\x1a\x16.user.SendMailCodeResp\x121\n" +
-	"\bRegister\x12\x11.user.RegisterReq\x1a\x12.user.RegisterResp\x12=\n" +
-	"\fUploadAvatar\x12\x15.user.UploadAvatarReq\x1a\x16.user.UploadAvatarRespB\bZ\x06./userb\x06proto3"
+	"\bRegister\x12\x11.user.RegisterReq\x1a\x12.user.RegisterResp\x12R\n" +
+	"\x13UploadPreviewAvatar\x12\x1c.user.UploadPreviewAvatarReq\x1a\x1d.user.UploadPreviewAvatarRespB\bZ\x06./userb\x06proto3"
 
 var (
 	file_rpc_user_proto_rawDescOnce sync.Once
@@ -1224,8 +1199,8 @@ var file_rpc_user_proto_goTypes = []any{
 	(*UserInfo)(nil),                // 10: user.UserInfo
 	(*CaptchaConfig)(nil),           // 11: user.CaptchaConfig
 	(*DrawOptions)(nil),             // 12: user.DrawOptions
-	(*UploadAvatarReq)(nil),         // 13: user.UploadAvatarReq
-	(*UploadAvatarResp)(nil),        // 14: user.UploadAvatarResp
+	(*UploadPreviewAvatarReq)(nil),  // 13: user.UploadPreviewAvatarReq
+	(*UploadPreviewAvatarResp)(nil), // 14: user.UploadPreviewAvatarResp
 }
 var file_rpc_user_proto_depIdxs = []int32{
 	11, // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
@@ -1236,13 +1211,13 @@ var file_rpc_user_proto_depIdxs = []int32{
 	5,  // 5: user.User.VerifyMailCode:input_type -> user.VerifyMailCodeReq
 	7,  // 6: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
 	8,  // 7: user.User.Register:input_type -> user.RegisterReq
-	13, // 8: user.User.UploadAvatar:input_type -> user.UploadAvatarReq
+	13, // 8: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
 	1,  // 9: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
 	3,  // 10: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
 	6,  // 11: user.User.VerifyMailCode:output_type -> user.VerifyMailCodeResp
 	4,  // 12: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
 	9,  // 13: user.User.Register:output_type -> user.RegisterResp
-	14, // 14: user.User.UploadAvatar:output_type -> user.UploadAvatarResp
+	14, // 14: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
 	9,  // [9:15] is the sub-list for method output_type
 	3,  // [3:9] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name

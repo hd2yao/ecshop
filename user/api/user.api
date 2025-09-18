@@ -134,21 +134,14 @@ type (
 	}
 )
 
-// ===== 文件上传相关结构体 =====
+// ===== 头像管理相关结构体 =====
 type (
-	// 文件上传请求
-	UploadAvatarRequest {
-		UserId int64  `form:"user_id"` // 用户ID
-		Dir    string `form:"dir,optional"` // 上传目录，可选
-	}
-	// 文件上传响应
-	UploadResponse {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Url     string `json:"url"` // 文件访问URL
-		CDNUrl  string `json:"cdn_url"` // CDN访问URL
-		Key     string `json:"key"` // 文件存储路径
-		Size    int64  `json:"size"` // 文件大小
+	// 头像上传响应
+	UploadPreviewAvatarResponse {
+		Code       int    `json:"code"`
+		Message    string `json:"message"`
+		PreviewKey string `json:"preview_key"` // 预览标识
+		PreviewUrl string `json:"preview_url"` // 预览图片
 	}
 )
 
@@ -199,8 +192,8 @@ service user-api {
 	prefix: /api/upload
 )
 service user-api {
-	@doc "上传用户头像"
-	@handler UploadAvatar
-	post /avatar (UploadAvatarRequest) returns (UploadResponse)
+	@doc "头像上传预览（注册和更新通用）"
+	@handler UploadPreviewAvatar
+	post /avatar/preview returns (UploadPreviewAvatarResponse)
 }
 

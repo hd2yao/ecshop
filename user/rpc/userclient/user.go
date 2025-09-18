@@ -22,8 +22,8 @@ type (
 	RegisterResp            = user.RegisterResp
 	SendMailCodeResp        = user.SendMailCodeResp
 	SendRegisterMailCodeReq = user.SendRegisterMailCodeReq
-	UploadAvatarReq         = user.UploadAvatarReq
-	UploadAvatarResp        = user.UploadAvatarResp
+	UploadPreviewAvatarReq  = user.UploadPreviewAvatarReq
+	UploadPreviewAvatarResp = user.UploadPreviewAvatarResp
 	UserInfo                = user.UserInfo
 	VerifyCaptchaReq        = user.VerifyCaptchaReq
 	VerifyCaptchaResp       = user.VerifyCaptchaResp
@@ -39,8 +39,8 @@ type (
 		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		// 用户注册
 		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
-		// 文件上传
-		UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error)
+		// 头像上传
+		UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
 	}
 
 	defaultUser struct {
@@ -82,8 +82,8 @@ func (m *defaultUser) Register(ctx context.Context, in *RegisterReq, opts ...grp
 	return client.Register(ctx, in, opts...)
 }
 
-// 文件上传
-func (m *defaultUser) UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error) {
+// 头像上传
+func (m *defaultUser) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
-	return client.UploadAvatar(ctx, in, opts...)
+	return client.UploadPreviewAvatar(ctx, in, opts...)
 }
