@@ -35,18 +35,24 @@ func (s *UserServer) VerifyCaptcha(ctx context.Context, in *user.VerifyCaptchaRe
 }
 
 // 邮件验证码
-func (s *UserServer) SendMailCode(ctx context.Context, in *user.SendMailCodeReq) (*user.SendMailCodeResp, error) {
-	l := logic.NewSendMailCodeLogic(ctx, s.svcCtx)
-	return l.SendMailCode(in)
-}
-
 func (s *UserServer) VerifyMailCode(ctx context.Context, in *user.VerifyMailCodeReq) (*user.VerifyMailCodeResp, error) {
 	l := logic.NewVerifyMailCodeLogic(ctx, s.svcCtx)
 	return l.VerifyMailCode(in)
 }
 
-// 文件上传
-func (s *UserServer) UploadAvatar(ctx context.Context, in *user.UploadAvatarReq) (*user.UploadAvatarResp, error) {
-	l := logic.NewUploadAvatarLogic(ctx, s.svcCtx)
-	return l.UploadAvatar(in)
+func (s *UserServer) SendRegisterMailCode(ctx context.Context, in *user.SendRegisterMailCodeReq) (*user.SendMailCodeResp, error) {
+	l := logic.NewSendRegisterMailCodeLogic(ctx, s.svcCtx)
+	return l.SendRegisterMailCode(in)
+}
+
+// 用户注册
+func (s *UserServer) Register(ctx context.Context, in *user.RegisterReq) (*user.RegisterResp, error) {
+	l := logic.NewRegisterLogic(ctx, s.svcCtx)
+	return l.Register(in)
+}
+
+// 头像上传
+func (s *UserServer) UploadPreviewAvatar(ctx context.Context, in *user.UploadPreviewAvatarReq) (*user.UploadPreviewAvatarResp, error) {
+	l := logic.NewUploadPreviewAvatarLogic(ctx, s.svcCtx)
+	return l.UploadPreviewAvatar(in)
 }

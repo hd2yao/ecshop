@@ -5,11 +5,14 @@ Etcd:
   - etcd:2379
   Key: user.rpc
 
-# 数据存储Redis配置
-DataRedis:
-  Host: redis:6379
-  Type: node
-  Pass:
+# 数据库配置
+DataSource: "admin:123456@tcp(mysql:3306)/ecshop?charset=utf8mb4&parseTime=true&loc=Local"
+
+# 统一的Redis配置（用于数据缓存和业务数据存储）
+CacheRedis:
+  - Host: redis:6379
+    Type: node
+    Pass:
 
 # 验证码配置
 Captcha:

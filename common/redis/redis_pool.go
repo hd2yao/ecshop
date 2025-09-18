@@ -55,36 +55,6 @@ func InitRedisPoolFromGoZero(config redis.RedisConf) error {
 	return err
 }
 
-// InitRedisPool 初始化 Redis 连接池（全局单例）- 向后兼容
-func InitRedisPool(config RedisPoolConfig) error {
-	var err error
-	redisPoolOnce.Do(func() {
-		// 创建Redis客户端
-		client := redis.New(config.Host, func(r *redis.Redis) {
-			r.Type = config.Type
-			r.Pass = config.Pass
-		})
-
-		// 测试连接
-		if !client.Ping() {
-			err = fmt.Errorf("Redis连接测试失败，请检查配置: Host=%s, Type=%s", config.Host, config.Type)
-			return
-		}
-
-		globalRedisPool = &RedisPool{
-			client: client,
-			config: redis.RedisConf{
-				Host: config.Host,
-				Type: config.Type,
-				Pass: config.Pass,
-			},
-			initialized: true,
-		}
-	})
-
-	return err
-}
-
 // GetRedisClient 获取 Redis 客户端
 func GetRedisClient() *redis.Redis {
 	if globalRedisPool == nil {

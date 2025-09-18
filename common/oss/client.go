@@ -117,6 +117,59 @@ func (c *Client) CheckFileExists(key string) (bool, error) {
 	return exists, nil
 }
 
+// Copy 复制文件
+func (c *Client) Copy(sourceKey, destKey string) (string, error) {
+	bucket, err := c.GetBucket()
+	if err != nil {
+		return "", fmt.Errorf("failed to get bucket: %v", err)
+	}
+
+	// 执行复制操作
+	_, err = bucket.CopyObject(sourceKey, destKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to copy file: %v", err)
+	}
+
+	// 返回新文件的URL
+	finalUrl := c.GetFileURL(destKey)
+	return finalUrl, nil
+}
+
+// Delete 删除文件
+func (c *Client) Delete(key string) error {
+	bucket, err := c.GetBucket()
+	if err != nil {
+		return fmt.Errorf("failed to get bucket: %v", err)
+	}
+
+	err = bucket.DeleteObject(key)
+	if err != nil {
+		return fmt.Errorf("failed to delete file: %v", err)
+	}
+
+	return nil
+}
+
+// GetSignedURL 生成带签名的访问 URL
+func (c *Client) GetSignedURL(key string, expireSeconds int64) (string, error) {
+	bucket, err := c.GetBucket()
+	if err != nil {
+		return "", fmt.Errorf("failed to get bucket: %v", err)
+	}
+
+	// 生成签名URL，默认过期时间为1小时
+	if expireSeconds <= 0 {
+		expireSeconds = 3600 // 1小时
+	}
+
+	signedURL, err := bucket.SignURL(key, oss.HTTPGet, expireSeconds)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate signed URL: %v", err)
+	}
+
+	return signedURL, nil
+}
+
 // validateFile 验证文件
 func (c *Client) validateFile(content []byte, filename string, options *UploadOptions) error {
 	// 检查文件大小

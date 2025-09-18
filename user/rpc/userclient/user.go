@@ -14,28 +14,33 @@ import (
 )
 
 type (
-	CaptchaConfig       = user.CaptchaConfig
-	DrawOptions         = user.DrawOptions
-	GenerateCaptchaReq  = user.GenerateCaptchaReq
-	GenerateCaptchaResp = user.GenerateCaptchaResp
-	SendMailCodeReq     = user.SendMailCodeReq
-	SendMailCodeResp    = user.SendMailCodeResp
-	UploadAvatarReq     = user.UploadAvatarReq
-	UploadAvatarResp    = user.UploadAvatarResp
-	VerifyCaptchaReq    = user.VerifyCaptchaReq
-	VerifyCaptchaResp   = user.VerifyCaptchaResp
-	VerifyMailCodeReq   = user.VerifyMailCodeReq
-	VerifyMailCodeResp  = user.VerifyMailCodeResp
+	CaptchaConfig           = user.CaptchaConfig
+	DrawOptions             = user.DrawOptions
+	GenerateCaptchaReq      = user.GenerateCaptchaReq
+	GenerateCaptchaResp     = user.GenerateCaptchaResp
+	RegisterReq             = user.RegisterReq
+	RegisterResp            = user.RegisterResp
+	SendMailCodeResp        = user.SendMailCodeResp
+	SendRegisterMailCodeReq = user.SendRegisterMailCodeReq
+	UploadPreviewAvatarReq  = user.UploadPreviewAvatarReq
+	UploadPreviewAvatarResp = user.UploadPreviewAvatarResp
+	UserInfo                = user.UserInfo
+	VerifyCaptchaReq        = user.VerifyCaptchaReq
+	VerifyCaptchaResp       = user.VerifyCaptchaResp
+	VerifyMailCodeReq       = user.VerifyMailCodeReq
+	VerifyMailCodeResp      = user.VerifyMailCodeResp
 
 	User interface {
 		// 图形验证码
 		GenerateCaptcha(ctx context.Context, in *GenerateCaptchaReq, opts ...grpc.CallOption) (*GenerateCaptchaResp, error)
 		VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, opts ...grpc.CallOption) (*VerifyCaptchaResp, error)
 		// 邮件验证码
-		SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
-		// 文件上传
-		UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error)
+		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
+		// 用户注册
+		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+		// 头像上传
+		UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
 	}
 
 	defaultUser struct {
@@ -61,18 +66,24 @@ func (m *defaultUser) VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, o
 }
 
 // 邮件验证码
-func (m *defaultUser) SendMailCode(ctx context.Context, in *SendMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
-	client := user.NewUserClient(m.cli.Conn())
-	return client.SendMailCode(ctx, in, opts...)
-}
-
 func (m *defaultUser) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.VerifyMailCode(ctx, in, opts...)
 }
 
-// 文件上传
-func (m *defaultUser) UploadAvatar(ctx context.Context, in *UploadAvatarReq, opts ...grpc.CallOption) (*UploadAvatarResp, error) {
+func (m *defaultUser) SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
-	return client.UploadAvatar(ctx, in, opts...)
+	return client.SendRegisterMailCode(ctx, in, opts...)
+}
+
+// 用户注册
+func (m *defaultUser) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.Register(ctx, in, opts...)
+}
+
+// 头像上传
+func (m *defaultUser) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UploadPreviewAvatar(ctx, in, opts...)
 }
