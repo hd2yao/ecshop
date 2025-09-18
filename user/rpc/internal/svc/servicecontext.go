@@ -53,10 +53,18 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("初始化邮件服务失败: %v", err)
 	}
 
-	// 初始化OSS客户端
-	ossClient, err := oss.NewClient(&c.Oss)
+	// 初始化 OSS 客户端
+	ossConfig := c.Oss
+	if accessKey := os.Getenv("OSS_ACCESS_KEY_ID"); accessKey != "" {
+		ossConfig.AccessKeyId = accessKey
+	}
+	if accessSecret := os.Getenv("OSS_ACCESS_KEY_SECRET"); accessSecret != "" {
+		ossConfig.AccessKeySecret = accessSecret
+	}
+
+	ossClient, err := oss.NewClient(&ossConfig)
 	if err != nil {
-		log.Fatalf("初始化OSS客户端失败: %v", err)
+		log.Fatalf("初始化 OSS 客户端失败: %v", err)
 	}
 
 	return &ServiceContext{
