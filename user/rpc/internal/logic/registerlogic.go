@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -130,10 +131,18 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		}, nil
 	}
 
-	// 10. 验证头像URL
+	// 10. 处理头像（临时文件移动到正式目录）
 	var avatarUrl string
 	if in.Avatar != "" && isValidURL(in.Avatar) {
-		avatarUrl = in.Avatar
+		// 检查是否为临时文件URL
+		if strings.Contains(in.Avatar, "/temp/") {
+			l.Infof("检测到临时头像URL，准备移动到正式目录: %s", in.Avatar)
+			// 先插入用户获取userId，然后移动文件
+			avatarUrl = in.Avatar // 暂时使用原URL，后面会更新
+		} else {
+			// 直接使用提供的URL
+			avatarUrl = in.Avatar
+		}
 	}
 
 	// 11. 插入用户信息
@@ -169,7 +178,29 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		}, nil
 	}
 
-	// 12. 生成访问令牌 (这里简单使用用户ID，实际项目中应该使用JWT)
+	// 12. 处理临时头像文件移动
+	if in.Avatar != "" && strings.Contains(in.Avatar, "/temp/") {
+		finalUrl, err := l.moveTempAvatarToFinal(in.Avatar, userId)
+		if err != nil {
+			l.Errorf("移动临时头像失败: %v", err)
+			// 移动失败不影响注册，继续使用临时URL
+		} else {
+			// 更新头像URL为正式URL
+			avatarUrl = finalUrl
+			// 更新数据库中的头像字段
+			updatedUser := &model.User{
+				Id:     uint64(userId),
+				Avatar: sql.NullString{String: finalUrl, Valid: true},
+			}
+			if updateErr := l.svcCtx.UserModel.Update(l.ctx, updatedUser); updateErr != nil {
+				l.Errorf("更新用户头像失败: %v", updateErr)
+			} else {
+				l.Infof("临时头像移动成功: %s -> %s", in.Avatar, finalUrl)
+			}
+		}
+	}
+
+	// 13. 生成访问令牌 (这里简单使用用户ID，实际项目中应该使用JWT)
 	token := generateToken(userId)
 
 	// 13. 返回用户信息
@@ -212,4 +243,56 @@ func generateToken(userId int64) string {
 // isValidURL 简单的URL验证
 func isValidURL(str string) bool {
 	return strings.HasPrefix(str, "http://") || strings.HasPrefix(str, "https://")
+}
+
+// moveTempAvatarToFinal 将临时头像文件移动到正式目录
+func (l *RegisterLogic) moveTempAvatarToFinal(tempUrl string, userId int64) (string, error) {
+	// 1. 从URL中提取相对路径
+	// 例如: https://hd2yao.oss-cn-shanghai.aliyuncs.com/avatars/temp/2025/09/18/ffec0039-c05e-4fe6-a721-30a6af7b5707.png
+	// 需要提取: avatars/temp/2025/09/18/ffec0039-c05e-4fe6-a721-30a6af7b5707.png
+
+	// 找到域名后的路径部分
+	parts := strings.SplitN(tempUrl, ".com/", 2)
+	if len(parts) != 2 {
+		return "", fmt.Errorf("无效的临时URL格式: %s", tempUrl)
+	}
+
+	relativePath := parts[1] // avatars/temp/2025/09/18/ffec0039-c05e-4fe6-a721-30a6af7b5707.png
+
+	// 处理URL中可能包含的查询参数
+	if strings.Contains(relativePath, "?") {
+		relativePath = strings.Split(relativePath, "?")[0]
+	}
+
+	// 2. 从相对路径中提取文件名和扩展名
+	pathParts := strings.Split(relativePath, "/")
+	if len(pathParts) < 2 {
+		return "", fmt.Errorf("无效的文件路径格式: %s", relativePath)
+	}
+
+	tempFileName := pathParts[len(pathParts)-1] // ffec0039-c05e-4fe6-a721-30a6af7b5707.png
+	fileExt := filepath.Ext(tempFileName)       // .png
+
+	// 3. 生成新的文件名和路径
+	newFileName := fmt.Sprintf("avatar_%d_%d%s", userId, time.Now().UnixNano(), fileExt)
+
+	// 4. 构建OSS中的源路径和目标路径
+	sourcePath := relativePath // 直接使用完整的相对路径
+	destPath := fmt.Sprintf("avatars/users/user_%d/%s", userId, newFileName)
+
+	l.Infof("准备复制头像文件: 源路径=%s, 目标路径=%s", sourcePath, destPath)
+
+	finalUrl, err := l.svcCtx.OssClient.Copy(sourcePath, destPath)
+	if err != nil {
+		return "", fmt.Errorf("复制文件失败: %v", err)
+	}
+
+	// 4. 删除临时文件
+	if err := l.svcCtx.OssClient.Delete(sourcePath); err != nil {
+		l.Errorf("删除临时文件失败: %v", err)
+		// 不影响主流程，继续返回新URL
+	}
+
+	l.Infof("头像文件移动成功: %s -> %s", sourcePath, destPath)
+	return finalUrl, nil
 }
