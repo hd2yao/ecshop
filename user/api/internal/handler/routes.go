@@ -7,6 +7,9 @@ import (
 	"net/http"
 
 	captcha "github.com/hd2yao/ecshop/user/api/internal/handler/captcha"
+	mail "github.com/hd2yao/ecshop/user/api/internal/handler/mail"
+	upload "github.com/hd2yao/ecshop/user/api/internal/handler/upload"
+	user "github.com/hd2yao/ecshop/user/api/internal/handler/user"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -29,5 +32,47 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/captcha"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 注册时发送邮件验证码（需要先验证图形验证码）
+				Method:  http.MethodPost,
+				Path:    "/register/send",
+				Handler: mail.SendRegisterMailCodeHandler(serverCtx),
+			},
+			{
+				// 验证邮件验证码
+				Method:  http.MethodPost,
+				Path:    "/verify",
+				Handler: mail.VerifyMailCodeHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/mail"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 头像上传预览（注册和更新通用）
+				Method:  http.MethodPost,
+				Path:    "/avatar/preview",
+				Handler: upload.UploadPreviewAvatarHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/upload"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// 用户注册
+				Method:  http.MethodPost,
+				Path:    "/register",
+				Handler: user.RegisterHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/user"),
 	)
 }
