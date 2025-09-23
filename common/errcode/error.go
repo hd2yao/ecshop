@@ -46,6 +46,16 @@ func (e *AppError) Msg() string {
 	return e.msg
 }
 
+// WithCause 设置错误原因，返回新的AppError实例
+func (e *AppError) WithCause(cause error) *AppError {
+	return &AppError{
+		code:     e.code,
+		msg:      e.msg,
+		cause:    cause,
+		occurred: e.occurred,
+	}
+}
+
 func newError(code int, msg string) *AppError {
 	if code > -1 {
 		if _, duplicated := codes[code]; duplicated {
