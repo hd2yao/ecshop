@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -39,8 +40,8 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 	if err != nil {
 		l.Errorf("RPC调用失败: %v", err)
 		return &types.RegisterResponse{
-			Code:    500,
-			Message: "系统错误",
+			Code:    errcode.CommonServerError.Code(),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 

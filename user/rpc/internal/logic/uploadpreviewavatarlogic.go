@@ -10,12 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zeromicro/go-zero/core/logx"
+
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/common/oss"
 	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type UploadPreviewAvatarLogic struct {
@@ -37,15 +38,15 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 	// 1. 参数验证
 	if len(in.FileData) == 0 {
 		return &user.UploadPreviewAvatarResp{
-			Code:    400,
-			Message: "文件数据不能为空",
+			Code:    int32(errcode.CommonParamError.Code()),
+			Message: errcode.CommonParamError.Msg(),
 		}, nil
 	}
 
 	if in.Filename == "" {
 		return &user.UploadPreviewAvatarResp{
-			Code:    400,
-			Message: "文件名不能为空",
+			Code:    int32(errcode.CommonParamError.Code()),
+			Message: errcode.CommonParamError.Msg(),
 		}, nil
 	}
 
@@ -60,7 +61,7 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 	ext := strings.ToLower(filepath.Ext(in.Filename))
 	if !allowedExts[ext] {
 		return &user.UploadPreviewAvatarResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "不支持的文件格式，只支持 jpg, jpeg, png, gif",
 		}, nil
 	}
@@ -69,7 +70,7 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 	maxSize := int64(5 * 1024 * 1024)
 	if in.FileSize > maxSize {
 		return &user.UploadPreviewAvatarResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "文件大小不能超过5MB",
 		}, nil
 	}
@@ -79,8 +80,8 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 	if err != nil {
 		l.Errorf("生成临时标识失败: %v", err)
 		return &user.UploadPreviewAvatarResp{
-			Code:    500,
-			Message: "系统错误",
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 
@@ -101,7 +102,7 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 	if err != nil {
 		l.Errorf("上传到 OSS 失败: %v", err)
 		return &user.UploadPreviewAvatarResp{
-			Code:    500,
+			Code:    int32(errcode.CommonServerError.Code()),
 			Message: "上传失败",
 		}, nil
 	}
@@ -127,8 +128,8 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 	l.Infof("预览头像上传成功: tempKey=%s, url=%s", tempKey, result.Url)
 
 	return &user.UploadPreviewAvatarResp{
-		Code:       200,
-		Message:    "上传成功",
+		Code:       int32(errcode.Success.Code()),
+		Message:    errcode.Success.Msg(),
 		PreviewKey: tempKey,
 		PreviewUrl: previewUrl,
 	}, nil

@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
 
@@ -28,8 +29,8 @@ func (l *VerifyMailCodeLogic) VerifyMailCode(in *user.VerifyMailCodeReq) (*user.
 	// 参数验证
 	if in.Email == "" || in.Code == "" {
 		return &user.VerifyMailCodeResp{
-			Code:    400,
-			Message: "邮箱地址和验证码不能为空",
+			Code:    int32(errcode.CommonParamError.Code()),
+			Message: errcode.CommonParamError.Msg(),
 			Valid:   false,
 		}, nil
 	}
@@ -37,15 +38,20 @@ func (l *VerifyMailCodeLogic) VerifyMailCode(in *user.VerifyMailCodeReq) (*user.
 	// 验证邮件验证码
 	isValid := l.svcCtx.MailService.VerifyCode(in.Email, in.Code)
 
-	message := "验证失败"
+	var code int32
+	var message string
 	if isValid {
+		code = int32(errcode.Success.Code())
 		message = "验证通过"
+	} else {
+		code = int32(errcode.UserCodeEmailError.Code())
+		message = errcode.UserCodeEmailError.Msg()
 	}
 
 	l.Infof("邮件验证码验证结果: email=%s, valid=%v", in.Email, isValid)
 
 	return &user.VerifyMailCodeResp{
-		Code:    200,
+		Code:    code,
 		Message: message,
 		Valid:   isValid,
 	}, nil

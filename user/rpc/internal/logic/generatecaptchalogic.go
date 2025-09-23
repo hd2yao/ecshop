@@ -5,11 +5,12 @@ import (
 	"image/color"
 	"time"
 
+	"github.com/zeromicro/go-zero/core/logx"
+
 	"github.com/hd2yao/ecshop/common/captcha"
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type GenerateCaptchaLogic struct {
@@ -75,7 +76,7 @@ func (l *GenerateCaptchaLogic) GenerateCaptcha(in *user.GenerateCaptchaReq) (*us
 	if err != nil {
 		l.Errorf("生成验证码失败: %v", err)
 		return &user.GenerateCaptchaResp{
-			Code:    500,
+			Code:    int32(errcode.CommonServerError.Code()),
 			Message: "验证码生成失败",
 		}, nil
 	}
@@ -83,8 +84,8 @@ func (l *GenerateCaptchaLogic) GenerateCaptcha(in *user.GenerateCaptchaReq) (*us
 	l.Infof("验证码生成成功，ID: %s", id)
 
 	return &user.GenerateCaptchaResp{
-		Code:      200,
-		Message:   "验证码生成成功",
+		Code:      int32(errcode.Success.Code()),
+		Message:   errcode.Success.Msg(),
 		CaptchaId: id,
 		ImageData: b64s,
 		Answer:    answer, // 生产环境不返回答案

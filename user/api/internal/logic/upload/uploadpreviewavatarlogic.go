@@ -7,6 +7,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -31,7 +32,7 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(r *http.Request) (resp *t
 	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB
 		l.Errorf("解析表单数据失败: %v", err)
 		return &types.UploadPreviewAvatarResponse{
-			Code:    400,
+			Code:    errcode.CommonParamError.Code(),
 			Message: "表单数据解析失败",
 		}, nil
 	}
@@ -41,7 +42,7 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(r *http.Request) (resp *t
 	if err != nil {
 		l.Errorf("获取上传文件失败: %v", err)
 		return &types.UploadPreviewAvatarResponse{
-			Code:    400,
+			Code:    errcode.CommonParamError.Code(),
 			Message: "请选择要上传的文件",
 		}, nil
 	}
@@ -52,8 +53,8 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(r *http.Request) (resp *t
 	if err != nil {
 		l.Errorf("读取文件数据失败: %v", err)
 		return &types.UploadPreviewAvatarResponse{
-			Code:    500,
-			Message: "读取文件失败",
+			Code:    errcode.CommonServerError.Code(),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 
@@ -67,8 +68,8 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(r *http.Request) (resp *t
 	if err != nil {
 		l.Errorf("调用RPC服务失败: %v", err)
 		return &types.UploadPreviewAvatarResponse{
-			Code:    500,
-			Message: "上传服务异常",
+			Code:    errcode.CommonServerError.Code(),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 
