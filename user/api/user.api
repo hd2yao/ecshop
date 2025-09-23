@@ -81,17 +81,6 @@ type (
 		Email   string `json:"email"`
 		CodeId  string `json:"code_id,optional"` // 用于测试环境返回验证码
 	}
-	// 邮件验证码验证请求
-	VerifyMailCodeRequest {
-		Email string `json:"email"` // 邮箱地址
-		Code  string `json:"code"` // 验证码
-	}
-	// 邮件验证码验证响应
-	VerifyMailCodeResponse {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Valid   bool   `json:"valid"`
-	}
 	// 注册时发送邮件验证码请求（需要先验证图形验证码）
 	SendRegisterMailCodeRequest {
 		CaptchaId   string `json:"captcha_id"` // 图形验证码ID
@@ -166,10 +155,6 @@ service user-api {
 	prefix: /api/mail
 )
 service user-api {
-	@doc "验证邮件验证码"
-	@handler VerifyMailCode
-	post /verify (VerifyMailCodeRequest) returns (VerifyMailCodeResponse)
-
 	@doc "注册时发送邮件验证码（需要先验证图形验证码）"
 	@handler SendRegisterMailCode
 	post /register/send (SendRegisterMailCodeRequest) returns (SendMailCodeResponse)

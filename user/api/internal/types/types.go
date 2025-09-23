@@ -87,8 +87,8 @@ type SendRegisterMailCodeRequest struct {
 type UploadPreviewAvatarResponse struct {
 	Code       int    `json:"code"`
 	Message    string `json:"message"`
-	PreviewKey string `json:"preview_key"` // 临时标识，注册时使用
-	PreviewUrl string `json:"preview_url"` // 预览图片URL
+	PreviewKey string `json:"preview_key"` // 预览标识
+	PreviewUrl string `json:"preview_url"` // 预览图片
 }
 
 type UserInfo struct {
@@ -100,17 +100,6 @@ type UserInfo struct {
 	Sex        int    `json:"sex"`
 	Points     int    `json:"points"`
 	CreateTime string `json:"create_time"`
-}
-
-type VerifyMailCodeRequest struct {
-	Email string `json:"email"` // 邮箱地址
-	Code  string `json:"code"`  // 验证码
-}
-
-type VerifyMailCodeResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Valid   bool   `json:"valid"`
 }
 
 type VerifyRequest struct {

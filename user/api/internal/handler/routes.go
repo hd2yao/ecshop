@@ -42,12 +42,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/register/send",
 				Handler: mail.SendRegisterMailCodeHandler(serverCtx),
 			},
-			{
-				// 验证邮件验证码
-				Method:  http.MethodPost,
-				Path:    "/verify",
-				Handler: mail.VerifyMailCodeHandler(serverCtx),
-			},
 		},
 		rest.WithPrefix("/api/mail"),
 	)

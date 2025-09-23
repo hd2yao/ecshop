@@ -10,7 +10,6 @@ service User {
   rpc VerifyCaptcha(VerifyCaptchaReq) returns (VerifyCaptchaResp);
   
   // 邮件验证码
-  rpc VerifyMailCode(VerifyMailCodeReq) returns (VerifyMailCodeResp);
   rpc SendRegisterMailCode(SendRegisterMailCodeReq) returns (SendMailCodeResp);
   
   // 用户注册
@@ -52,17 +51,6 @@ message SendMailCodeResp {
   string message = 2;
   string email = 3;
   string code_id = 4; // 测试环境返回
-}
-
-message VerifyMailCodeReq {
-  string email = 1;
-  string code = 2;
-}
-
-message VerifyMailCodeResp {
-  int32 code = 1;
-  string message = 2;
-  bool valid = 3;
 }
 
 // 注册时发送邮件验证码

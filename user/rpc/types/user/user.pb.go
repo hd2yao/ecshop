@@ -339,118 +339,6 @@ func (x *SendMailCodeResp) GetCodeId() string {
 	return ""
 }
 
-type VerifyMailCodeReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VerifyMailCodeReq) Reset() {
-	*x = VerifyMailCodeReq{}
-	mi := &file_rpc_user_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VerifyMailCodeReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VerifyMailCodeReq) ProtoMessage() {}
-
-func (x *VerifyMailCodeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VerifyMailCodeReq.ProtoReflect.Descriptor instead.
-func (*VerifyMailCodeReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *VerifyMailCodeReq) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *VerifyMailCodeReq) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
-
-type VerifyMailCodeResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Valid         bool                   `protobuf:"varint,3,opt,name=valid,proto3" json:"valid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VerifyMailCodeResp) Reset() {
-	*x = VerifyMailCodeResp{}
-	mi := &file_rpc_user_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VerifyMailCodeResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VerifyMailCodeResp) ProtoMessage() {}
-
-func (x *VerifyMailCodeResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VerifyMailCodeResp.ProtoReflect.Descriptor instead.
-func (*VerifyMailCodeResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *VerifyMailCodeResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *VerifyMailCodeResp) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-func (x *VerifyMailCodeResp) GetValid() bool {
-	if x != nil {
-		return x.Valid
-	}
-	return false
-}
-
 // 注册时发送邮件验证码
 type SendRegisterMailCodeReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -464,7 +352,7 @@ type SendRegisterMailCodeReq struct {
 
 func (x *SendRegisterMailCodeReq) Reset() {
 	*x = SendRegisterMailCodeReq{}
-	mi := &file_rpc_user_proto_msgTypes[7]
+	mi := &file_rpc_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -476,7 +364,7 @@ func (x *SendRegisterMailCodeReq) String() string {
 func (*SendRegisterMailCodeReq) ProtoMessage() {}
 
 func (x *SendRegisterMailCodeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[7]
+	mi := &file_rpc_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +377,7 @@ func (x *SendRegisterMailCodeReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendRegisterMailCodeReq.ProtoReflect.Descriptor instead.
 func (*SendRegisterMailCodeReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{7}
+	return file_rpc_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SendRegisterMailCodeReq) GetCaptchaId() string {
@@ -536,7 +424,7 @@ type RegisterReq struct {
 
 func (x *RegisterReq) Reset() {
 	*x = RegisterReq{}
-	mi := &file_rpc_user_proto_msgTypes[8]
+	mi := &file_rpc_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -548,7 +436,7 @@ func (x *RegisterReq) String() string {
 func (*RegisterReq) ProtoMessage() {}
 
 func (x *RegisterReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[8]
+	mi := &file_rpc_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -561,7 +449,7 @@ func (x *RegisterReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterReq.ProtoReflect.Descriptor instead.
 func (*RegisterReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{8}
+	return file_rpc_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *RegisterReq) GetEmail() string {
@@ -626,7 +514,7 @@ type RegisterResp struct {
 
 func (x *RegisterResp) Reset() {
 	*x = RegisterResp{}
-	mi := &file_rpc_user_proto_msgTypes[9]
+	mi := &file_rpc_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -638,7 +526,7 @@ func (x *RegisterResp) String() string {
 func (*RegisterResp) ProtoMessage() {}
 
 func (x *RegisterResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[9]
+	mi := &file_rpc_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -651,7 +539,7 @@ func (x *RegisterResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResp.ProtoReflect.Descriptor instead.
 func (*RegisterResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{9}
+	return file_rpc_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RegisterResp) GetCode() int32 {
@@ -705,7 +593,7 @@ type UserInfo struct {
 
 func (x *UserInfo) Reset() {
 	*x = UserInfo{}
-	mi := &file_rpc_user_proto_msgTypes[10]
+	mi := &file_rpc_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -717,7 +605,7 @@ func (x *UserInfo) String() string {
 func (*UserInfo) ProtoMessage() {}
 
 func (x *UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[10]
+	mi := &file_rpc_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -730,7 +618,7 @@ func (x *UserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
 func (*UserInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{10}
+	return file_rpc_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserInfo) GetId() int64 {
@@ -802,7 +690,7 @@ type CaptchaConfig struct {
 
 func (x *CaptchaConfig) Reset() {
 	*x = CaptchaConfig{}
-	mi := &file_rpc_user_proto_msgTypes[11]
+	mi := &file_rpc_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -814,7 +702,7 @@ func (x *CaptchaConfig) String() string {
 func (*CaptchaConfig) ProtoMessage() {}
 
 func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[11]
+	mi := &file_rpc_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -827,7 +715,7 @@ func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CaptchaConfig.ProtoReflect.Descriptor instead.
 func (*CaptchaConfig) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{11}
+	return file_rpc_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CaptchaConfig) GetWidth() int32 {
@@ -872,7 +760,7 @@ type DrawOptions struct {
 
 func (x *DrawOptions) Reset() {
 	*x = DrawOptions{}
-	mi := &file_rpc_user_proto_msgTypes[12]
+	mi := &file_rpc_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -884,7 +772,7 @@ func (x *DrawOptions) String() string {
 func (*DrawOptions) ProtoMessage() {}
 
 func (x *DrawOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[12]
+	mi := &file_rpc_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -897,7 +785,7 @@ func (x *DrawOptions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DrawOptions.ProtoReflect.Descriptor instead.
 func (*DrawOptions) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{12}
+	return file_rpc_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DrawOptions) GetUseCustomDraw() bool {
@@ -954,7 +842,7 @@ type UploadPreviewAvatarReq struct {
 
 func (x *UploadPreviewAvatarReq) Reset() {
 	*x = UploadPreviewAvatarReq{}
-	mi := &file_rpc_user_proto_msgTypes[13]
+	mi := &file_rpc_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -966,7 +854,7 @@ func (x *UploadPreviewAvatarReq) String() string {
 func (*UploadPreviewAvatarReq) ProtoMessage() {}
 
 func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[13]
+	mi := &file_rpc_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -979,7 +867,7 @@ func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadPreviewAvatarReq.ProtoReflect.Descriptor instead.
 func (*UploadPreviewAvatarReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{13}
+	return file_rpc_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UploadPreviewAvatarReq) GetFileData() []byte {
@@ -1007,7 +895,7 @@ type UploadPreviewAvatarResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	PreviewKey    string                 `protobuf:"bytes,3,opt,name=preview_key,json=previewKey,proto3" json:"preview_key,omitempty"` // 临时标识，注册时使用
+	PreviewKey    string                 `protobuf:"bytes,3,opt,name=preview_key,json=previewKey,proto3" json:"preview_key,omitempty"` // 预览标识
 	PreviewUrl    string                 `protobuf:"bytes,4,opt,name=preview_url,json=previewUrl,proto3" json:"preview_url,omitempty"` // 预览图片URL
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1015,7 +903,7 @@ type UploadPreviewAvatarResp struct {
 
 func (x *UploadPreviewAvatarResp) Reset() {
 	*x = UploadPreviewAvatarResp{}
-	mi := &file_rpc_user_proto_msgTypes[14]
+	mi := &file_rpc_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1027,7 +915,7 @@ func (x *UploadPreviewAvatarResp) String() string {
 func (*UploadPreviewAvatarResp) ProtoMessage() {}
 
 func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[14]
+	mi := &file_rpc_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1040,7 +928,7 @@ func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadPreviewAvatarResp.ProtoReflect.Descriptor instead.
 func (*UploadPreviewAvatarResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{14}
+	return file_rpc_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UploadPreviewAvatarResp) GetCode() int32 {
@@ -1100,14 +988,7 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x17\n" +
-	"\acode_id\x18\x04 \x01(\tR\x06codeId\"=\n" +
-	"\x11VerifyMailCodeReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\tR\x04code\"X\n" +
-	"\x12VerifyMailCodeResp\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
-	"\x05valid\x18\x03 \x01(\bR\x05valid\"\x92\x01\n" +
+	"\acode_id\x18\x04 \x01(\tR\x06codeId\"\x92\x01\n" +
 	"\x17SendRegisterMailCodeReq\x12\x1d\n" +
 	"\n" +
 	"captcha_id\x18\x01 \x01(\tR\tcaptchaId\x12!\n" +
@@ -1163,11 +1044,10 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\vpreview_key\x18\x03 \x01(\tR\n" +
 	"previewKey\x12\x1f\n" +
 	"\vpreview_url\x18\x04 \x01(\tR\n" +
-	"previewUrl2\xab\x03\n" +
+	"previewUrl2\xe6\x02\n" +
 	"\x04User\x12F\n" +
 	"\x0fGenerateCaptcha\x12\x18.user.GenerateCaptchaReq\x1a\x19.user.GenerateCaptchaResp\x12@\n" +
-	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12C\n" +
-	"\x0eVerifyMailCode\x12\x17.user.VerifyMailCodeReq\x1a\x18.user.VerifyMailCodeResp\x12M\n" +
+	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12M\n" +
 	"\x14SendRegisterMailCode\x12\x1d.user.SendRegisterMailCodeReq\x1a\x16.user.SendMailCodeResp\x121\n" +
 	"\bRegister\x12\x11.user.RegisterReq\x1a\x12.user.RegisterResp\x12R\n" +
 	"\x13UploadPreviewAvatar\x12\x1c.user.UploadPreviewAvatarReq\x1a\x1d.user.UploadPreviewAvatarRespB\bZ\x06./userb\x06proto3"
@@ -1184,42 +1064,38 @@ func file_rpc_user_proto_rawDescGZIP() []byte {
 	return file_rpc_user_proto_rawDescData
 }
 
-var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_rpc_user_proto_goTypes = []any{
 	(*GenerateCaptchaReq)(nil),      // 0: user.GenerateCaptchaReq
 	(*GenerateCaptchaResp)(nil),     // 1: user.GenerateCaptchaResp
 	(*VerifyCaptchaReq)(nil),        // 2: user.VerifyCaptchaReq
 	(*VerifyCaptchaResp)(nil),       // 3: user.VerifyCaptchaResp
 	(*SendMailCodeResp)(nil),        // 4: user.SendMailCodeResp
-	(*VerifyMailCodeReq)(nil),       // 5: user.VerifyMailCodeReq
-	(*VerifyMailCodeResp)(nil),      // 6: user.VerifyMailCodeResp
-	(*SendRegisterMailCodeReq)(nil), // 7: user.SendRegisterMailCodeReq
-	(*RegisterReq)(nil),             // 8: user.RegisterReq
-	(*RegisterResp)(nil),            // 9: user.RegisterResp
-	(*UserInfo)(nil),                // 10: user.UserInfo
-	(*CaptchaConfig)(nil),           // 11: user.CaptchaConfig
-	(*DrawOptions)(nil),             // 12: user.DrawOptions
-	(*UploadPreviewAvatarReq)(nil),  // 13: user.UploadPreviewAvatarReq
-	(*UploadPreviewAvatarResp)(nil), // 14: user.UploadPreviewAvatarResp
+	(*SendRegisterMailCodeReq)(nil), // 5: user.SendRegisterMailCodeReq
+	(*RegisterReq)(nil),             // 6: user.RegisterReq
+	(*RegisterResp)(nil),            // 7: user.RegisterResp
+	(*UserInfo)(nil),                // 8: user.UserInfo
+	(*CaptchaConfig)(nil),           // 9: user.CaptchaConfig
+	(*DrawOptions)(nil),             // 10: user.DrawOptions
+	(*UploadPreviewAvatarReq)(nil),  // 11: user.UploadPreviewAvatarReq
+	(*UploadPreviewAvatarResp)(nil), // 12: user.UploadPreviewAvatarResp
 }
 var file_rpc_user_proto_depIdxs = []int32{
-	11, // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
-	12, // 1: user.GenerateCaptchaReq.draw_opts:type_name -> user.DrawOptions
-	10, // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
+	9,  // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
+	10, // 1: user.GenerateCaptchaReq.draw_opts:type_name -> user.DrawOptions
+	8,  // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
 	0,  // 3: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
 	2,  // 4: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
-	5,  // 5: user.User.VerifyMailCode:input_type -> user.VerifyMailCodeReq
-	7,  // 6: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
-	8,  // 7: user.User.Register:input_type -> user.RegisterReq
-	13, // 8: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
-	1,  // 9: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
-	3,  // 10: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
-	6,  // 11: user.User.VerifyMailCode:output_type -> user.VerifyMailCodeResp
-	4,  // 12: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
-	9,  // 13: user.User.Register:output_type -> user.RegisterResp
-	14, // 14: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
-	9,  // [9:15] is the sub-list for method output_type
-	3,  // [3:9] is the sub-list for method input_type
+	5,  // 5: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
+	6,  // 6: user.User.Register:input_type -> user.RegisterReq
+	11, // 7: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
+	1,  // 8: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
+	3,  // 9: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
+	4,  // 10: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
+	7,  // 11: user.User.Register:output_type -> user.RegisterResp
+	12, // 12: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -1236,7 +1112,7 @@ func file_rpc_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_user_proto_rawDesc), len(file_rpc_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

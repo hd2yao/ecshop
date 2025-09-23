@@ -27,15 +27,12 @@ type (
 	UserInfo                = user.UserInfo
 	VerifyCaptchaReq        = user.VerifyCaptchaReq
 	VerifyCaptchaResp       = user.VerifyCaptchaResp
-	VerifyMailCodeReq       = user.VerifyMailCodeReq
-	VerifyMailCodeResp      = user.VerifyMailCodeResp
 
 	User interface {
 		// 图形验证码
 		GenerateCaptcha(ctx context.Context, in *GenerateCaptchaReq, opts ...grpc.CallOption) (*GenerateCaptchaResp, error)
 		VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, opts ...grpc.CallOption) (*VerifyCaptchaResp, error)
 		// 邮件验证码
-		VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
 		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		// 用户注册
 		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
@@ -66,11 +63,6 @@ func (m *defaultUser) VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, o
 }
 
 // 邮件验证码
-func (m *defaultUser) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
-	client := user.NewUserClient(m.cli.Conn())
-	return client.VerifyMailCode(ctx, in, opts...)
-}
-
 func (m *defaultUser) SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.SendRegisterMailCode(ctx, in, opts...)

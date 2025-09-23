@@ -35,11 +35,6 @@ func (s *UserServer) VerifyCaptcha(ctx context.Context, in *user.VerifyCaptchaRe
 }
 
 // 邮件验证码
-func (s *UserServer) VerifyMailCode(ctx context.Context, in *user.VerifyMailCodeReq) (*user.VerifyMailCodeResp, error) {
-	l := logic.NewVerifyMailCodeLogic(ctx, s.svcCtx)
-	return l.VerifyMailCode(in)
-}
-
 func (s *UserServer) SendRegisterMailCode(ctx context.Context, in *user.SendRegisterMailCodeReq) (*user.SendMailCodeResp, error) {
 	l := logic.NewSendRegisterMailCodeLogic(ctx, s.svcCtx)
 	return l.SendRegisterMailCode(in)
