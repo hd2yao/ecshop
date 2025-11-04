@@ -18,6 +18,9 @@ service User {
   // 用户登录
   rpc Login(LoginReq) returns (LoginResp);
   
+  // 刷新Token
+  rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
+  
   // 头像上传
   rpc UploadPreviewAvatar(UploadPreviewAvatarReq) returns (UploadPreviewAvatarResp);
 }
@@ -93,8 +96,21 @@ message LoginResp {
   int32 code = 1;
   string message = 2;
   int64 user_id = 3;
-  string token = 4;
-  UserInfo user_info = 5;
+  string access_token = 4;   // Access Token (2小时)
+  string refresh_token = 5;  // Refresh Token (7天)
+  UserInfo user_info = 6;
+}
+
+// Token 刷新相关
+message RefreshTokenReq {
+  string refresh_token = 1;  // Refresh Token
+}
+
+message RefreshTokenResp {
+  int32 code = 1;
+  string message = 2;
+  string access_token = 3;   // 新的 Access Token
+  string refresh_token = 4;  // 新的 Refresh Token（可选：滚动刷新）
 }
 
 message UserInfo {

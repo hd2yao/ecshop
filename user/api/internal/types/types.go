@@ -53,17 +53,29 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Code     int      `json:"code"`
-	Message  string   `json:"message"`
-	UserId   int64    `json:"user_id,optional"`   // 用户ID
-	Token    string   `json:"token,optional"`     // 访问令牌
-	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+	Code         int      `json:"code"`
+	Message      string   `json:"message"`
+	UserId       int64    `json:"user_id,optional"`       // 用户ID
+	AccessToken  string   `json:"access_token,optional"`  // 访问令牌（2小时）
+	RefreshToken string   `json:"refresh_token,optional"` // 刷新令牌（7天）
+	UserInfo     UserInfo `json:"user_info,optional"`     // 用户信息
 }
 
 type PresetConfig struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Request     CaptchaRequest `json:"request"`
+}
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" validate:"required"` // Refresh Token
+}
+
+type RefreshTokenResponse struct {
+	Code         int    `json:"code"`
+	Message      string `json:"message"`
+	AccessToken  string `json:"access_token,optional"`  // 新的 Access Token
+	RefreshToken string `json:"refresh_token,optional"` // 新的 Refresh Token
 }
 
 type RegisterRequest struct {

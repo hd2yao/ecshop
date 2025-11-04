@@ -52,6 +52,12 @@ func (s *UserServer) Login(ctx context.Context, in *user.LoginReq) (*user.LoginR
 	return l.Login(in)
 }
 
+// 刷新Token
+func (s *UserServer) RefreshToken(ctx context.Context, in *user.RefreshTokenReq) (*user.RefreshTokenResp, error) {
+	l := logic.NewRefreshTokenLogic(ctx, s.svcCtx)
+	return l.RefreshToken(in)
+}
+
 // 头像上传
 func (s *UserServer) UploadPreviewAvatar(ctx context.Context, in *user.UploadPreviewAvatarReq) (*user.UploadPreviewAvatarResp, error) {
 	l := logic.NewUploadPreviewAvatarLogic(ctx, s.svcCtx)

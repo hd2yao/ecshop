@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/hd2yao/ecshop/common/errcode"
+	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/common/utils"
 	"github.com/hd2yao/ecshop/user/model"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
@@ -96,17 +97,34 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 		}, nil
 	}
 
-	// 5. 生成 JWT Token (默认7天过期)
-	token, err := jwt.GenerateToken(int64(foundUser.Id), foundUser.Name.String, foundUser.Mail.String)
+	// 5. 生成 Access Token (2小时有效期)
+	accessToken, err := jwt.GenerateToken(int64(foundUser.Id), foundUser.Name.String, foundUser.Mail.String)
 	if err != nil {
-		l.Errorf("生成 token 失败: %v", err)
+		l.Errorf("生成 access token 失败: %v", err)
 		return &user.LoginResp{
 			Code:    int32(errcode.CommonServerError.Code()),
 			Message: "生成令牌失败",
 		}, nil
 	}
 
-	// 6. 构建用户信息响应
+	// 6. 生成 Refresh Token (7天有效期)
+	refreshToken, err := jwt.GenerateRefreshToken(int64(foundUser.Id), foundUser.Name.String, foundUser.Mail.String)
+	if err != nil {
+		l.Errorf("生成 refresh token 失败: %v", err)
+		return &user.LoginResp{
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: "生成刷新令牌失败",
+		}, nil
+	}
+
+	// 7. 将 Refresh Token 存储到 Redis（7天过期）
+	refreshKey := redisPool.NewRedisKeyBuilder("user", "refresh_token").BuildKey(foundUser.Mail.String)
+	if err := redisPool.GetRedisClient().Setex(refreshKey, refreshToken, int(jwt.RefreshTokenExpiration.Seconds())); err != nil {
+		l.Errorf("存储 refresh token 到 Redis 失败: %v", err)
+		// 不影响登录流程，只记录日志
+	}
+
+	// 8. 构建用户信息响应
 	userInfo := &user.UserInfo{
 		Id:         int64(foundUser.Id),
 		Name:       foundUser.Name.String,
@@ -121,10 +139,11 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 	l.Infof("用户登录成功: userId=%d, email=%s, phone=%s", foundUser.Id, in.Email, in.Phone)
 
 	return &user.LoginResp{
-		Code:     int32(errcode.Success.Code()),
-		Message:  errcode.Success.Msg(),
-		UserId:   int64(foundUser.Id),
-		Token:    token,
-		UserInfo: userInfo,
+		Code:         int32(errcode.Success.Code()),
+		Message:      errcode.Success.Msg(),
+		UserId:       int64(foundUser.Id),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		UserInfo:     userInfo,
 	}, nil
 }

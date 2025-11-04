@@ -63,10 +63,11 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 		Message: loginResp.Message,
 	}
 
-	// 4. 如果登录成功，填充用户信息
+	// 4. 如果登录成功，填充用户信息和Token
 	if loginResp.Code == int32(errcode.Success.Code()) {
 		resp.UserId = loginResp.UserId
-		resp.Token = loginResp.Token
+		resp.AccessToken = loginResp.AccessToken
+		resp.RefreshToken = loginResp.RefreshToken
 		if loginResp.UserInfo != nil {
 			resp.UserInfo = types.UserInfo{
 				Id:         loginResp.UserInfo.Id,

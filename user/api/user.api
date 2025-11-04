@@ -132,11 +132,27 @@ type (
 	}
 	// 用户登录响应
 	LoginResponse {
-		Code     int      `json:"code"`
-		Message  string   `json:"message"`
-		UserId   int64    `json:"user_id,optional"` // 用户ID
-		Token    string   `json:"token,optional"` // 访问令牌
-		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+		Code         int      `json:"code"`
+		Message      string   `json:"message"`
+		UserId       int64    `json:"user_id,optional"` // 用户ID
+		AccessToken  string   `json:"access_token,optional"` // 访问令牌（2小时）
+		RefreshToken string   `json:"refresh_token,optional"` // 刷新令牌（7天）
+		UserInfo     UserInfo `json:"user_info,optional"` // 用户信息
+	}
+)
+
+// ===== Token 刷新相关结构体 =====
+type (
+	// Token 刷新请求
+	RefreshTokenRequest {
+		RefreshToken string `json:"refresh_token" validate:"required"` // Refresh Token
+	}
+	// Token 刷新响应
+	RefreshTokenResponse {
+		Code         int    `json:"code"`
+		Message      string `json:"message"`
+		AccessToken  string `json:"access_token,optional"` // 新的 Access Token
+		RefreshToken string `json:"refresh_token,optional"` // 新的 Refresh Token
 	}
 )
 
@@ -190,6 +206,10 @@ service user-api {
 	@doc "用户登录"
 	@handler Login
 	post /login (LoginRequest) returns (LoginResponse)
+
+	@doc "刷新Token"
+	@handler RefreshToken
+	post /refresh-token (RefreshTokenRequest) returns (RefreshTokenResponse)
 }
 
 // ===== 文件上传服务 =====
