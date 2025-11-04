@@ -8,19 +8,29 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const secret = "ecshop-jwt-secret"
+const (
+	secret            = "ecshop-jwt-secret"
+	DefaultExpiration = 7 * 24 * time.Hour
+)
 
 type Claims struct {
 	UserID   int64  `json:"user_id"`
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	jwt.RegisteredClaims
 }
 
-// GenerateToken 生成 JWT token
-func GenerateToken(userID int64, username string, expire time.Duration) (string, error) {
+// GenerateToken 生成 JWT token，默认7天过期
+func GenerateToken(userID int64, username, email string) (string, error) {
+	return GenerateTokenWithExpire(userID, username, email, DefaultExpiration)
+}
+
+// GenerateTokenWithExpire 生成指定过期时间的 JWT token
+func GenerateTokenWithExpire(userID int64, username, email string, expire time.Duration) (string, error) {
 	claims := &Claims{
 		UserID:   userID,
 		Username: username,
+		Email:    email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expire)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -53,7 +63,8 @@ func ParseToken(tokenString string, secret string) (*Claims, error) {
 	})
 
 	if err != nil {
-		if ve, ok := err.(*jwt.ValidationError); ok {
+		var ve *jwt.ValidationError
+		if errors.As(err, &ve) {
 			if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				return nil, errors.New("token 已过期")
 			}
