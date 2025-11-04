@@ -46,6 +46,20 @@ type ErrorResponse struct {
 	Error   string `json:"error,optional"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email,optional"`                     // 邮箱地址（邮箱和手机号二选一）
+	Phone    string `json:"phone,optional"`                     // 手机号（邮箱和手机号二选一）
+	Password string `json:"password" validate:"required,min=6"` // 密码
+}
+
+type LoginResponse struct {
+	Code     int      `json:"code"`
+	Message  string   `json:"message"`
+	UserId   int64    `json:"user_id,optional"`   // 用户ID
+	Token    string   `json:"token,optional"`     // 访问令牌
+	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+}
+
 type PresetConfig struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`

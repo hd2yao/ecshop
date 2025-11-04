@@ -15,6 +15,9 @@ service User {
   // 用户注册
   rpc Register(RegisterReq) returns (RegisterResp);
   
+  // 用户登录
+  rpc Login(LoginReq) returns (LoginResp);
+  
   // 头像上传
   rpc UploadPreviewAvatar(UploadPreviewAvatarReq) returns (UploadPreviewAvatarResp);
 }
@@ -73,6 +76,21 @@ message RegisterReq {
 }
 
 message RegisterResp {
+  int32 code = 1;
+  string message = 2;
+  int64 user_id = 3;
+  string token = 4;
+  UserInfo user_info = 5;
+}
+
+// 用户登录相关
+message LoginReq {
+  string email = 1;     // 邮箱（邮箱和手机号二选一）
+  string phone = 2;     // 手机号（邮箱和手机号二选一）
+  string password = 3;  // 密码
+}
+
+message LoginResp {
   int32 code = 1;
   string message = 2;
   int64 user_id = 3;

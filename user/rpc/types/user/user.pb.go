@@ -577,6 +577,143 @@ func (x *RegisterResp) GetUserInfo() *UserInfo {
 	return nil
 }
 
+// 用户登录相关
+type LoginReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`       // 邮箱（邮箱和手机号二选一）
+	Phone         string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`       // 手机号（邮箱和手机号二选一）
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"` // 密码
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginReq) Reset() {
+	*x = LoginReq{}
+	mi := &file_rpc_user_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginReq) ProtoMessage() {}
+
+func (x *LoginReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginReq.ProtoReflect.Descriptor instead.
+func (*LoginReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *LoginReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *LoginReq) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *LoginReq) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserId        int64                  `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	UserInfo      *UserInfo              `protobuf:"bytes,5,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginResp) Reset() {
+	*x = LoginResp{}
+	mi := &file_rpc_user_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResp) ProtoMessage() {}
+
+func (x *LoginResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResp.ProtoReflect.Descriptor instead.
+func (*LoginResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *LoginResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *LoginResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *LoginResp) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *LoginResp) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *LoginResp) GetUserInfo() *UserInfo {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
 type UserInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -593,7 +730,7 @@ type UserInfo struct {
 
 func (x *UserInfo) Reset() {
 	*x = UserInfo{}
-	mi := &file_rpc_user_proto_msgTypes[8]
+	mi := &file_rpc_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -605,7 +742,7 @@ func (x *UserInfo) String() string {
 func (*UserInfo) ProtoMessage() {}
 
 func (x *UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[8]
+	mi := &file_rpc_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +755,7 @@ func (x *UserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
 func (*UserInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{8}
+	return file_rpc_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UserInfo) GetId() int64 {
@@ -690,7 +827,7 @@ type CaptchaConfig struct {
 
 func (x *CaptchaConfig) Reset() {
 	*x = CaptchaConfig{}
-	mi := &file_rpc_user_proto_msgTypes[9]
+	mi := &file_rpc_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -702,7 +839,7 @@ func (x *CaptchaConfig) String() string {
 func (*CaptchaConfig) ProtoMessage() {}
 
 func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[9]
+	mi := &file_rpc_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -715,7 +852,7 @@ func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CaptchaConfig.ProtoReflect.Descriptor instead.
 func (*CaptchaConfig) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{9}
+	return file_rpc_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CaptchaConfig) GetWidth() int32 {
@@ -760,7 +897,7 @@ type DrawOptions struct {
 
 func (x *DrawOptions) Reset() {
 	*x = DrawOptions{}
-	mi := &file_rpc_user_proto_msgTypes[10]
+	mi := &file_rpc_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -772,7 +909,7 @@ func (x *DrawOptions) String() string {
 func (*DrawOptions) ProtoMessage() {}
 
 func (x *DrawOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[10]
+	mi := &file_rpc_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -785,7 +922,7 @@ func (x *DrawOptions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DrawOptions.ProtoReflect.Descriptor instead.
 func (*DrawOptions) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{10}
+	return file_rpc_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DrawOptions) GetUseCustomDraw() bool {
@@ -842,7 +979,7 @@ type UploadPreviewAvatarReq struct {
 
 func (x *UploadPreviewAvatarReq) Reset() {
 	*x = UploadPreviewAvatarReq{}
-	mi := &file_rpc_user_proto_msgTypes[11]
+	mi := &file_rpc_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -854,7 +991,7 @@ func (x *UploadPreviewAvatarReq) String() string {
 func (*UploadPreviewAvatarReq) ProtoMessage() {}
 
 func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[11]
+	mi := &file_rpc_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -867,7 +1004,7 @@ func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadPreviewAvatarReq.ProtoReflect.Descriptor instead.
 func (*UploadPreviewAvatarReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{11}
+	return file_rpc_user_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UploadPreviewAvatarReq) GetFileData() []byte {
@@ -903,7 +1040,7 @@ type UploadPreviewAvatarResp struct {
 
 func (x *UploadPreviewAvatarResp) Reset() {
 	*x = UploadPreviewAvatarResp{}
-	mi := &file_rpc_user_proto_msgTypes[12]
+	mi := &file_rpc_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -915,7 +1052,7 @@ func (x *UploadPreviewAvatarResp) String() string {
 func (*UploadPreviewAvatarResp) ProtoMessage() {}
 
 func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[12]
+	mi := &file_rpc_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -928,7 +1065,7 @@ func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadPreviewAvatarResp.ProtoReflect.Descriptor instead.
 func (*UploadPreviewAvatarResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{12}
+	return file_rpc_user_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UploadPreviewAvatarResp) GetCode() int32 {
@@ -1010,6 +1147,16 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12\x14\n" +
 	"\x05token\x18\x04 \x01(\tR\x05token\x12+\n" +
+	"\tuser_info\x18\x05 \x01(\v2\x0e.user.UserInfoR\buserInfo\"R\n" +
+	"\bLoginReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x14\n" +
+	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"\x95\x01\n" +
+	"\tLoginResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\x12+\n" +
 	"\tuser_info\x18\x05 \x01(\v2\x0e.user.UserInfoR\buserInfo\"\xbd\x01\n" +
 	"\bUserInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
@@ -1044,12 +1191,13 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\vpreview_key\x18\x03 \x01(\tR\n" +
 	"previewKey\x12\x1f\n" +
 	"\vpreview_url\x18\x04 \x01(\tR\n" +
-	"previewUrl2\xe6\x02\n" +
+	"previewUrl2\x90\x03\n" +
 	"\x04User\x12F\n" +
 	"\x0fGenerateCaptcha\x12\x18.user.GenerateCaptchaReq\x1a\x19.user.GenerateCaptchaResp\x12@\n" +
 	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12M\n" +
 	"\x14SendRegisterMailCode\x12\x1d.user.SendRegisterMailCodeReq\x1a\x16.user.SendMailCodeResp\x121\n" +
-	"\bRegister\x12\x11.user.RegisterReq\x1a\x12.user.RegisterResp\x12R\n" +
+	"\bRegister\x12\x11.user.RegisterReq\x1a\x12.user.RegisterResp\x12(\n" +
+	"\x05Login\x12\x0e.user.LoginReq\x1a\x0f.user.LoginResp\x12R\n" +
 	"\x13UploadPreviewAvatar\x12\x1c.user.UploadPreviewAvatarReq\x1a\x1d.user.UploadPreviewAvatarRespB\bZ\x06./userb\x06proto3"
 
 var (
@@ -1064,7 +1212,7 @@ func file_rpc_user_proto_rawDescGZIP() []byte {
 	return file_rpc_user_proto_rawDescData
 }
 
-var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_rpc_user_proto_goTypes = []any{
 	(*GenerateCaptchaReq)(nil),      // 0: user.GenerateCaptchaReq
 	(*GenerateCaptchaResp)(nil),     // 1: user.GenerateCaptchaResp
@@ -1074,31 +1222,36 @@ var file_rpc_user_proto_goTypes = []any{
 	(*SendRegisterMailCodeReq)(nil), // 5: user.SendRegisterMailCodeReq
 	(*RegisterReq)(nil),             // 6: user.RegisterReq
 	(*RegisterResp)(nil),            // 7: user.RegisterResp
-	(*UserInfo)(nil),                // 8: user.UserInfo
-	(*CaptchaConfig)(nil),           // 9: user.CaptchaConfig
-	(*DrawOptions)(nil),             // 10: user.DrawOptions
-	(*UploadPreviewAvatarReq)(nil),  // 11: user.UploadPreviewAvatarReq
-	(*UploadPreviewAvatarResp)(nil), // 12: user.UploadPreviewAvatarResp
+	(*LoginReq)(nil),                // 8: user.LoginReq
+	(*LoginResp)(nil),               // 9: user.LoginResp
+	(*UserInfo)(nil),                // 10: user.UserInfo
+	(*CaptchaConfig)(nil),           // 11: user.CaptchaConfig
+	(*DrawOptions)(nil),             // 12: user.DrawOptions
+	(*UploadPreviewAvatarReq)(nil),  // 13: user.UploadPreviewAvatarReq
+	(*UploadPreviewAvatarResp)(nil), // 14: user.UploadPreviewAvatarResp
 }
 var file_rpc_user_proto_depIdxs = []int32{
-	9,  // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
-	10, // 1: user.GenerateCaptchaReq.draw_opts:type_name -> user.DrawOptions
-	8,  // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
-	0,  // 3: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
-	2,  // 4: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
-	5,  // 5: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
-	6,  // 6: user.User.Register:input_type -> user.RegisterReq
-	11, // 7: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
-	1,  // 8: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
-	3,  // 9: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
-	4,  // 10: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
-	7,  // 11: user.User.Register:output_type -> user.RegisterResp
-	12, // 12: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
-	8,  // [8:13] is the sub-list for method output_type
-	3,  // [3:8] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	11, // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
+	12, // 1: user.GenerateCaptchaReq.draw_opts:type_name -> user.DrawOptions
+	10, // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
+	10, // 3: user.LoginResp.user_info:type_name -> user.UserInfo
+	0,  // 4: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
+	2,  // 5: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
+	5,  // 6: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
+	6,  // 7: user.User.Register:input_type -> user.RegisterReq
+	8,  // 8: user.User.Login:input_type -> user.LoginReq
+	13, // 9: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
+	1,  // 10: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
+	3,  // 11: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
+	4,  // 12: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
+	7,  // 13: user.User.Register:output_type -> user.RegisterResp
+	9,  // 14: user.User.Login:output_type -> user.LoginResp
+	14, // 15: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
+	10, // [10:16] is the sub-list for method output_type
+	4,  // [4:10] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_rpc_user_proto_init() }
@@ -1112,7 +1265,7 @@ func file_rpc_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_user_proto_rawDesc), len(file_rpc_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
