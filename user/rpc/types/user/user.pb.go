@@ -506,8 +506,7 @@ type RegisterResp struct {
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	UserId        int64                  `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
-	UserInfo      *UserInfo              `protobuf:"bytes,5,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	UserInfo      *UserInfo              `protobuf:"bytes,4,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -561,13 +560,6 @@ func (x *RegisterResp) GetUserId() int64 {
 		return x.UserId
 	}
 	return 0
-}
-
-func (x *RegisterResp) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
 }
 
 func (x *RegisterResp) GetUserInfo() *UserInfo {
@@ -1141,13 +1133,12 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12\x14\n" +
 	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x10\n" +
 	"\x03sex\x18\x06 \x01(\x05R\x03sex\x12\x16\n" +
-	"\x06avatar\x18\a \x01(\tR\x06avatar\"\x98\x01\n" +
+	"\x06avatar\x18\a \x01(\tR\x06avatar\"\x82\x01\n" +
 	"\fRegisterResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
-	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12\x14\n" +
-	"\x05token\x18\x04 \x01(\tR\x05token\x12+\n" +
-	"\tuser_info\x18\x05 \x01(\v2\x0e.user.UserInfoR\buserInfo\"R\n" +
+	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12+\n" +
+	"\tuser_info\x18\x04 \x01(\v2\x0e.user.UserInfoR\buserInfo\"R\n" +
 	"\bLoginReq\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x1a\n" +

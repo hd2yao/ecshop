@@ -80,7 +80,6 @@ type RegisterResponse struct {
 	Code     int      `json:"code"`
 	Message  string   `json:"message"`
 	UserId   int64    `json:"user_id,optional"`   // 用户ID
-	Token    string   `json:"token,optional"`     // 访问令牌
 	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 }
 

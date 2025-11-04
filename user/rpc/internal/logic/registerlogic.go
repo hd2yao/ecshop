@@ -201,9 +201,6 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		}
 	}
 
-	// 13. 生成访问令牌 (这里简单使用用户ID，实际项目中应该使用JWT)
-	token := generateToken(userId)
-
 	// 13. 返回用户信息
 	userInfo := &user.UserInfo{
 		Id:         userId,
@@ -222,7 +219,6 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		Code:     int32(errcode.Success.Code()),
 		Message:  errcode.Success.Msg(),
 		UserId:   userId,
-		Token:    token,
 		UserInfo: userInfo,
 	}, nil
 }
@@ -234,11 +230,6 @@ func generateSecret() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
-}
-
-// generateToken 生成访问令牌 (简单实现，实际项目应使用JWT)
-func generateToken(userId int64) string {
-	return fmt.Sprintf("token_%d_%d", userId, time.Now().Unix())
 }
 
 // isValidURL 简单的URL验证

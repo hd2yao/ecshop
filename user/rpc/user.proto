@@ -79,8 +79,7 @@ message RegisterResp {
   int32 code = 1;
   string message = 2;
   int64 user_id = 3;
-  string token = 4;
-  UserInfo user_info = 5;
+  UserInfo user_info = 4;
 }
 
 // 用户登录相关
