@@ -35,9 +35,9 @@ var (
 var (
 	UserPhoneError       = newError(2101001, "手机号不合法")
 	UserCodeFastLimited  = newError(2101002, "验证码发送太快了")
-	UserCodeError        = newError(2102003, "验证码错误")
-	UserCodeCaptchaError = newError(2102004, "图形验证码错误")
-	UserCodeEmailError   = newError(2102005, "邮箱验证码错误")
+	UserCodeError        = newError(2101003, "验证码错误")
+	UserCodeCaptchaError = newError(2101004, "图形验证码错误")
+	UserCodeEmailError   = newError(2101005, "邮箱验证码错误")
 )
 
 /**
