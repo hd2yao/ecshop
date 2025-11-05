@@ -98,7 +98,8 @@ message LoginResp {
   int64 user_id = 3;
   string access_token = 4;   // Access Token (2小时)
   string refresh_token = 5;  // Refresh Token (7天)
-  UserInfo user_info = 6;
+  string access_token_expire_time = 6;  // Access Token 过期时间（ISO 8601格式）
+  UserInfo user_info = 7;
 }
 
 // Token 刷新相关
@@ -111,6 +112,7 @@ message RefreshTokenResp {
   string message = 2;
   string access_token = 3;   // 新的 Access Token
   string refresh_token = 4;  // 新的 Refresh Token（可选：滚动刷新）
+  string access_token_expire_time = 5;  // Access Token 过期时间（ISO 8601格式）
 }
 
 message UserInfo {

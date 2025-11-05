@@ -49,6 +49,16 @@ var (
 	UserAccountPwdError   = newError(2102003, "用户账号或密码错误")
 )
 
+/**
+ * 用户微服务 Token 相关 2103 开头
+ */
+var (
+	UserTokenInvalid        = newError(2103001, "Token 无效")
+	UserTokenExpired        = newError(2103002, "Token 已过期")
+	UserTokenMalformed      = newError(2103003, "Token 格式错误")
+	UserRefreshTokenInvalid = newError(2103004, "Refresh Token 无效或已失效")
+)
+
 // HttpStatusCode 返回 HTTP 状态码
 func (e *AppError) HttpStatusCode() int {
 	switch e.Code() {
@@ -65,6 +75,8 @@ func (e *AppError) HttpStatusCode() int {
 		return http.StatusTooManyRequests
 	case UserPhoneError.Code():
 		return http.StatusForbidden
+	case UserTokenInvalid.Code(), UserTokenExpired.Code(), UserTokenMalformed.Code(), UserRefreshTokenInvalid.Code():
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

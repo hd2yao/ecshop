@@ -58,6 +58,7 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenRequest) (resp *
 	if refreshResp.Code == int32(errcode.Success.Code()) {
 		resp.AccessToken = refreshResp.AccessToken
 		resp.RefreshToken = refreshResp.RefreshToken
+		resp.AccessTokenExpireTime = refreshResp.AccessTokenExpireTime
 	}
 
 	return resp, nil

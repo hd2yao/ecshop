@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
@@ -43,9 +44,22 @@ func (l *RefreshTokenLogic) RefreshToken(in *user.RefreshTokenReq) (*user.Refres
 	claims, err := jwt.ParseRefreshToken(in.RefreshToken)
 	if err != nil {
 		l.Errorf("解析 Refresh Token 失败: %v", err)
+		// 根据错误类型返回不同的错误码
+		errMsg := err.Error()
+		if errMsg == "token 已过期" {
+			return &user.RefreshTokenResp{
+				Code:    int32(errcode.UserTokenExpired.Code()),
+				Message: errcode.UserTokenExpired.Msg(),
+			}, nil
+		} else if errMsg == "token 格式错误" {
+			return &user.RefreshTokenResp{
+				Code:    int32(errcode.UserTokenMalformed.Code()),
+				Message: errcode.UserTokenMalformed.Msg(),
+			}, nil
+		}
 		return &user.RefreshTokenResp{
-			Code:    int32(errcode.UserAccountUnregister.Code()),
-			Message: "Refresh Token 无效或已过期",
+			Code:    int32(errcode.UserTokenInvalid.Code()),
+			Message: errcode.UserTokenInvalid.Msg(),
 		}, nil
 	}
 
@@ -53,10 +67,10 @@ func (l *RefreshTokenLogic) RefreshToken(in *user.RefreshTokenReq) (*user.Refres
 	refreshKey := redisPool.NewRedisKeyBuilder("user", "refresh_token").BuildKey(claims.Email)
 	storedToken, err := redisPool.GetRedisClient().Get(refreshKey)
 	if err != nil || storedToken != in.RefreshToken {
-		l.Errorf("Refresh Token 在 Redis 中不存在或不匹配: userId=%d", claims.UserID)
+		l.Errorf("Refresh Token 在 Redis 中不存在或不匹配: userId=%d, email=%s", claims.UserID, claims.Email)
 		return &user.RefreshTokenResp{
-			Code:    int32(errcode.UserAccountUnregister.Code()),
-			Message: "Refresh Token 已失效，请重新登录",
+			Code:    int32(errcode.UserRefreshTokenInvalid.Code()),
+			Message: errcode.UserRefreshTokenInvalid.Msg(),
 		}, nil
 	}
 
@@ -106,9 +120,10 @@ func (l *RefreshTokenLogic) RefreshToken(in *user.RefreshTokenReq) (*user.Refres
 	l.Infof("Token刷新成功: userId=%d", claims.UserID)
 
 	return &user.RefreshTokenResp{
-		Code:         int32(errcode.Success.Code()),
-		Message:      errcode.Success.Msg(),
-		AccessToken:  newAccessToken,
-		RefreshToken: newRefreshToken,
+		Code:                  int32(errcode.Success.Code()),
+		Message:               errcode.Success.Msg(),
+		AccessToken:           newAccessToken,
+		RefreshToken:          newRefreshToken,
+		AccessTokenExpireTime: time.Now().Add(jwt.AccessTokenExpiration).Format(time.RFC3339),
 	}, nil
 }

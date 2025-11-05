@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/bcrypt"
@@ -139,11 +140,12 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 	l.Infof("用户登录成功: userId=%d, email=%s, phone=%s", foundUser.Id, in.Email, in.Phone)
 
 	return &user.LoginResp{
-		Code:         int32(errcode.Success.Code()),
-		Message:      errcode.Success.Msg(),
-		UserId:       int64(foundUser.Id),
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		UserInfo:     userInfo,
+		Code:                  int32(errcode.Success.Code()),
+		Message:               errcode.Success.Msg(),
+		UserId:                int64(foundUser.Id),
+		AccessToken:           accessToken,
+		RefreshToken:          refreshToken,
+		AccessTokenExpireTime: time.Now().Add(jwt.AccessTokenExpiration).Format(time.RFC3339),
+		UserInfo:              userInfo,
 	}, nil
 }

@@ -631,15 +631,16 @@ func (x *LoginReq) GetPassword() string {
 }
 
 type LoginResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	UserId        int64                  `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,4,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`    // Access Token (2小时)
-	RefreshToken  string                 `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"` // Refresh Token (7天)
-	UserInfo      *UserInfo              `protobuf:"bytes,6,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Code                  int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message               string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserId                int64                  `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AccessToken           string                 `protobuf:"bytes,4,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`                                   // Access Token (2小时)
+	RefreshToken          string                 `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`                                // Refresh Token (7天)
+	AccessTokenExpireTime string                 `protobuf:"bytes,6,opt,name=access_token_expire_time,json=accessTokenExpireTime,proto3" json:"access_token_expire_time,omitempty"` // Access Token 过期时间（ISO 8601格式）
+	UserInfo              *UserInfo              `protobuf:"bytes,7,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *LoginResp) Reset() {
@@ -707,6 +708,13 @@ func (x *LoginResp) GetRefreshToken() string {
 	return ""
 }
 
+func (x *LoginResp) GetAccessTokenExpireTime() string {
+	if x != nil {
+		return x.AccessTokenExpireTime
+	}
+	return ""
+}
+
 func (x *LoginResp) GetUserInfo() *UserInfo {
 	if x != nil {
 		return x.UserInfo
@@ -760,13 +768,14 @@ func (x *RefreshTokenReq) GetRefreshToken() string {
 }
 
 type RefreshTokenResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	AccessToken   string                 `protobuf:"bytes,3,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`    // 新的 Access Token
-	RefreshToken  string                 `protobuf:"bytes,4,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"` // 新的 Refresh Token（可选：滚动刷新）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Code                  int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message               string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	AccessToken           string                 `protobuf:"bytes,3,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`                                   // 新的 Access Token
+	RefreshToken          string                 `protobuf:"bytes,4,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`                                // 新的 Refresh Token（可选：滚动刷新）
+	AccessTokenExpireTime string                 `protobuf:"bytes,5,opt,name=access_token_expire_time,json=accessTokenExpireTime,proto3" json:"access_token_expire_time,omitempty"` // Access Token 过期时间（ISO 8601格式）
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *RefreshTokenResp) Reset() {
@@ -823,6 +832,13 @@ func (x *RefreshTokenResp) GetAccessToken() string {
 func (x *RefreshTokenResp) GetRefreshToken() string {
 	if x != nil {
 		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *RefreshTokenResp) GetAccessTokenExpireTime() string {
+	if x != nil {
+		return x.AccessTokenExpireTime
 	}
 	return ""
 }
@@ -1263,21 +1279,23 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\bLoginReq\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\"\xc7\x01\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"\x80\x02\n" +
 	"\tLoginResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12!\n" +
 	"\faccess_token\x18\x04 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x05 \x01(\tR\frefreshToken\x12+\n" +
-	"\tuser_info\x18\x06 \x01(\v2\x0e.user.UserInfoR\buserInfo\"6\n" +
+	"\rrefresh_token\x18\x05 \x01(\tR\frefreshToken\x127\n" +
+	"\x18access_token_expire_time\x18\x06 \x01(\tR\x15accessTokenExpireTime\x12+\n" +
+	"\tuser_info\x18\a \x01(\v2\x0e.user.UserInfoR\buserInfo\"6\n" +
 	"\x0fRefreshTokenReq\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\x88\x01\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\xc1\x01\n" +
 	"\x10RefreshTokenResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12!\n" +
 	"\faccess_token\x18\x03 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x04 \x01(\tR\frefreshToken\"\xbd\x01\n" +
+	"\rrefresh_token\x18\x04 \x01(\tR\frefreshToken\x127\n" +
+	"\x18access_token_expire_time\x18\x05 \x01(\tR\x15accessTokenExpireTime\"\xbd\x01\n" +
 	"\bUserInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +

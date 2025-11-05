@@ -68,6 +68,7 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 		resp.UserId = loginResp.UserId
 		resp.AccessToken = loginResp.AccessToken
 		resp.RefreshToken = loginResp.RefreshToken
+		resp.AccessTokenExpireTime = loginResp.AccessTokenExpireTime
 		if loginResp.UserInfo != nil {
 			resp.UserInfo = types.UserInfo{
 				Id:         loginResp.UserInfo.Id,
