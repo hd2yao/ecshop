@@ -69,3 +69,29 @@ func (s *UserServer) GetUserInfo(ctx context.Context, in *user.GetUserInfoReq) (
 	l := logic.NewGetUserInfoLogic(ctx, s.svcCtx)
 	return l.GetUserInfo(in)
 }
+
+// 用户地址管理
+func (s *UserServer) GetAddressList(ctx context.Context, in *user.GetAddressListReq) (*user.GetAddressListResp, error) {
+	l := logic.NewGetAddressListLogic(ctx, s.svcCtx)
+	return l.GetAddressList(in)
+}
+
+func (s *UserServer) GetAddressDetail(ctx context.Context, in *user.GetAddressDetailReq) (*user.GetAddressDetailResp, error) {
+	l := logic.NewGetAddressDetailLogic(ctx, s.svcCtx)
+	return l.GetAddressDetail(in)
+}
+
+func (s *UserServer) AddAddress(ctx context.Context, in *user.AddAddressReq) (*user.AddAddressResp, error) {
+	l := logic.NewAddAddressLogic(ctx, s.svcCtx)
+	return l.AddAddress(in)
+}
+
+func (s *UserServer) UpdateAddress(ctx context.Context, in *user.UpdateAddressReq) (*user.UpdateAddressResp, error) {
+	l := logic.NewUpdateAddressLogic(ctx, s.svcCtx)
+	return l.UpdateAddress(in)
+}
+
+func (s *UserServer) DeleteAddress(ctx context.Context, in *user.DeleteAddressReq) (*user.DeleteAddressResp, error) {
+	l := logic.NewDeleteAddressLogic(ctx, s.svcCtx)
+	return l.DeleteAddress(in)
+}

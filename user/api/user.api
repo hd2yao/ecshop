@@ -179,6 +179,81 @@ type (
 	}
 )
 
+// ===== 用户地址管理相关结构体 =====
+type (
+	// 地址信息
+	UserAddress {
+		Id            int64  `json:"id"`
+		UserId        int64  `json:"user_id"`
+		DefaultStatus int    `json:"default_status"` // 是否默认：0否 1是
+		ReceiveName   string `json:"receive_name"` // 收货人姓名
+		Phone         string `json:"phone"` // 收货人电话
+		Province      string `json:"province"` // 省/直辖市
+		City          string `json:"city"` // 市
+		Region        string `json:"region"` // 区
+		DetailAddress string `json:"detail_address"` // 详细地址
+		CreateTime    string `json:"create_time"` // 创建时间
+		UpdateTime    string `json:"update_time"` // 更新时间
+	}
+	// 获取用户全部地址列表响应
+	GetAddressListResponse {
+		Code        int           `json:"code"`
+		Message     string        `json:"message"`
+		AddressList []UserAddress `json:"address_list,optional"`
+	}
+	// 获取地址详情请求
+	GetAddressDetailRequest {
+		AddressId int64 `path:"id"` // 地址ID
+	}
+	// 获取地址详情响应
+	GetAddressDetailResponse {
+		Code    int         `json:"code"`
+		Message string      `json:"message"`
+		Address UserAddress `json:"address,optional"`
+	}
+	// 新增地址请求
+	AddAddressRequest {
+		DefaultStatus int    `json:"default_status,optional,default=0"` // 是否默认：0否 1是
+		ReceiveName   string `json:"receive_name" validate:"required"` // 收货人姓名
+		Phone         string `json:"phone" validate:"required"` // 收货人电话
+		Province      string `json:"province" validate:"required"` // 省/直辖市
+		City          string `json:"city" validate:"required"` // 市
+		Region        string `json:"region" validate:"required"` // 区
+		DetailAddress string `json:"detail_address" validate:"required"` // 详细地址
+	}
+	// 新增地址响应
+	AddAddressResponse {
+		Code      int    `json:"code"`
+		Message   string `json:"message"`
+		AddressId int64  `json:"address_id,optional"` // 新增的地址ID
+	}
+	// 修改地址请求
+	UpdateAddressRequest {
+		AddressId     int64  `path:"id"` // 地址ID
+		DefaultStatus int    `json:"default_status,optional,default=0"` // 是否默认：0否 1是
+		ReceiveName   string `json:"receive_name" validate:"required"` // 收货人姓名
+		Phone         string `json:"phone" validate:"required"` // 收货人电话
+		Province      string `json:"province" validate:"required"` // 省/直辖市
+		City          string `json:"city" validate:"required"` // 市
+		Region        string `json:"region" validate:"required"` // 区
+		DetailAddress string `json:"detail_address" validate:"required"` // 详细地址
+	}
+	// 修改地址响应
+	UpdateAddressResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
+	// 删除地址请求
+	DeleteAddressRequest {
+		AddressId int64 `path:"id"` // 地址ID
+	}
+	// 删除地址响应
+	DeleteAddressResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
 // ===== 验证码服务 =====
 @server (
 	group:  captcha
@@ -245,5 +320,33 @@ service user-api {
 	@doc "获取当前登录用户信息"
 	@handler GetUserInfo
 	get /info returns (GetUserInfoResponse)
+}
+
+// ===== 用户地址管理服务（需要JWT认证）=====
+@server (
+	group:      address
+	prefix:     /api/user/address
+	middleware: JWTAuth // 启用JWT认证中间件
+)
+service user-api {
+	@doc "获取用户全部地址列表"
+	@handler GetAddressList
+	get /list returns (GetAddressListResponse)
+
+	@doc "获取地址详情"
+	@handler GetAddressDetail
+	get /:id (GetAddressDetailRequest) returns (GetAddressDetailResponse)
+
+	@doc "新增用户地址"
+	@handler AddAddress
+	post /add (AddAddressRequest) returns (AddAddressResponse)
+
+	@doc "修改用户地址"
+	@handler UpdateAddress
+	put /:id (UpdateAddressRequest) returns (UpdateAddressResponse)
+
+	@doc "删除用户地址"
+	@handler DeleteAddress
+	delete /:id (DeleteAddressRequest) returns (DeleteAddressResponse)
 }
 

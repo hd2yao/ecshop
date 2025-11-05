@@ -15,10 +15,11 @@ import (
 )
 
 type ServiceContext struct {
-	Config      config.Config
-	MailService *mail.MailService
-	OssClient   *oss.Client
-	UserModel   model.UserModel
+	Config           config.Config
+	MailService      *mail.MailService
+	OssClient        *oss.Client
+	UserModel        model.UserModel
+	UserAddressModel model.UserAddressModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -27,6 +28,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	
 	// 初始化用户模型（同时用于数据缓存和业务数据存储）
 	userModel := model.NewUserModel(conn, c.CacheRedis)
+	
+	// 初始化用户地址模型
+	userAddressModel := model.NewUserAddressModel(conn, c.CacheRedis)
 
 	// 初始化Redis连接池（从CacheRedis配置中提取第一个Redis配置）
 	if len(c.CacheRedis) > 0 {
@@ -68,9 +72,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	return &ServiceContext{
-		Config:      c,
-		MailService: mailService,
-		OssClient:   ossClient,
-		UserModel:   userModel,
+		Config:           c,
+		MailService:      mailService,
+		OssClient:        ossClient,
+		UserModel:        userModel,
+		UserAddressModel: userAddressModel,
 	}
 }
