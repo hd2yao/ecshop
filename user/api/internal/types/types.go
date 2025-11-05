@@ -3,6 +3,22 @@
 
 package types
 
+type AddAddressRequest struct {
+	DefaultStatus int    `json:"default_status,optional,default=0"`  // 是否默认：0否 1是
+	ReceiveName   string `json:"receive_name" validate:"required"`   // 收货人姓名
+	Phone         string `json:"phone" validate:"required"`          // 收货人电话
+	Province      string `json:"province" validate:"required"`       // 省/直辖市
+	City          string `json:"city" validate:"required"`           // 市
+	Region        string `json:"region" validate:"required"`         // 区
+	DetailAddress string `json:"detail_address" validate:"required"` // 详细地址
+}
+
+type AddAddressResponse struct {
+	Code      int    `json:"code"`
+	Message   string `json:"message"`
+	AddressId int64  `json:"address_id,optional"` // 新增的地址ID
+}
+
 type CaptchaRequest struct {
 	CaptchaType string       `json:"captcha_type,optional"` // string, math, chinese
 	Config      DriverConfig `json:"config,optional"`
@@ -22,6 +38,15 @@ type CaptchaTypeInfo struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Examples    []string `json:"examples"`
+}
+
+type DeleteAddressRequest struct {
+	AddressId int64 `path:"id"` // 地址ID
+}
+
+type DeleteAddressResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 type DrawOptions struct {
@@ -44,6 +69,22 @@ type ErrorResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Error   string `json:"error,optional"`
+}
+
+type GetAddressDetailRequest struct {
+	AddressId int64 `path:"id"` // 地址ID
+}
+
+type GetAddressDetailResponse struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Address UserAddress `json:"address,optional"`
+}
+
+type GetAddressListResponse struct {
+	Code        int           `json:"code"`
+	Message     string        `json:"message"`
+	AddressList []UserAddress `json:"address_list,optional"`
 }
 
 type GetUserInfoResponse struct {
@@ -117,11 +158,41 @@ type SendRegisterMailCodeRequest struct {
 	CodeLength  int    `json:"code_length,optional"` // 验证码长度，默认6位
 }
 
+type UpdateAddressRequest struct {
+	AddressId     int64  `path:"id"`                                 // 地址ID
+	DefaultStatus int    `json:"default_status,optional,default=0"`  // 是否默认：0否 1是
+	ReceiveName   string `json:"receive_name" validate:"required"`   // 收货人姓名
+	Phone         string `json:"phone" validate:"required"`          // 收货人电话
+	Province      string `json:"province" validate:"required"`       // 省/直辖市
+	City          string `json:"city" validate:"required"`           // 市
+	Region        string `json:"region" validate:"required"`         // 区
+	DetailAddress string `json:"detail_address" validate:"required"` // 详细地址
+}
+
+type UpdateAddressResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 type UploadPreviewAvatarResponse struct {
 	Code       int    `json:"code"`
 	Message    string `json:"message"`
 	PreviewKey string `json:"preview_key"` // 预览标识
 	PreviewUrl string `json:"preview_url"` // 预览图片
+}
+
+type UserAddress struct {
+	Id            int64  `json:"id"`
+	UserId        int64  `json:"user_id"`
+	DefaultStatus int    `json:"default_status"` // 是否默认：0否 1是
+	ReceiveName   string `json:"receive_name"`   // 收货人姓名
+	Phone         string `json:"phone"`          // 收货人电话
+	Province      string `json:"province"`       // 省/直辖市
+	City          string `json:"city"`           // 市
+	Region        string `json:"region"`         // 区
+	DetailAddress string `json:"detail_address"` // 详细地址
+	CreateTime    string `json:"create_time"`    // 创建时间
+	UpdateTime    string `json:"update_time"`    // 更新时间
 }
 
 type UserInfo struct {
