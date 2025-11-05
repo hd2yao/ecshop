@@ -18,6 +18,8 @@ type (
 	DrawOptions             = user.DrawOptions
 	GenerateCaptchaReq      = user.GenerateCaptchaReq
 	GenerateCaptchaResp     = user.GenerateCaptchaResp
+	GetUserInfoReq          = user.GetUserInfoReq
+	GetUserInfoResp         = user.GetUserInfoResp
 	LoginReq                = user.LoginReq
 	LoginResp               = user.LoginResp
 	RefreshTokenReq         = user.RefreshTokenReq
@@ -40,12 +42,14 @@ type (
 		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		// 用户注册
 		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+		// 头像上传
+		UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
 		// 用户登录
 		Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
 		// 刷新Token
 		RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
-		// 头像上传
-		UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
+		// 获取用户信息
+		GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
 	}
 
 	defaultUser struct {
@@ -82,6 +86,12 @@ func (m *defaultUser) Register(ctx context.Context, in *RegisterReq, opts ...grp
 	return client.Register(ctx, in, opts...)
 }
 
+// 头像上传
+func (m *defaultUser) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UploadPreviewAvatar(ctx, in, opts...)
+}
+
 // 用户登录
 func (m *defaultUser) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
@@ -94,8 +104,8 @@ func (m *defaultUser) RefreshToken(ctx context.Context, in *RefreshTokenReq, opt
 	return client.RefreshToken(ctx, in, opts...)
 }
 
-// 头像上传
-func (m *defaultUser) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
+// 获取用户信息
+func (m *defaultUser) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
-	return client.UploadPreviewAvatar(ctx, in, opts...)
+	return client.GetUserInfo(ctx, in, opts...)
 }

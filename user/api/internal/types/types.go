@@ -46,6 +46,12 @@ type ErrorResponse struct {
 	Error   string `json:"error,optional"`
 }
 
+type GetUserInfoResponse struct {
+	Code     int      `json:"code"`
+	Message  string   `json:"message"`
+	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+}
+
 type LoginRequest struct {
 	Email    string `json:"email,optional"`                     // 邮箱地址（邮箱和手机号二选一）
 	Phone    string `json:"phone,optional"`                     // 手机号（邮箱和手机号二选一）
