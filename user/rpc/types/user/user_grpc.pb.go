@@ -23,9 +23,10 @@ const (
 	User_VerifyCaptcha_FullMethodName        = "/user.User/VerifyCaptcha"
 	User_SendRegisterMailCode_FullMethodName = "/user.User/SendRegisterMailCode"
 	User_Register_FullMethodName             = "/user.User/Register"
+	User_UploadPreviewAvatar_FullMethodName  = "/user.User/UploadPreviewAvatar"
 	User_Login_FullMethodName                = "/user.User/Login"
 	User_RefreshToken_FullMethodName         = "/user.User/RefreshToken"
-	User_UploadPreviewAvatar_FullMethodName  = "/user.User/UploadPreviewAvatar"
+	User_GetUserInfo_FullMethodName          = "/user.User/GetUserInfo"
 )
 
 // UserClient is the client API for User service.
@@ -41,12 +42,14 @@ type UserClient interface {
 	SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 	// 用户注册
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+	// 头像上传
+	UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
 	// 用户登录
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
 	// 刷新Token
 	RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
-	// 头像上传
-	UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
+	// 获取用户信息
+	GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
 }
 
 type userClient struct {
@@ -97,6 +100,16 @@ func (c *userClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc
 	return out, nil
 }
 
+func (c *userClient) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UploadPreviewAvatarResp)
+	err := c.cc.Invoke(ctx, User_UploadPreviewAvatar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginResp)
@@ -117,10 +130,10 @@ func (c *userClient) RefreshToken(ctx context.Context, in *RefreshTokenReq, opts
 	return out, nil
 }
 
-func (c *userClient) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
+func (c *userClient) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UploadPreviewAvatarResp)
-	err := c.cc.Invoke(ctx, User_UploadPreviewAvatar_FullMethodName, in, out, cOpts...)
+	out := new(GetUserInfoResp)
+	err := c.cc.Invoke(ctx, User_GetUserInfo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +153,14 @@ type UserServer interface {
 	SendRegisterMailCode(context.Context, *SendRegisterMailCodeReq) (*SendMailCodeResp, error)
 	// 用户注册
 	Register(context.Context, *RegisterReq) (*RegisterResp, error)
+	// 头像上传
+	UploadPreviewAvatar(context.Context, *UploadPreviewAvatarReq) (*UploadPreviewAvatarResp, error)
 	// 用户登录
 	Login(context.Context, *LoginReq) (*LoginResp, error)
 	// 刷新Token
 	RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error)
-	// 头像上传
-	UploadPreviewAvatar(context.Context, *UploadPreviewAvatarReq) (*UploadPreviewAvatarResp, error)
+	// 获取用户信息
+	GetUserInfo(context.Context, *GetUserInfoReq) (*GetUserInfoResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -168,14 +183,17 @@ func (UnimplementedUserServer) SendRegisterMailCode(context.Context, *SendRegist
 func (UnimplementedUserServer) Register(context.Context, *RegisterReq) (*RegisterResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
+func (UnimplementedUserServer) UploadPreviewAvatar(context.Context, *UploadPreviewAvatarReq) (*UploadPreviewAvatarResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadPreviewAvatar not implemented")
+}
 func (UnimplementedUserServer) Login(context.Context, *LoginReq) (*LoginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedUserServer) RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
 }
-func (UnimplementedUserServer) UploadPreviewAvatar(context.Context, *UploadPreviewAvatarReq) (*UploadPreviewAvatarResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UploadPreviewAvatar not implemented")
+func (UnimplementedUserServer) GetUserInfo(context.Context, *GetUserInfoReq) (*GetUserInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -270,6 +288,24 @@ func _User_Register_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UploadPreviewAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadPreviewAvatarReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UploadPreviewAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UploadPreviewAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UploadPreviewAvatar(ctx, req.(*UploadPreviewAvatarReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginReq)
 	if err := dec(in); err != nil {
@@ -306,20 +342,20 @@ func _User_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UploadPreviewAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UploadPreviewAvatarReq)
+func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserInfoReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UploadPreviewAvatar(ctx, in)
+		return srv.(UserServer).GetUserInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UploadPreviewAvatar_FullMethodName,
+		FullMethod: User_GetUserInfo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UploadPreviewAvatar(ctx, req.(*UploadPreviewAvatarReq))
+		return srv.(UserServer).GetUserInfo(ctx, req.(*GetUserInfoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -348,6 +384,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_Register_Handler,
 		},
 		{
+			MethodName: "UploadPreviewAvatar",
+			Handler:    _User_UploadPreviewAvatar_Handler,
+		},
+		{
 			MethodName: "Login",
 			Handler:    _User_Login_Handler,
 		},
@@ -356,8 +396,8 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_RefreshToken_Handler,
 		},
 		{
-			MethodName: "UploadPreviewAvatar",
-			Handler:    _User_UploadPreviewAvatar_Handler,
+			MethodName: "GetUserInfo",
+			Handler:    _User_GetUserInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

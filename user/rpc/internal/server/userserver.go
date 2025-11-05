@@ -46,6 +46,12 @@ func (s *UserServer) Register(ctx context.Context, in *user.RegisterReq) (*user.
 	return l.Register(in)
 }
 
+// 头像上传
+func (s *UserServer) UploadPreviewAvatar(ctx context.Context, in *user.UploadPreviewAvatarReq) (*user.UploadPreviewAvatarResp, error) {
+	l := logic.NewUploadPreviewAvatarLogic(ctx, s.svcCtx)
+	return l.UploadPreviewAvatar(in)
+}
+
 // 用户登录
 func (s *UserServer) Login(ctx context.Context, in *user.LoginReq) (*user.LoginResp, error) {
 	l := logic.NewLoginLogic(ctx, s.svcCtx)
@@ -58,8 +64,8 @@ func (s *UserServer) RefreshToken(ctx context.Context, in *user.RefreshTokenReq)
 	return l.RefreshToken(in)
 }
 
-// 头像上传
-func (s *UserServer) UploadPreviewAvatar(ctx context.Context, in *user.UploadPreviewAvatarReq) (*user.UploadPreviewAvatarResp, error) {
-	l := logic.NewUploadPreviewAvatarLogic(ctx, s.svcCtx)
-	return l.UploadPreviewAvatar(in)
+// 获取用户信息
+func (s *UserServer) GetUserInfo(ctx context.Context, in *user.GetUserInfoReq) (*user.GetUserInfoResp, error) {
+	l := logic.NewGetUserInfoLogic(ctx, s.svcCtx)
+	return l.GetUserInfo(in)
 }

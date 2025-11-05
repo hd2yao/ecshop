@@ -81,4 +81,19 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 		rest.WithPrefix("/api/user"),
 	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.JWTAuth},
+			[]rest.Route{
+				{
+					// 获取当前登录用户信息
+					Method:  http.MethodGet,
+					Path:    "/info",
+					Handler: user.GetUserInfoHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/user"),
+	)
 }

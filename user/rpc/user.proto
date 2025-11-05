@@ -14,6 +14,9 @@ service User {
   
   // 用户注册
   rpc Register(RegisterReq) returns (RegisterResp);
+
+  // 头像上传
+  rpc UploadPreviewAvatar(UploadPreviewAvatarReq) returns (UploadPreviewAvatarResp);
   
   // 用户登录
   rpc Login(LoginReq) returns (LoginResp);
@@ -21,8 +24,8 @@ service User {
   // 刷新Token
   rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
   
-  // 头像上传
-  rpc UploadPreviewAvatar(UploadPreviewAvatarReq) returns (UploadPreviewAvatarResp);
+  // 获取用户信息
+  rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
 }
 
 // 图形验证码相关
@@ -30,6 +33,23 @@ message GenerateCaptchaReq {
   string captcha_type = 1;
   CaptchaConfig config = 2;
   DrawOptions draw_opts = 3;
+}
+
+// 辅助结构
+message CaptchaConfig {
+  int32 width = 1;
+  int32 height = 2;
+  int32 length = 3;
+  string bg_color = 4;
+}
+
+message DrawOptions {
+  bool use_custom_draw = 1;
+  bool draw_text = 2;
+  bool draw_hollow = 3;
+  bool draw_sine = 4;
+  int32 draw_slim_line = 5;
+  string draw_noise_text = 6;
 }
 
 message GenerateCaptchaResp {
@@ -85,6 +105,20 @@ message RegisterResp {
   UserInfo user_info = 4;
 }
 
+// 头像管理相关
+message UploadPreviewAvatarReq {
+  bytes file_data = 1;    // 文件数据
+  string filename = 2;    // 文件名
+  int64 file_size = 3;    // 文件大小
+}
+
+message UploadPreviewAvatarResp {
+  int32 code = 1;
+  string message = 2;
+  string preview_key = 3; // 预览标识
+  string preview_url = 4; // 预览图片URL
+}
+
 // 用户登录相关
 message LoginReq {
   string email = 1;     // 邮箱（邮箱和手机号二选一）
@@ -102,6 +136,17 @@ message LoginResp {
   UserInfo user_info = 7;
 }
 
+message UserInfo {
+  int64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string email = 4;
+  string phone = 5;
+  int32 sex = 6;
+  int32 points = 7;
+  string create_time = 8;
+}
+
 // Token 刷新相关
 message RefreshTokenReq {
   string refresh_token = 1;  // Refresh Token
@@ -115,44 +160,13 @@ message RefreshTokenResp {
   string access_token_expire_time = 5;  // Access Token 过期时间（ISO 8601格式）
 }
 
-message UserInfo {
-  int64 id = 1;
-  string name = 2;
-  string avatar = 3;
-  string email = 4;
-  string phone = 5;
-  int32 sex = 6;
-  int32 points = 7;
-  string create_time = 8;
+// 获取用户信息相关
+message GetUserInfoReq {
+  int64 user_id = 1;  // 用户ID（从token中获取）
 }
 
-// 辅助结构
-message CaptchaConfig {
-  int32 width = 1;
-  int32 height = 2;
-  int32 length = 3;
-  string bg_color = 4;
-}
-
-message DrawOptions {
-  bool use_custom_draw = 1;
-  bool draw_text = 2;
-  bool draw_hollow = 3;
-  bool draw_sine = 4;
-  int32 draw_slim_line = 5;
-  string draw_noise_text = 6;
-}
-
-// 头像管理相关
-message UploadPreviewAvatarReq {
-  bytes file_data = 1;    // 文件数据
-  string filename = 2;    // 文件名
-  int64 file_size = 3;    // 文件大小
-}
-
-message UploadPreviewAvatarResp {
+message GetUserInfoResp {
   int32 code = 1;
   string message = 2;
-  string preview_key = 3; // 预览标识
-  string preview_url = 4; // 预览图片URL
+  UserInfo user_info = 3;  // 用户信息
 }

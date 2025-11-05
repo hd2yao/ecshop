@@ -122,6 +122,17 @@ type (
 	}
 )
 
+// ===== 头像管理相关结构体 =====
+type (
+	// 头像上传响应
+	UploadPreviewAvatarResponse {
+		Code       int    `json:"code"`
+		Message    string `json:"message"`
+		PreviewKey string `json:"preview_key"` // 预览标识
+		PreviewUrl string `json:"preview_url"` // 预览图片
+	}
+)
+
 // ===== 用户登录相关结构体 =====
 type (
 	// 用户登录请求
@@ -158,14 +169,13 @@ type (
 	}
 )
 
-// ===== 头像管理相关结构体 =====
+// ===== 用户信息查询相关结构体 =====
 type (
-	// 头像上传响应
-	UploadPreviewAvatarResponse {
-		Code       int    `json:"code"`
-		Message    string `json:"message"`
-		PreviewKey string `json:"preview_key"` // 预览标识
-		PreviewUrl string `json:"preview_url"` // 预览图片
+	// 获取当前用户信息响应
+	GetUserInfoResponse {
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 	}
 )
 
@@ -195,6 +205,17 @@ service user-api {
 	post /register/send (SendRegisterMailCodeRequest) returns (SendMailCodeResponse)
 }
 
+// ===== 文件上传服务 =====
+@server (
+	group:  upload
+	prefix: /api/upload
+)
+service user-api {
+	@doc "头像上传预览（注册和更新通用）"
+	@handler UploadPreviewAvatar
+	post /avatar/preview returns (UploadPreviewAvatarResponse)
+}
+
 // ===== 用户注册服务 =====
 @server (
 	group:  user
@@ -214,14 +235,15 @@ service user-api {
 	post /refresh-token (RefreshTokenRequest) returns (RefreshTokenResponse)
 }
 
-// ===== 文件上传服务 =====
+// ===== 用户信息服务（需要JWT认证）=====
 @server (
-	group:  upload
-	prefix: /api/upload
+	group:      user
+	prefix:     /api/user
+	middleware: JWTAuth // 启用JWT认证中间件
 )
 service user-api {
-	@doc "头像上传预览（注册和更新通用）"
-	@handler UploadPreviewAvatar
-	post /avatar/preview returns (UploadPreviewAvatarResponse)
+	@doc "获取当前登录用户信息"
+	@handler GetUserInfo
+	get /info returns (GetUserInfoResponse)
 }
 
