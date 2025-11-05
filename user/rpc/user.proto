@@ -15,6 +15,12 @@ service User {
   // 用户注册
   rpc Register(RegisterReq) returns (RegisterResp);
   
+  // 用户登录
+  rpc Login(LoginReq) returns (LoginResp);
+  
+  // 刷新Token
+  rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
+  
   // 头像上传
   rpc UploadPreviewAvatar(UploadPreviewAvatarReq) returns (UploadPreviewAvatarResp);
 }
@@ -76,8 +82,37 @@ message RegisterResp {
   int32 code = 1;
   string message = 2;
   int64 user_id = 3;
-  string token = 4;
-  UserInfo user_info = 5;
+  UserInfo user_info = 4;
+}
+
+// 用户登录相关
+message LoginReq {
+  string email = 1;     // 邮箱（邮箱和手机号二选一）
+  string phone = 2;     // 手机号（邮箱和手机号二选一）
+  string password = 3;  // 密码
+}
+
+message LoginResp {
+  int32 code = 1;
+  string message = 2;
+  int64 user_id = 3;
+  string access_token = 4;   // Access Token (2小时)
+  string refresh_token = 5;  // Refresh Token (7天)
+  string access_token_expire_time = 6;  // Access Token 过期时间（ISO 8601格式）
+  UserInfo user_info = 7;
+}
+
+// Token 刷新相关
+message RefreshTokenReq {
+  string refresh_token = 1;  // Refresh Token
+}
+
+message RefreshTokenResp {
+  int32 code = 1;
+  string message = 2;
+  string access_token = 3;   // 新的 Access Token
+  string refresh_token = 4;  // 新的 Refresh Token（可选：滚动刷新）
+  string access_token_expire_time = 5;  // Access Token 过期时间（ISO 8601格式）
 }
 
 message UserInfo {

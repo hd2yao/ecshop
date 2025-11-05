@@ -107,7 +107,6 @@ type (
 		Code     int      `json:"code"`
 		Message  string   `json:"message"`
 		UserId   int64    `json:"user_id,optional"` // 用户ID
-		Token    string   `json:"token,optional"` // 访问令牌
 		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 	}
 	// 用户信息
@@ -120,6 +119,42 @@ type (
 		Sex        int    `json:"sex"`
 		Points     int    `json:"points"`
 		CreateTime string `json:"create_time"`
+	}
+)
+
+// ===== 用户登录相关结构体 =====
+type (
+	// 用户登录请求
+	LoginRequest {
+		Email    string `json:"email,optional"` // 邮箱地址（邮箱和手机号二选一）
+		Phone    string `json:"phone,optional"` // 手机号（邮箱和手机号二选一）
+		Password string `json:"password" validate:"required,min=6"` // 密码
+	}
+	// 用户登录响应
+	LoginResponse {
+		Code                  int      `json:"code"`
+		Message               string   `json:"message"`
+		UserId                int64    `json:"user_id,optional"` // 用户ID
+		AccessToken           string   `json:"access_token,optional"` // 访问令牌（2小时）
+		RefreshToken          string   `json:"refresh_token,optional"` // 刷新令牌（7天）
+		AccessTokenExpireTime string   `json:"access_token_expire_time,optional"` // Access Token 过期时间（ISO 8601格式）
+		UserInfo              UserInfo `json:"user_info,optional"` // 用户信息
+	}
+)
+
+// ===== Token 刷新相关结构体 =====
+type (
+	// Token 刷新请求
+	RefreshTokenRequest {
+		RefreshToken string `json:"refresh_token" validate:"required"` // Refresh Token
+	}
+	// Token 刷新响应
+	RefreshTokenResponse {
+		Code                  int    `json:"code"`
+		Message               string `json:"message"`
+		AccessToken           string `json:"access_token,optional"` // 新的 Access Token
+		RefreshToken          string `json:"refresh_token,optional"` // 新的 Refresh Token
+		AccessTokenExpireTime string `json:"access_token_expire_time,optional"` // Access Token 过期时间（ISO 8601格式）
 	}
 )
 
@@ -169,6 +204,14 @@ service user-api {
 	@doc "用户注册"
 	@handler Register
 	post /register (RegisterRequest) returns (RegisterResponse)
+
+	@doc "用户登录"
+	@handler Login
+	post /login (LoginRequest) returns (LoginResponse)
+
+	@doc "刷新Token"
+	@handler RefreshToken
+	post /refresh-token (RefreshTokenRequest) returns (RefreshTokenResponse)
 }
 
 // ===== 文件上传服务 =====

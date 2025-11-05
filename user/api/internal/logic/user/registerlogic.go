@@ -57,7 +57,6 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 		Code:    int(rpcResp.Code),
 		Message: rpcResp.Message,
 		UserId:  rpcResp.UserId,
-		Token:   rpcResp.Token,
 	}
 
 	// 4. 转换用户信息

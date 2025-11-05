@@ -46,10 +46,38 @@ type ErrorResponse struct {
 	Error   string `json:"error,optional"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email,optional"`                     // 邮箱地址（邮箱和手机号二选一）
+	Phone    string `json:"phone,optional"`                     // 手机号（邮箱和手机号二选一）
+	Password string `json:"password" validate:"required,min=6"` // 密码
+}
+
+type LoginResponse struct {
+	Code                  int      `json:"code"`
+	Message               string   `json:"message"`
+	UserId                int64    `json:"user_id,optional"`                  // 用户ID
+	AccessToken           string   `json:"access_token,optional"`             // 访问令牌（2小时）
+	RefreshToken          string   `json:"refresh_token,optional"`            // 刷新令牌（7天）
+	AccessTokenExpireTime string   `json:"access_token_expire_time,optional"` // Access Token 过期时间（ISO 8601格式）
+	UserInfo              UserInfo `json:"user_info,optional"`                // 用户信息
+}
+
 type PresetConfig struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Request     CaptchaRequest `json:"request"`
+}
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" validate:"required"` // Refresh Token
+}
+
+type RefreshTokenResponse struct {
+	Code                  int    `json:"code"`
+	Message               string `json:"message"`
+	AccessToken           string `json:"access_token,optional"`             // 新的 Access Token
+	RefreshToken          string `json:"refresh_token,optional"`            // 新的 Refresh Token
+	AccessTokenExpireTime string `json:"access_token_expire_time,optional"` // Access Token 过期时间（ISO 8601格式）
 }
 
 type RegisterRequest struct {
@@ -66,7 +94,6 @@ type RegisterResponse struct {
 	Code     int      `json:"code"`
 	Message  string   `json:"message"`
 	UserId   int64    `json:"user_id,optional"`   // 用户ID
-	Token    string   `json:"token,optional"`     // 访问令牌
 	UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 }
 

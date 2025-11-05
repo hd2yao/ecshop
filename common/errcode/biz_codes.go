@@ -35,9 +35,9 @@ var (
 var (
 	UserPhoneError       = newError(2101001, "手机号不合法")
 	UserCodeFastLimited  = newError(2101002, "验证码发送太快了")
-	UserCodeError        = newError(2102003, "验证码错误")
-	UserCodeCaptchaError = newError(2102004, "图形验证码错误")
-	UserCodeEmailError   = newError(2102005, "邮箱验证码错误")
+	UserCodeError        = newError(2101003, "验证码错误")
+	UserCodeCaptchaError = newError(2101004, "图形验证码错误")
+	UserCodeEmailError   = newError(2101005, "邮箱验证码错误")
 )
 
 /**
@@ -47,6 +47,16 @@ var (
 	UserAccountExist      = newError(2102001, "用户账号已存在")
 	UserAccountUnregister = newError(2102002, "用户账号未注册")
 	UserAccountPwdError   = newError(2102003, "用户账号或密码错误")
+)
+
+/**
+ * 用户微服务 Token 相关 2103 开头
+ */
+var (
+	UserTokenInvalid        = newError(2103001, "Token 无效")
+	UserTokenExpired        = newError(2103002, "Token 已过期")
+	UserTokenMalformed      = newError(2103003, "Token 格式错误")
+	UserRefreshTokenInvalid = newError(2103004, "Refresh Token 无效或已失效")
 )
 
 // HttpStatusCode 返回 HTTP 状态码
@@ -65,6 +75,8 @@ func (e *AppError) HttpStatusCode() int {
 		return http.StatusTooManyRequests
 	case UserPhoneError.Code():
 		return http.StatusForbidden
+	case UserTokenInvalid.Code(), UserTokenExpired.Code(), UserTokenMalformed.Code(), UserRefreshTokenInvalid.Code():
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

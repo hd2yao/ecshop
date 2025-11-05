@@ -18,6 +18,10 @@ type (
 	DrawOptions             = user.DrawOptions
 	GenerateCaptchaReq      = user.GenerateCaptchaReq
 	GenerateCaptchaResp     = user.GenerateCaptchaResp
+	LoginReq                = user.LoginReq
+	LoginResp               = user.LoginResp
+	RefreshTokenReq         = user.RefreshTokenReq
+	RefreshTokenResp        = user.RefreshTokenResp
 	RegisterReq             = user.RegisterReq
 	RegisterResp            = user.RegisterResp
 	SendMailCodeResp        = user.SendMailCodeResp
@@ -36,6 +40,10 @@ type (
 		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		// 用户注册
 		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+		// 用户登录
+		Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+		// 刷新Token
+		RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
 		// 头像上传
 		UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
 	}
@@ -72,6 +80,18 @@ func (m *defaultUser) SendRegisterMailCode(ctx context.Context, in *SendRegister
 func (m *defaultUser) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.Register(ctx, in, opts...)
+}
+
+// 用户登录
+func (m *defaultUser) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.Login(ctx, in, opts...)
+}
+
+// 刷新Token
+func (m *defaultUser) RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.RefreshToken(ctx, in, opts...)
 }
 
 // 头像上传
