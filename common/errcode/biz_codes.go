@@ -30,6 +30,24 @@ var (
 )
 
 /**
+ * 缓存相关错误码 1101 开头
+ */
+var (
+	CacheNotFound = newError(1101001, "缓存未找到")
+	CacheEmpty    = newError(1101002, "缓存为空值")
+)
+
+/**
+ * 分布式锁相关错误码 1102 开头
+ */
+var (
+	LockFailed   = newError(1102001, "获取锁失败")
+	LockNotHeld  = newError(1102002, "锁未被持有")
+	LockExpired  = newError(1102003, "锁已过期")
+	UnlockFailed = newError(1102004, "释放锁失败")
+)
+
+/**
  * 用户微服务验证码相关  2101 开头
  */
 var (
@@ -64,14 +82,14 @@ func (e *AppError) HttpStatusCode() int {
 	switch e.Code() {
 	case Success.Code():
 		return http.StatusOK
-	case CommonServerError.Code(), CommonServerBusyError.Code(), CommonPanicErr.Code():
+	case CommonServerError.Code(), CommonServerBusyError.Code(), CommonPanicErr.Code(), UnlockFailed.Code():
 		return http.StatusInternalServerError
 	case CommonOpRepeat.Code(), CommonParamError.Code(), UserCodeFastLimited.Code(), UserCodeError.Code(), UserCodeCaptchaError.Code(), UserCodeEmailError.Code(),
-		UserAccountExist.Code(), UserAccountUnregister.Code(), UserAccountPwdError.Code():
+		UserAccountExist.Code(), UserAccountUnregister.Code(), UserAccountPwdError.Code(), LockNotHeld.Code(), LockExpired.Code():
 		return http.StatusBadRequest
-	case CommonNetworkAddressError.Code():
+	case CommonNetworkAddressError.Code(), CacheNotFound.Code(), CacheEmpty.Code():
 		return http.StatusNotFound
-	case CommonTooManyTry.Code():
+	case CommonTooManyTry.Code(), LockFailed.Code():
 		return http.StatusTooManyRequests
 	case UserPhoneError.Code():
 		return http.StatusForbidden
