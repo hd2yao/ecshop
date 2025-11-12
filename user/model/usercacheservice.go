@@ -24,6 +24,16 @@ type UserCacheService struct {
 	cacheOpt  *redisPool.CacheOption
 }
 
+// DataSource 表示数据来源
+type DataSource string
+
+const (
+	// DataSourceCache 表示数据来自缓存
+	DataSourceCache DataSource = "cache"
+	// DataSourceDatabase 表示数据来自数据库
+	DataSourceDatabase DataSource = "database"
+)
+
 // NewUserCacheService 创建用户缓存服务
 func NewUserCacheService(userModel UserModel) *UserCacheService {
 	return &UserCacheService{
@@ -87,10 +97,18 @@ func toUserDTO(user *User) *UserDTO {
 // 3. 数据不存在时设置空值缓存防止穿透
 // 4. 高并发场景下的锁优化：未获取到锁的线程不等待，直接穿透查询
 func (s *UserCacheService) GetUserById(ctx context.Context, userId uint64) (*UserDTO, error) {
+	userDTO, _, err := s.GetUserByIdWithSource(ctx, userId)
+	return userDTO, err
+}
+
+// GetUserByIdWithSource 根据 ID 获取用户信息（带缓存）并返回数据来源
+func (s *UserCacheService) GetUserByIdWithSource(ctx context.Context, userId uint64) (*UserDTO, DataSource, error) {
 	cacheKey := fmt.Sprintf("id:%d", userId)
 	var userDTO UserDTO
+	source := DataSourceCache
 
 	err := s.cache.GetWithLoader(ctx, cacheKey, &userDTO, func() (interface{}, error) {
+		source = DataSourceDatabase
 		// 从数据库加载用户数据
 		user, err := s.userModel.FindOne(ctx, userId)
 		if err != nil {
@@ -105,12 +123,16 @@ func (s *UserCacheService) GetUserById(ctx context.Context, userId uint64) (*Use
 
 	if err != nil {
 		if errors.Is(err, errcode.CacheNotFound) {
-			return nil, ErrNotFound
+			return nil, DataSourceDatabase, ErrNotFound
 		}
-		return nil, err
+		return nil, source, err
 	}
 
-	return &userDTO, nil
+	if source == DataSourceDatabase && userDTO.Id == 0 {
+		return nil, source, ErrNotFound
+	}
+
+	return &userDTO, source, nil
 }
 
 // GetUserByMail 根据邮箱获取用户信息（带缓存）
@@ -175,7 +197,7 @@ func (s *UserCacheService) GetUserByIdWithMutex(ctx context.Context, userId uint
 	cacheKey := fmt.Sprintf("id:%d", userId)
 	var userDTO UserDTO
 
-	err := s.cache.GetWithLoaderAndMutex(ctx, cacheKey, &userDTO, func() (interface{}, error) {
+	err := s.cache.GetWithLoader(ctx, cacheKey, &userDTO, func() (interface{}, error) {
 		// 从数据库加载用户数据
 		user, err := s.userModel.FindOne(ctx, userId)
 		if err != nil {

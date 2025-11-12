@@ -177,6 +177,19 @@ type (
 		Message  string   `json:"message"`
 		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 	}
+	// 修改用户信息请求
+	UpdateUserInfoRequest {
+		Name   string `json:"name,optional"` // 用户昵称
+		Avatar string `json:"avatar,optional"` // 头像OSS地址
+		Phone  string `json:"phone,optional"` // 手机号
+		Sex    int    `json:"sex,optional"` // 性别：0女 1男
+	}
+	// 修改用户信息响应
+	UpdateUserInfoResponse {
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		UserInfo UserInfo `json:"user_info,optional"` // 更新后的用户信息
+	}
 )
 
 // ===== 用户地址管理相关结构体 =====
@@ -320,6 +333,10 @@ service user-api {
 	@doc "获取当前登录用户信息"
 	@handler GetUserInfo
 	get /info returns (GetUserInfoResponse)
+
+	@doc "修改用户个人信息"
+	@handler UpdateUserInfo
+	put /info (UpdateUserInfoRequest) returns (UpdateUserInfoResponse)
 }
 
 // ===== 用户地址管理服务（需要JWT认证）=====

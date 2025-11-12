@@ -14,7 +14,7 @@ type (
 	// and implement the added methods in customUserModel.
 	UserModel interface {
 		userModel
-		// CacheService 扩展方法：带缓存的用户服务
+		// 扩展方法：带缓存的用户服务
 		CacheService() *UserCacheService
 	}
 

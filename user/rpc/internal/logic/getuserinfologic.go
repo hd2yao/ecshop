@@ -2,12 +2,12 @@ package logic
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"github.com/hd2yao/ecshop/common/errcode"
+	"github.com/hd2yao/ecshop/user/model"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
 )
@@ -38,10 +38,10 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.GetUserInfoReq) (*user.GetUserIn
 
 	l.Infof("查询用户信息，用户ID: %d", in.UserId)
 
-	// 2. 从数据库查询用户信息
-	userInfo, err := l.svcCtx.UserModel.FindOne(l.ctx, uint64(in.UserId))
+	// 2. 优先从缓存查询用户信息
+	userDTO, source, err := l.svcCtx.UserModel.CacheService().GetUserByIdWithSource(l.ctx, uint64(in.UserId))
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, model.ErrNotFound) {
 			// 用户不存在
 			l.Infof("用户不存在，用户ID: %d", in.UserId)
 			return &user.GetUserInfoResp{
@@ -57,19 +57,41 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.GetUserInfoReq) (*user.GetUserIn
 		}, nil
 	}
 
+	if userDTO == nil {
+		l.Infof("缓存未命中且数据库未查询到用户，用户ID: %d", in.UserId)
+		return &user.GetUserInfoResp{
+			Code:    int32(errcode.UserAccountUnregister.Code()),
+			Message: errcode.UserAccountUnregister.Msg(),
+		}, nil
+	}
+
+	switch source {
+	case model.DataSourceCache:
+		l.Infof("用户信息来自缓存，用户ID: %d", in.UserId)
+	case model.DataSourceDatabase:
+		l.Infof("用户信息来自数据库，用户ID: %d", in.UserId)
+	default:
+		l.Infof("用户信息来源未知(%s)，用户ID: %d", source, in.UserId)
+	}
+
+	createTime := ""
+	if !userDTO.CreateTime.IsZero() {
+		createTime = userDTO.CreateTime.Format("2006-01-02 15:04:05")
+	}
+
 	// 3. 返回用户信息
 	return &user.GetUserInfoResp{
 		Code:    int32(errcode.Success.Code()),
 		Message: errcode.Success.Msg(),
 		UserInfo: &user.UserInfo{
-			Id:         int64(userInfo.Id),
-			Name:       userInfo.Name.String,
-			Avatar:     userInfo.Avatar.String,
-			Email:      userInfo.Mail.String,
-			Phone:      userInfo.Phone.String,
-			Sex:        int32(userInfo.Sex),
-			Points:     int32(userInfo.Points),
-			CreateTime: userInfo.CreateTime.Time.Format("2006-01-02 15:04:05"),
+			Id:         int64(userDTO.Id),
+			Name:       userDTO.Name,
+			Avatar:     userDTO.Avatar,
+			Email:      userDTO.Mail,
+			Phone:      userDTO.Phone,
+			Sex:        int32(userDTO.Sex),
+			Points:     int32(userDTO.Points),
+			CreateTime: createTime,
 		},
 	}, nil
 }

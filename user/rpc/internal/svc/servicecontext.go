@@ -23,22 +23,22 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	// 初始化数据库连接
-	conn := sqlx.NewMysql(c.DataSource)
-	
-	// 初始化用户模型（同时用于数据缓存和业务数据存储）
-	userModel := model.NewUserModel(conn, c.CacheRedis)
-	
-	// 初始化用户地址模型
-	userAddressModel := model.NewUserAddressModel(conn, c.CacheRedis)
-
-	// 初始化Redis连接池（从CacheRedis配置中提取第一个Redis配置）
+	// 初始化 Redis 连接池（从 CacheRedis 配置中提取第一个 Redis 配置）
 	if len(c.CacheRedis) > 0 {
 		redisConf := c.CacheRedis[0]
 		if err := redisPool.InitRedisPoolFromGoZero(redisConf.RedisConf); err != nil {
 			log.Fatalf("初始化Redis连接池失败: %v", err)
 		}
 	}
+
+	// 初始化数据库连接
+	conn := sqlx.NewMysql(c.DataSource)
+
+	// 初始化用户模型（同时用于数据缓存和业务数据存储）
+	userModel := model.NewUserModel(conn, c.CacheRedis)
+
+	// 初始化用户地址模型
+	userAddressModel := model.NewUserAddressModel(conn, c.CacheRedis)
 
 	// 初始化邮件服务 - 从环境变量读取配置
 	mailConfig := c.Mail

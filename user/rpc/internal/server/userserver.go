@@ -70,6 +70,12 @@ func (s *UserServer) GetUserInfo(ctx context.Context, in *user.GetUserInfoReq) (
 	return l.GetUserInfo(in)
 }
 
+// 修改用户信息
+func (s *UserServer) UpdateUserInfo(ctx context.Context, in *user.UpdateUserInfoReq) (*user.UpdateUserInfoResp, error) {
+	l := logic.NewUpdateUserInfoLogic(ctx, s.svcCtx)
+	return l.UpdateUserInfo(in)
+}
+
 // 用户地址管理
 func (s *UserServer) GetAddressList(ctx context.Context, in *user.GetAddressListReq) (*user.GetAddressListResp, error) {
 	l := logic.NewGetAddressListLogic(ctx, s.svcCtx)
