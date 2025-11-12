@@ -26,6 +26,10 @@ const (
 	DefaultBaseExpiry = 48 * time.Hour
 	// DefaultAutoRefreshThreshold 自动续期阈值（剩余过期时间百分比）
 	DefaultAutoRefreshThreshold = 0.2
+	// DefaultLockWaitTimeout 等待缓存更新的最大超时时间
+	DefaultLockWaitTimeout = 500 * time.Millisecond
+	// DefaultLockPollInterval 轮询检查缓存的间隔时间
+	DefaultLockPollInterval = 50 * time.Millisecond
 )
 
 // ==================== 类型定义 ====================
@@ -47,6 +51,8 @@ type CacheOption struct {
 	EmptyExpiry          time.Duration // 空值过期时间（防止缓存穿透）
 	EnableAutoRefresh    bool          // 是否启用自动续期
 	AutoRefreshThreshold float64       // 自动续期阈值（剩余过期时间百分比）
+	LockWaitTimeout      time.Duration // 等待缓存更新的最大超时时间（当获取不到锁时）
+	LockPollInterval     time.Duration // 轮询检查缓存的间隔时间
 }
 
 // DefaultCacheOption 默认缓存配置
@@ -57,6 +63,8 @@ func DefaultCacheOption() *CacheOption {
 		EmptyExpiry:          DefaultEmptyExpiry,
 		EnableAutoRefresh:    true,
 		AutoRefreshThreshold: DefaultAutoRefreshThreshold,
+		LockWaitTimeout:      DefaultLockWaitTimeout,
+		LockPollInterval:     DefaultLockPollInterval,
 	}
 }
 
@@ -78,9 +86,12 @@ func NewRedisCache(module, business string) *RedisCache {
 //   - 缓存击穿防护：分布式锁 + Double Check
 //   - 缓存雪崩防护：随机过期时间
 //   - 热点数据自动延期：访问频繁的数据自动续期
-//   - 高并发优化：串行转并发，未获取锁的线程自动降级
+//   - 读写互斥：使用与 UpdateWithMutex 相同的互斥锁，保证读写串行化
+//   - 串行转并发：使用非阻塞锁，只有一个线程加载数据，其他线程轮询等待缓存更新
 //
-// 适用场景：高并发读场景（如首页 Feed 流、商品详情页）
+// 适用场景：需要保证数据库和缓存强一致性的场景（如用户信息、账户设置）
+// 优化说明：当缓存过期时，只有一个线程获取锁并加载数据，其他线程不等待锁，
+//           而是轮询检查缓存是否已更新，实现从"串行"到"并发"的性能提升
 func (c *RedisCache) GetWithLoader(
 	ctx context.Context,
 	key string,
@@ -93,8 +104,10 @@ func (c *RedisCache) GetWithLoader(
 	}
 
 	cacheKey := c.keyBuilder.BuildKey(key)
+	// 使用与 UpdateWithMutex 相同的互斥锁，保证读写互斥
+	lockKey := c.keyBuilder.BuildKey(key + ":mutex")
 
-	// 第一次尝试：直接从缓存读取
+	// 1. 外层快速检查（无锁）：如果缓存存在，直接返回
 	ttl, err := c.getFromCache(ctx, cacheKey, result)
 	if err == nil {
 		// 缓存命中，检查是否需要自动续期
@@ -109,93 +122,9 @@ func (c *RedisCache) GetWithLoader(
 		return errcode.CacheNotFound
 	}
 
-	// 缓存未命中，需要从数据源加载
-	// 使用分布式锁保护，防止缓存击穿
-	lockKey := c.keyBuilder.BuildKey(key + ":lock")
-
-	// 尝试获取锁（非阻塞）
+	// 2. 尝试非阻塞获取锁：只有第一个请求能获取到锁
 	executed, err := c.lockExecutor.ExecuteWithTryLock(ctx, lockKey, 10*time.Second, func() error {
-		// Double Check：再次检查缓存，避免重复加载
-		_, err := c.getFromCache(ctx, cacheKey, result)
-		if err == nil {
-			return nil
-		}
-
-		// 从数据源加载
-		data, loadErr := loader()
-		if loadErr != nil {
-			return fmt.Errorf("加载数据失败: %w", loadErr)
-		}
-
-		// 如果数据为空，设置空值缓存防止穿透
-		if data == nil {
-			return c.SetEmpty(ctx, key, opt.EmptyExpiry)
-		}
-
-		// 设置缓存
-		expiry := c.calculateExpiry(opt)
-		return c.Set(ctx, key, data, expiry)
-	})
-
-	if err != nil {
-		return err
-	}
-
-	// 如果没有执行（说明没获取到锁）
-	if !executed {
-		// 短暂等待后重试读取缓存（此时其他线程可能已经加载完成）
-		time.Sleep(50 * time.Millisecond)
-
-		// 再次尝试从缓存读取
-		_, err := c.getFromCache(ctx, cacheKey, result)
-		if err == nil {
-			return nil
-		}
-
-		// 如果还是读不到，可能是并发量太大，直接穿透到数据库
-		// 这里不再使用阻塞锁，避免大量线程排队
-		data, loadErr := loader()
-		if loadErr != nil {
-			return fmt.Errorf("加载数据失败: %w", loadErr)
-		}
-
-		if data == nil {
-			return errcode.CacheNotFound
-		}
-
-		// 将数据赋值给 result
-		return c.unmarshalData(data, result)
-	}
-
-	// 重新读取缓存
-	_, err = c.getFromCache(ctx, cacheKey, result)
-	return err
-}
-
-// GetWithLoaderAndMutex 获取缓存，使用互斥锁保证读写串行化（强一致性）
-//
-// 使用场景：需要保证数据库和缓存强一致性的场景（如个人中心、账户设置）
-//
-// 与 GetWithLoader 的区别：
-//   - GetWithLoader: 非阻塞锁，高并发优化，允许短暂不一致
-//   - GetWithLoaderAndMutex: 互斥锁，读写串行化，保证强一致性
-func (c *RedisCache) GetWithLoaderAndMutex(
-	ctx context.Context,
-	key string,
-	result interface{},
-	loader func() (interface{}, error),
-	opt *CacheOption,
-) error {
-	if opt == nil {
-		opt = DefaultCacheOption()
-	}
-
-	cacheKey := c.keyBuilder.BuildKey(key)
-	lockKey := c.keyBuilder.BuildKey(key + ":mutex")
-
-	// 使用分布式锁保证读写互斥
-	return c.lockExecutor.ExecuteWithLock(ctx, lockKey, 10*time.Second, 3*time.Second, func() error {
-		// Double Check：在锁内再次检查缓存
+		// Double Check：在锁内再次检查缓存（防止在获取锁的过程中缓存已被更新）
 		ttl, err := c.getFromCache(ctx, cacheKey, result)
 		if err == nil {
 			// 缓存命中，检查是否需要自动续期
@@ -221,21 +150,45 @@ func (c *RedisCache) GetWithLoaderAndMutex(
 			return c.SetEmpty(ctx, key, opt.EmptyExpiry)
 		}
 
+		// Double Check 写入：在写入缓存前再次检查缓存是否已被更新
+		// 防止并发场景下，其他线程（如更新操作）已经更新了缓存，导致旧数据覆盖新数据
+		exists, _ := c.client.ExistsCtx(ctx, cacheKey)
+		if exists {
+			// 缓存已被更新，重新读取缓存数据而不是写入旧数据
+			_, err := c.getFromCache(ctx, cacheKey, result)
+			if err == nil {
+				return nil
+			}
+		}
+
 		// 设置缓存
 		expiry := c.calculateExpiry(opt)
 		if err := c.Set(ctx, key, data, expiry); err != nil {
 			return err
 		}
 
-		// 将数据赋值给 result
+		// 将数据赋值给 result，避免重新读取缓存
 		return c.unmarshalData(data, result)
 	})
+
+	if err != nil {
+		return err
+	}
+
+	// 3. 如果获取到锁并执行完成，直接返回
+	if executed {
+		return nil
+	}
+
+	// 4. 如果获取不到锁，说明有其他请求正在加载数据，轮询等待缓存更新
+	// 这样其他线程就不需要等待锁，而是直接并发读取缓存，实现"串行"转"并发"
+	return c.waitForCacheUpdate(ctx, cacheKey, result, opt)
 }
 
 // UpdateWithMutex 在分布式锁保护下更新缓存和数据库
 //
 // 用于写操作，保证缓存和数据库的强一致性
-// 使用与 GetWithLoaderAndMutex 相同的互斥锁，保证读写互斥
+// 使用与 GetWithLoader 相同的互斥锁，保证读写互斥
 //
 // 使用场景：更新用户信息、修改订单状态等需要强一致性的写操作
 func (c *RedisCache) UpdateWithMutex(
@@ -808,6 +761,75 @@ func (c *RedisCache) getFromCache(ctx context.Context, cacheKey string, result i
 	}
 
 	return time.Duration(ttl) * time.Second, nil
+}
+
+// waitForCacheUpdate 等待其他请求完成缓存更新（内部方法）
+//
+// 当获取不到锁时，说明有其他请求正在加载数据，此时不等待锁释放，
+// 而是轮询检查缓存是否已被更新，一旦缓存更新立即返回。
+// 这样实现了从"串行等待锁"到"并发读取缓存"的性能优化。
+func (c *RedisCache) waitForCacheUpdate(
+	ctx context.Context,
+	cacheKey string,
+	result interface{},
+	opt *CacheOption,
+) error {
+	// 设置默认值
+	waitTimeout := opt.LockWaitTimeout
+	if waitTimeout == 0 {
+		waitTimeout = DefaultLockWaitTimeout
+	}
+	pollInterval := opt.LockPollInterval
+	if pollInterval == 0 {
+		pollInterval = DefaultLockPollInterval
+	}
+
+	deadline := time.Now().Add(waitTimeout)
+	ticker := time.NewTicker(pollInterval)
+	defer ticker.Stop()
+
+	// 第一次立即检查（可能在轮询间隔内缓存已被更新）
+	ttl, err := c.getFromCache(ctx, cacheKey, result)
+	if err == nil {
+		// 缓存已更新，直接返回
+		if opt.EnableAutoRefresh {
+			c.tryAutoRefresh(ctx, cacheKey, ttl, opt)
+		}
+		return nil
+	}
+
+	// 轮询等待缓存更新
+	for {
+		// 检查是否超时
+		if time.Now().After(deadline) {
+			// 超时，返回缓存未找到错误
+			// 注意：这里不返回 CacheEmpty，因为可能是加载失败或超时
+			return errcode.CacheNotFound
+		}
+
+		// 等待下次轮询
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+			// 检查缓存是否已更新
+			ttl, err := c.getFromCache(ctx, cacheKey, result)
+			if err == nil {
+				// 缓存已更新，直接返回
+				if opt.EnableAutoRefresh {
+					c.tryAutoRefresh(ctx, cacheKey, ttl, opt)
+				}
+				return nil
+			}
+
+			// 如果是空值缓存，返回错误
+			if errors.Is(err, errcode.CacheEmpty) {
+				return errcode.CacheNotFound
+			}
+
+			// 缓存仍未更新，继续等待
+		}
+	}
 }
 
 // unmarshalData 将数据反序列化到 result（内部方法）
