@@ -27,6 +27,7 @@ const (
 	User_Login_FullMethodName                = "/user.User/Login"
 	User_RefreshToken_FullMethodName         = "/user.User/RefreshToken"
 	User_GetUserInfo_FullMethodName          = "/user.User/GetUserInfo"
+	User_UpdateUserInfo_FullMethodName       = "/user.User/UpdateUserInfo"
 	User_GetAddressList_FullMethodName       = "/user.User/GetAddressList"
 	User_GetAddressDetail_FullMethodName     = "/user.User/GetAddressDetail"
 	User_AddAddress_FullMethodName           = "/user.User/AddAddress"
@@ -55,6 +56,8 @@ type UserClient interface {
 	RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
 	// 获取用户信息
 	GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
+	// 修改用户信息
+	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error)
 	// 用户地址管理
 	GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error)
 	GetAddressDetail(ctx context.Context, in *GetAddressDetailReq, opts ...grpc.CallOption) (*GetAddressDetailResp, error)
@@ -151,6 +154,16 @@ func (c *userClient) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts .
 	return out, nil
 }
 
+func (c *userClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateUserInfoResp)
+	err := c.cc.Invoke(ctx, User_UpdateUserInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAddressListResp)
@@ -222,6 +235,8 @@ type UserServer interface {
 	RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error)
 	// 获取用户信息
 	GetUserInfo(context.Context, *GetUserInfoReq) (*GetUserInfoResp, error)
+	// 修改用户信息
+	UpdateUserInfo(context.Context, *UpdateUserInfoReq) (*UpdateUserInfoResp, error)
 	// 用户地址管理
 	GetAddressList(context.Context, *GetAddressListReq) (*GetAddressListResp, error)
 	GetAddressDetail(context.Context, *GetAddressDetailReq) (*GetAddressDetailResp, error)
@@ -261,6 +276,9 @@ func (UnimplementedUserServer) RefreshToken(context.Context, *RefreshTokenReq) (
 }
 func (UnimplementedUserServer) GetUserInfo(context.Context, *GetUserInfoReq) (*GetUserInfoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
+}
+func (UnimplementedUserServer) UpdateUserInfo(context.Context, *UpdateUserInfoReq) (*UpdateUserInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserInfo not implemented")
 }
 func (UnimplementedUserServer) GetAddressList(context.Context, *GetAddressListReq) (*GetAddressListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAddressList not implemented")
@@ -442,6 +460,24 @@ func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UpdateUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateUserInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateUserInfo(ctx, req.(*UpdateUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAddressListReq)
 	if err := dec(in); err != nil {
@@ -570,6 +606,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserInfo",
 			Handler:    _User_GetUserInfo_Handler,
+		},
+		{
+			MethodName: "UpdateUserInfo",
+			Handler:    _User_UpdateUserInfo_Handler,
 		},
 		{
 			MethodName: "GetAddressList",

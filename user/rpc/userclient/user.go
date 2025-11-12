@@ -39,6 +39,8 @@ type (
 	SendRegisterMailCodeReq = user.SendRegisterMailCodeReq
 	UpdateAddressReq        = user.UpdateAddressReq
 	UpdateAddressResp       = user.UpdateAddressResp
+	UpdateUserInfoReq       = user.UpdateUserInfoReq
+	UpdateUserInfoResp      = user.UpdateUserInfoResp
 	UploadPreviewAvatarReq  = user.UploadPreviewAvatarReq
 	UploadPreviewAvatarResp = user.UploadPreviewAvatarResp
 	UserInfo                = user.UserInfo
@@ -61,6 +63,8 @@ type (
 		RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
 		// 获取用户信息
 		GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
+		// 修改用户信息
+		UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error)
 		// 用户地址管理
 		GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error)
 		GetAddressDetail(ctx context.Context, in *GetAddressDetailReq, opts ...grpc.CallOption) (*GetAddressDetailResp, error)
@@ -125,6 +129,12 @@ func (m *defaultUser) RefreshToken(ctx context.Context, in *RefreshTokenReq, opt
 func (m *defaultUser) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetUserInfo(ctx, in, opts...)
+}
+
+// 修改用户信息
+func (m *defaultUser) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateUserInfo(ctx, in, opts...)
 }
 
 // 用户地址管理

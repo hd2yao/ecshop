@@ -27,6 +27,9 @@ service User {
   // 获取用户信息
   rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
   
+  // 修改用户信息
+  rpc UpdateUserInfo(UpdateUserInfoReq) returns (UpdateUserInfoResp);
+  
   // 用户地址管理
   rpc GetAddressList(GetAddressListReq) returns (GetAddressListResp);
   rpc GetAddressDetail(GetAddressDetailReq) returns (GetAddressDetailResp);
@@ -176,6 +179,21 @@ message GetUserInfoResp {
   int32 code = 1;
   string message = 2;
   UserInfo user_info = 3;  // 用户信息
+}
+
+// 修改用户信息相关
+message UpdateUserInfoReq {
+  int64 user_id = 1;  // 用户ID
+  string name = 2;    // 用户昵称（可选）
+  string avatar = 3;  // 头像OSS地址（可选）
+  string phone = 4;   // 手机号（可选）
+  int32 sex = 5;      // 性别：0女 1男（可选）
+}
+
+message UpdateUserInfoResp {
+  int32 code = 1;
+  string message = 2;
+  UserInfo user_info = 3;  // 更新后的用户信息
 }
 
 // 用户地址管理相关

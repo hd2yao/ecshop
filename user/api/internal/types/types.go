@@ -174,6 +174,19 @@ type UpdateAddressResponse struct {
 	Message string `json:"message"`
 }
 
+type UpdateUserInfoRequest struct {
+	Name   string `json:"name,optional"`   // 用户昵称
+	Avatar string `json:"avatar,optional"` // 头像OSS地址
+	Phone  string `json:"phone,optional"`  // 手机号
+	Sex    int    `json:"sex,optional"`    // 性别：0女 1男
+}
+
+type UpdateUserInfoResponse struct {
+	Code     int      `json:"code"`
+	Message  string   `json:"message"`
+	UserInfo UserInfo `json:"user_info,optional"` // 更新后的用户信息
+}
+
 type UploadPreviewAvatarResponse struct {
 	Code       int    `json:"code"`
 	Message    string `json:"message"`

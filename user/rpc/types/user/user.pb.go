@@ -1330,6 +1330,143 @@ func (x *GetUserInfoResp) GetUserInfo() *UserInfo {
 	return nil
 }
 
+// 修改用户信息相关
+type UpdateUserInfoReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                    // 用户昵称（可选）
+	Avatar        string                 `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar,omitempty"`                // 头像OSS地址（可选）
+	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`                  // 手机号（可选）
+	Sex           int32                  `protobuf:"varint,5,opt,name=sex,proto3" json:"sex,omitempty"`                     // 性别：0女 1男（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserInfoReq) Reset() {
+	*x = UpdateUserInfoReq{}
+	mi := &file_rpc_user_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserInfoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserInfoReq) ProtoMessage() {}
+
+func (x *UpdateUserInfoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserInfoReq.ProtoReflect.Descriptor instead.
+func (*UpdateUserInfoReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateUserInfoReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UpdateUserInfoReq) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoReq) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoReq) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoReq) GetSex() int32 {
+	if x != nil {
+		return x.Sex
+	}
+	return 0
+}
+
+type UpdateUserInfoResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserInfo      *UserInfo              `protobuf:"bytes,3,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"` // 更新后的用户信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserInfoResp) Reset() {
+	*x = UpdateUserInfoResp{}
+	mi := &file_rpc_user_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserInfoResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserInfoResp) ProtoMessage() {}
+
+func (x *UpdateUserInfoResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserInfoResp.ProtoReflect.Descriptor instead.
+func (*UpdateUserInfoResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpdateUserInfoResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateUserInfoResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoResp) GetUserInfo() *UserInfo {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
 // 用户地址管理相关
 type AddressInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1350,7 +1487,7 @@ type AddressInfo struct {
 
 func (x *AddressInfo) Reset() {
 	*x = AddressInfo{}
-	mi := &file_rpc_user_proto_msgTypes[19]
+	mi := &file_rpc_user_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1362,7 +1499,7 @@ func (x *AddressInfo) String() string {
 func (*AddressInfo) ProtoMessage() {}
 
 func (x *AddressInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[19]
+	mi := &file_rpc_user_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1375,7 +1512,7 @@ func (x *AddressInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddressInfo.ProtoReflect.Descriptor instead.
 func (*AddressInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{19}
+	return file_rpc_user_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *AddressInfo) GetId() int64 {
@@ -1465,7 +1602,7 @@ type GetAddressListReq struct {
 
 func (x *GetAddressListReq) Reset() {
 	*x = GetAddressListReq{}
-	mi := &file_rpc_user_proto_msgTypes[20]
+	mi := &file_rpc_user_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1477,7 +1614,7 @@ func (x *GetAddressListReq) String() string {
 func (*GetAddressListReq) ProtoMessage() {}
 
 func (x *GetAddressListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[20]
+	mi := &file_rpc_user_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1490,7 +1627,7 @@ func (x *GetAddressListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAddressListReq.ProtoReflect.Descriptor instead.
 func (*GetAddressListReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{20}
+	return file_rpc_user_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetAddressListReq) GetUserId() int64 {
@@ -1511,7 +1648,7 @@ type GetAddressListResp struct {
 
 func (x *GetAddressListResp) Reset() {
 	*x = GetAddressListResp{}
-	mi := &file_rpc_user_proto_msgTypes[21]
+	mi := &file_rpc_user_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1523,7 +1660,7 @@ func (x *GetAddressListResp) String() string {
 func (*GetAddressListResp) ProtoMessage() {}
 
 func (x *GetAddressListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[21]
+	mi := &file_rpc_user_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1536,7 +1673,7 @@ func (x *GetAddressListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAddressListResp.ProtoReflect.Descriptor instead.
 func (*GetAddressListResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{21}
+	return file_rpc_user_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetAddressListResp) GetCode() int32 {
@@ -1571,7 +1708,7 @@ type GetAddressDetailReq struct {
 
 func (x *GetAddressDetailReq) Reset() {
 	*x = GetAddressDetailReq{}
-	mi := &file_rpc_user_proto_msgTypes[22]
+	mi := &file_rpc_user_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1583,7 +1720,7 @@ func (x *GetAddressDetailReq) String() string {
 func (*GetAddressDetailReq) ProtoMessage() {}
 
 func (x *GetAddressDetailReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[22]
+	mi := &file_rpc_user_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1596,7 +1733,7 @@ func (x *GetAddressDetailReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAddressDetailReq.ProtoReflect.Descriptor instead.
 func (*GetAddressDetailReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{22}
+	return file_rpc_user_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetAddressDetailReq) GetUserId() int64 {
@@ -1624,7 +1761,7 @@ type GetAddressDetailResp struct {
 
 func (x *GetAddressDetailResp) Reset() {
 	*x = GetAddressDetailResp{}
-	mi := &file_rpc_user_proto_msgTypes[23]
+	mi := &file_rpc_user_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1636,7 +1773,7 @@ func (x *GetAddressDetailResp) String() string {
 func (*GetAddressDetailResp) ProtoMessage() {}
 
 func (x *GetAddressDetailResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[23]
+	mi := &file_rpc_user_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1649,7 +1786,7 @@ func (x *GetAddressDetailResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAddressDetailResp.ProtoReflect.Descriptor instead.
 func (*GetAddressDetailResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{23}
+	return file_rpc_user_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetAddressDetailResp) GetCode() int32 {
@@ -1690,7 +1827,7 @@ type AddAddressReq struct {
 
 func (x *AddAddressReq) Reset() {
 	*x = AddAddressReq{}
-	mi := &file_rpc_user_proto_msgTypes[24]
+	mi := &file_rpc_user_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1702,7 +1839,7 @@ func (x *AddAddressReq) String() string {
 func (*AddAddressReq) ProtoMessage() {}
 
 func (x *AddAddressReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[24]
+	mi := &file_rpc_user_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1715,7 +1852,7 @@ func (x *AddAddressReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddAddressReq.ProtoReflect.Descriptor instead.
 func (*AddAddressReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{24}
+	return file_rpc_user_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *AddAddressReq) GetUserId() int64 {
@@ -1785,7 +1922,7 @@ type AddAddressResp struct {
 
 func (x *AddAddressResp) Reset() {
 	*x = AddAddressResp{}
-	mi := &file_rpc_user_proto_msgTypes[25]
+	mi := &file_rpc_user_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1797,7 +1934,7 @@ func (x *AddAddressResp) String() string {
 func (*AddAddressResp) ProtoMessage() {}
 
 func (x *AddAddressResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[25]
+	mi := &file_rpc_user_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1810,7 +1947,7 @@ func (x *AddAddressResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddAddressResp.ProtoReflect.Descriptor instead.
 func (*AddAddressResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{25}
+	return file_rpc_user_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *AddAddressResp) GetCode() int32 {
@@ -1852,7 +1989,7 @@ type UpdateAddressReq struct {
 
 func (x *UpdateAddressReq) Reset() {
 	*x = UpdateAddressReq{}
-	mi := &file_rpc_user_proto_msgTypes[26]
+	mi := &file_rpc_user_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1864,7 +2001,7 @@ func (x *UpdateAddressReq) String() string {
 func (*UpdateAddressReq) ProtoMessage() {}
 
 func (x *UpdateAddressReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[26]
+	mi := &file_rpc_user_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1877,7 +2014,7 @@ func (x *UpdateAddressReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAddressReq.ProtoReflect.Descriptor instead.
 func (*UpdateAddressReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{26}
+	return file_rpc_user_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpdateAddressReq) GetUserId() int64 {
@@ -1953,7 +2090,7 @@ type UpdateAddressResp struct {
 
 func (x *UpdateAddressResp) Reset() {
 	*x = UpdateAddressResp{}
-	mi := &file_rpc_user_proto_msgTypes[27]
+	mi := &file_rpc_user_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1965,7 +2102,7 @@ func (x *UpdateAddressResp) String() string {
 func (*UpdateAddressResp) ProtoMessage() {}
 
 func (x *UpdateAddressResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[27]
+	mi := &file_rpc_user_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1978,7 +2115,7 @@ func (x *UpdateAddressResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAddressResp.ProtoReflect.Descriptor instead.
 func (*UpdateAddressResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{27}
+	return file_rpc_user_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UpdateAddressResp) GetCode() int32 {
@@ -2006,7 +2143,7 @@ type DeleteAddressReq struct {
 
 func (x *DeleteAddressReq) Reset() {
 	*x = DeleteAddressReq{}
-	mi := &file_rpc_user_proto_msgTypes[28]
+	mi := &file_rpc_user_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2018,7 +2155,7 @@ func (x *DeleteAddressReq) String() string {
 func (*DeleteAddressReq) ProtoMessage() {}
 
 func (x *DeleteAddressReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[28]
+	mi := &file_rpc_user_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2031,7 +2168,7 @@ func (x *DeleteAddressReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAddressReq.ProtoReflect.Descriptor instead.
 func (*DeleteAddressReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{28}
+	return file_rpc_user_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *DeleteAddressReq) GetUserId() int64 {
@@ -2058,7 +2195,7 @@ type DeleteAddressResp struct {
 
 func (x *DeleteAddressResp) Reset() {
 	*x = DeleteAddressResp{}
-	mi := &file_rpc_user_proto_msgTypes[29]
+	mi := &file_rpc_user_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2070,7 +2207,7 @@ func (x *DeleteAddressResp) String() string {
 func (*DeleteAddressResp) ProtoMessage() {}
 
 func (x *DeleteAddressResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[29]
+	mi := &file_rpc_user_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2083,7 +2220,7 @@ func (x *DeleteAddressResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAddressResp.ProtoReflect.Descriptor instead.
 func (*DeleteAddressResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{29}
+	return file_rpc_user_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *DeleteAddressResp) GetCode() int32 {
@@ -2210,6 +2347,16 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x0fGetUserInfoResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
+	"\tuser_info\x18\x03 \x01(\v2\x0e.user.UserInfoR\buserInfo\"\x80\x01\n" +
+	"\x11UpdateUserInfoReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06avatar\x18\x03 \x01(\tR\x06avatar\x12\x14\n" +
+	"\x05phone\x18\x04 \x01(\tR\x05phone\x12\x10\n" +
+	"\x03sex\x18\x05 \x01(\x05R\x03sex\"o\n" +
+	"\x12UpdateUserInfoResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
 	"\tuser_info\x18\x03 \x01(\v2\x0e.user.UserInfoR\buserInfo\"\xc7\x02\n" +
 	"\vAddressInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
@@ -2274,7 +2421,7 @@ const file_rpc_user_proto_rawDesc = "" +
 	"address_id\x18\x02 \x01(\x03R\taddressId\"A\n" +
 	"\x11DeleteAddressResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xd8\x06\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x9d\a\n" +
 	"\x04User\x12F\n" +
 	"\x0fGenerateCaptcha\x12\x18.user.GenerateCaptchaReq\x1a\x19.user.GenerateCaptchaResp\x12@\n" +
 	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12M\n" +
@@ -2284,6 +2431,7 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x05Login\x12\x0e.user.LoginReq\x1a\x0f.user.LoginResp\x12=\n" +
 	"\fRefreshToken\x12\x15.user.RefreshTokenReq\x1a\x16.user.RefreshTokenResp\x12:\n" +
 	"\vGetUserInfo\x12\x14.user.GetUserInfoReq\x1a\x15.user.GetUserInfoResp\x12C\n" +
+	"\x0eUpdateUserInfo\x12\x17.user.UpdateUserInfoReq\x1a\x18.user.UpdateUserInfoResp\x12C\n" +
 	"\x0eGetAddressList\x12\x17.user.GetAddressListReq\x1a\x18.user.GetAddressListResp\x12I\n" +
 	"\x10GetAddressDetail\x12\x19.user.GetAddressDetailReq\x1a\x1a.user.GetAddressDetailResp\x127\n" +
 	"\n" +
@@ -2303,7 +2451,7 @@ func file_rpc_user_proto_rawDescGZIP() []byte {
 	return file_rpc_user_proto_rawDescData
 }
 
-var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_rpc_user_proto_goTypes = []any{
 	(*GenerateCaptchaReq)(nil),      // 0: user.GenerateCaptchaReq
 	(*CaptchaConfig)(nil),           // 1: user.CaptchaConfig
@@ -2324,17 +2472,19 @@ var file_rpc_user_proto_goTypes = []any{
 	(*RefreshTokenResp)(nil),        // 16: user.RefreshTokenResp
 	(*GetUserInfoReq)(nil),          // 17: user.GetUserInfoReq
 	(*GetUserInfoResp)(nil),         // 18: user.GetUserInfoResp
-	(*AddressInfo)(nil),             // 19: user.AddressInfo
-	(*GetAddressListReq)(nil),       // 20: user.GetAddressListReq
-	(*GetAddressListResp)(nil),      // 21: user.GetAddressListResp
-	(*GetAddressDetailReq)(nil),     // 22: user.GetAddressDetailReq
-	(*GetAddressDetailResp)(nil),    // 23: user.GetAddressDetailResp
-	(*AddAddressReq)(nil),           // 24: user.AddAddressReq
-	(*AddAddressResp)(nil),          // 25: user.AddAddressResp
-	(*UpdateAddressReq)(nil),        // 26: user.UpdateAddressReq
-	(*UpdateAddressResp)(nil),       // 27: user.UpdateAddressResp
-	(*DeleteAddressReq)(nil),        // 28: user.DeleteAddressReq
-	(*DeleteAddressResp)(nil),       // 29: user.DeleteAddressResp
+	(*UpdateUserInfoReq)(nil),       // 19: user.UpdateUserInfoReq
+	(*UpdateUserInfoResp)(nil),      // 20: user.UpdateUserInfoResp
+	(*AddressInfo)(nil),             // 21: user.AddressInfo
+	(*GetAddressListReq)(nil),       // 22: user.GetAddressListReq
+	(*GetAddressListResp)(nil),      // 23: user.GetAddressListResp
+	(*GetAddressDetailReq)(nil),     // 24: user.GetAddressDetailReq
+	(*GetAddressDetailResp)(nil),    // 25: user.GetAddressDetailResp
+	(*AddAddressReq)(nil),           // 26: user.AddAddressReq
+	(*AddAddressResp)(nil),          // 27: user.AddAddressResp
+	(*UpdateAddressReq)(nil),        // 28: user.UpdateAddressReq
+	(*UpdateAddressResp)(nil),       // 29: user.UpdateAddressResp
+	(*DeleteAddressReq)(nil),        // 30: user.DeleteAddressReq
+	(*DeleteAddressResp)(nil),       // 31: user.DeleteAddressResp
 }
 var file_rpc_user_proto_depIdxs = []int32{
 	1,  // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
@@ -2342,39 +2492,42 @@ var file_rpc_user_proto_depIdxs = []int32{
 	14, // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
 	14, // 3: user.LoginResp.user_info:type_name -> user.UserInfo
 	14, // 4: user.GetUserInfoResp.user_info:type_name -> user.UserInfo
-	19, // 5: user.GetAddressListResp.address_list:type_name -> user.AddressInfo
-	19, // 6: user.GetAddressDetailResp.address:type_name -> user.AddressInfo
-	0,  // 7: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
-	4,  // 8: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
-	7,  // 9: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
-	8,  // 10: user.User.Register:input_type -> user.RegisterReq
-	10, // 11: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
-	12, // 12: user.User.Login:input_type -> user.LoginReq
-	15, // 13: user.User.RefreshToken:input_type -> user.RefreshTokenReq
-	17, // 14: user.User.GetUserInfo:input_type -> user.GetUserInfoReq
-	20, // 15: user.User.GetAddressList:input_type -> user.GetAddressListReq
-	22, // 16: user.User.GetAddressDetail:input_type -> user.GetAddressDetailReq
-	24, // 17: user.User.AddAddress:input_type -> user.AddAddressReq
-	26, // 18: user.User.UpdateAddress:input_type -> user.UpdateAddressReq
-	28, // 19: user.User.DeleteAddress:input_type -> user.DeleteAddressReq
-	3,  // 20: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
-	5,  // 21: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
-	6,  // 22: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
-	9,  // 23: user.User.Register:output_type -> user.RegisterResp
-	11, // 24: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
-	13, // 25: user.User.Login:output_type -> user.LoginResp
-	16, // 26: user.User.RefreshToken:output_type -> user.RefreshTokenResp
-	18, // 27: user.User.GetUserInfo:output_type -> user.GetUserInfoResp
-	21, // 28: user.User.GetAddressList:output_type -> user.GetAddressListResp
-	23, // 29: user.User.GetAddressDetail:output_type -> user.GetAddressDetailResp
-	25, // 30: user.User.AddAddress:output_type -> user.AddAddressResp
-	27, // 31: user.User.UpdateAddress:output_type -> user.UpdateAddressResp
-	29, // 32: user.User.DeleteAddress:output_type -> user.DeleteAddressResp
-	20, // [20:33] is the sub-list for method output_type
-	7,  // [7:20] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	14, // 5: user.UpdateUserInfoResp.user_info:type_name -> user.UserInfo
+	21, // 6: user.GetAddressListResp.address_list:type_name -> user.AddressInfo
+	21, // 7: user.GetAddressDetailResp.address:type_name -> user.AddressInfo
+	0,  // 8: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
+	4,  // 9: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
+	7,  // 10: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
+	8,  // 11: user.User.Register:input_type -> user.RegisterReq
+	10, // 12: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
+	12, // 13: user.User.Login:input_type -> user.LoginReq
+	15, // 14: user.User.RefreshToken:input_type -> user.RefreshTokenReq
+	17, // 15: user.User.GetUserInfo:input_type -> user.GetUserInfoReq
+	19, // 16: user.User.UpdateUserInfo:input_type -> user.UpdateUserInfoReq
+	22, // 17: user.User.GetAddressList:input_type -> user.GetAddressListReq
+	24, // 18: user.User.GetAddressDetail:input_type -> user.GetAddressDetailReq
+	26, // 19: user.User.AddAddress:input_type -> user.AddAddressReq
+	28, // 20: user.User.UpdateAddress:input_type -> user.UpdateAddressReq
+	30, // 21: user.User.DeleteAddress:input_type -> user.DeleteAddressReq
+	3,  // 22: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
+	5,  // 23: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
+	6,  // 24: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
+	9,  // 25: user.User.Register:output_type -> user.RegisterResp
+	11, // 26: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
+	13, // 27: user.User.Login:output_type -> user.LoginResp
+	16, // 28: user.User.RefreshToken:output_type -> user.RefreshTokenResp
+	18, // 29: user.User.GetUserInfo:output_type -> user.GetUserInfoResp
+	20, // 30: user.User.UpdateUserInfo:output_type -> user.UpdateUserInfoResp
+	23, // 31: user.User.GetAddressList:output_type -> user.GetAddressListResp
+	25, // 32: user.User.GetAddressDetail:output_type -> user.GetAddressDetailResp
+	27, // 33: user.User.AddAddress:output_type -> user.AddAddressResp
+	29, // 34: user.User.UpdateAddress:output_type -> user.UpdateAddressResp
+	31, // 35: user.User.DeleteAddress:output_type -> user.DeleteAddressResp
+	22, // [22:36] is the sub-list for method output_type
+	8,  // [8:22] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_rpc_user_proto_init() }
@@ -2388,7 +2541,7 @@ func file_rpc_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_user_proto_rawDesc), len(file_rpc_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

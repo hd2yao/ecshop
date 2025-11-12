@@ -127,10 +127,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.JWTAuth},
 			[]rest.Route{
 				{
-					// 获取当前登录用户信息
+					// 获取当前登录用户信息（包含地址列表）
 					Method:  http.MethodGet,
 					Path:    "/info",
 					Handler: user.GetUserInfoHandler(serverCtx),
+				},
+				{
+					// 修改用户个人信息
+					Method:  http.MethodPut,
+					Path:    "/info",
+					Handler: user.UpdateUserInfoHandler(serverCtx),
 				},
 			}...,
 		),
