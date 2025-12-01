@@ -231,6 +231,12 @@ func (c *RedisCache) Set(ctx context.Context, key string, value interface{}, exp
 		return fmt.Errorf("序列化数据失败: %w", err)
 	}
 
+	ttlSeconds := int(expiry.Seconds())
+	if ttlSeconds <= 0 {
+		// 不设置过期时间
+		return c.client.SetCtx(ctx, cacheKey, string(data))
+	}
+
 	return c.client.SetexCtx(ctx, cacheKey, string(data), int(expiry.Seconds()))
 }
 
