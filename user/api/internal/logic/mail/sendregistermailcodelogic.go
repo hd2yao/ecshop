@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -35,10 +36,16 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(req *types.SendRegister
 	})
 	if err != nil {
 		l.Errorf("RPC调用失败: %v", err)
-		return &types.SendMailCodeResponse{
-			Code:    500,
-			Message: "系统错误",
-		}, nil
+		return nil, errcode.CommonServerError
+	}
+
+	// 检查RPC响应的错误码
+	if rpcResp.Code != int32(errcode.Success.Code()) {
+		// 根据RPC返回的错误码返回对应的AppError
+		if appErr := l.getAppErrorByCode(int(rpcResp.Code)); appErr != nil {
+			return nil, appErr
+		}
+		return nil, errcode.CommonServerError
 	}
 
 	return &types.SendMailCodeResponse{
@@ -47,4 +54,20 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(req *types.SendRegister
 		Email:   rpcResp.Email,
 		CodeId:  rpcResp.CodeId,
 	}, nil
+}
+
+// getAppErrorByCode 根据错误码获取对应的AppError
+func (l *SendRegisterMailCodeLogic) getAppErrorByCode(code int) *errcode.AppError {
+	switch code {
+	case errcode.CommonParamError.Code():
+		return errcode.CommonParamError
+	case errcode.CommonServerError.Code():
+		return errcode.CommonServerError
+	case errcode.UserCodeCaptchaError.Code():
+		return errcode.UserCodeCaptchaError
+	case errcode.UserAccountExist.Code():
+		return errcode.UserAccountExist
+	default:
+		return nil
+	}
 }

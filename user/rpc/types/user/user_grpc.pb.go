@@ -21,10 +21,18 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	User_GenerateCaptcha_FullMethodName      = "/user.User/GenerateCaptcha"
 	User_VerifyCaptcha_FullMethodName        = "/user.User/VerifyCaptcha"
-	User_VerifyMailCode_FullMethodName       = "/user.User/VerifyMailCode"
 	User_SendRegisterMailCode_FullMethodName = "/user.User/SendRegisterMailCode"
 	User_Register_FullMethodName             = "/user.User/Register"
 	User_UploadPreviewAvatar_FullMethodName  = "/user.User/UploadPreviewAvatar"
+	User_Login_FullMethodName                = "/user.User/Login"
+	User_RefreshToken_FullMethodName         = "/user.User/RefreshToken"
+	User_GetUserInfo_FullMethodName          = "/user.User/GetUserInfo"
+	User_UpdateUserInfo_FullMethodName       = "/user.User/UpdateUserInfo"
+	User_GetAddressList_FullMethodName       = "/user.User/GetAddressList"
+	User_GetAddressDetail_FullMethodName     = "/user.User/GetAddressDetail"
+	User_AddAddress_FullMethodName           = "/user.User/AddAddress"
+	User_UpdateAddress_FullMethodName        = "/user.User/UpdateAddress"
+	User_DeleteAddress_FullMethodName        = "/user.User/DeleteAddress"
 )
 
 // UserClient is the client API for User service.
@@ -37,12 +45,25 @@ type UserClient interface {
 	GenerateCaptcha(ctx context.Context, in *GenerateCaptchaReq, opts ...grpc.CallOption) (*GenerateCaptchaResp, error)
 	VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, opts ...grpc.CallOption) (*VerifyCaptchaResp, error)
 	// 邮件验证码
-	VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
 	SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 	// 用户注册
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
 	// 头像上传
 	UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
+	// 用户登录
+	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+	// 刷新Token
+	RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
+	// 获取用户信息
+	GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
+	// 修改用户信息
+	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error)
+	// 用户地址管理
+	GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error)
+	GetAddressDetail(ctx context.Context, in *GetAddressDetailReq, opts ...grpc.CallOption) (*GetAddressDetailResp, error)
+	AddAddress(ctx context.Context, in *AddAddressReq, opts ...grpc.CallOption) (*AddAddressResp, error)
+	UpdateAddress(ctx context.Context, in *UpdateAddressReq, opts ...grpc.CallOption) (*UpdateAddressResp, error)
+	DeleteAddress(ctx context.Context, in *DeleteAddressReq, opts ...grpc.CallOption) (*DeleteAddressResp, error)
 }
 
 type userClient struct {
@@ -67,16 +88,6 @@ func (c *userClient) VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VerifyCaptchaResp)
 	err := c.cc.Invoke(ctx, User_VerifyCaptcha_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VerifyMailCodeResp)
-	err := c.cc.Invoke(ctx, User_VerifyMailCode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +124,96 @@ func (c *userClient) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewA
 	return out, nil
 }
 
+func (c *userClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResp)
+	err := c.cc.Invoke(ctx, User_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefreshTokenResp)
+	err := c.cc.Invoke(ctx, User_RefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserInfoResp)
+	err := c.cc.Invoke(ctx, User_GetUserInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateUserInfoResp)
+	err := c.cc.Invoke(ctx, User_UpdateUserInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAddressListResp)
+	err := c.cc.Invoke(ctx, User_GetAddressList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetAddressDetail(ctx context.Context, in *GetAddressDetailReq, opts ...grpc.CallOption) (*GetAddressDetailResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAddressDetailResp)
+	err := c.cc.Invoke(ctx, User_GetAddressDetail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) AddAddress(ctx context.Context, in *AddAddressReq, opts ...grpc.CallOption) (*AddAddressResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddAddressResp)
+	err := c.cc.Invoke(ctx, User_AddAddress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateAddress(ctx context.Context, in *UpdateAddressReq, opts ...grpc.CallOption) (*UpdateAddressResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateAddressResp)
+	err := c.cc.Invoke(ctx, User_UpdateAddress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DeleteAddress(ctx context.Context, in *DeleteAddressReq, opts ...grpc.CallOption) (*DeleteAddressResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAddressResp)
+	err := c.cc.Invoke(ctx, User_DeleteAddress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -123,12 +224,25 @@ type UserServer interface {
 	GenerateCaptcha(context.Context, *GenerateCaptchaReq) (*GenerateCaptchaResp, error)
 	VerifyCaptcha(context.Context, *VerifyCaptchaReq) (*VerifyCaptchaResp, error)
 	// 邮件验证码
-	VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error)
 	SendRegisterMailCode(context.Context, *SendRegisterMailCodeReq) (*SendMailCodeResp, error)
 	// 用户注册
 	Register(context.Context, *RegisterReq) (*RegisterResp, error)
 	// 头像上传
 	UploadPreviewAvatar(context.Context, *UploadPreviewAvatarReq) (*UploadPreviewAvatarResp, error)
+	// 用户登录
+	Login(context.Context, *LoginReq) (*LoginResp, error)
+	// 刷新Token
+	RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error)
+	// 获取用户信息
+	GetUserInfo(context.Context, *GetUserInfoReq) (*GetUserInfoResp, error)
+	// 修改用户信息
+	UpdateUserInfo(context.Context, *UpdateUserInfoReq) (*UpdateUserInfoResp, error)
+	// 用户地址管理
+	GetAddressList(context.Context, *GetAddressListReq) (*GetAddressListResp, error)
+	GetAddressDetail(context.Context, *GetAddressDetailReq) (*GetAddressDetailResp, error)
+	AddAddress(context.Context, *AddAddressReq) (*AddAddressResp, error)
+	UpdateAddress(context.Context, *UpdateAddressReq) (*UpdateAddressResp, error)
+	DeleteAddress(context.Context, *DeleteAddressReq) (*DeleteAddressResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -145,9 +259,6 @@ func (UnimplementedUserServer) GenerateCaptcha(context.Context, *GenerateCaptcha
 func (UnimplementedUserServer) VerifyCaptcha(context.Context, *VerifyCaptchaReq) (*VerifyCaptchaResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyCaptcha not implemented")
 }
-func (UnimplementedUserServer) VerifyMailCode(context.Context, *VerifyMailCodeReq) (*VerifyMailCodeResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyMailCode not implemented")
-}
 func (UnimplementedUserServer) SendRegisterMailCode(context.Context, *SendRegisterMailCodeReq) (*SendMailCodeResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendRegisterMailCode not implemented")
 }
@@ -156,6 +267,33 @@ func (UnimplementedUserServer) Register(context.Context, *RegisterReq) (*Registe
 }
 func (UnimplementedUserServer) UploadPreviewAvatar(context.Context, *UploadPreviewAvatarReq) (*UploadPreviewAvatarResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadPreviewAvatar not implemented")
+}
+func (UnimplementedUserServer) Login(context.Context, *LoginReq) (*LoginResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServer) RefreshToken(context.Context, *RefreshTokenReq) (*RefreshTokenResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedUserServer) GetUserInfo(context.Context, *GetUserInfoReq) (*GetUserInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
+}
+func (UnimplementedUserServer) UpdateUserInfo(context.Context, *UpdateUserInfoReq) (*UpdateUserInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserInfo not implemented")
+}
+func (UnimplementedUserServer) GetAddressList(context.Context, *GetAddressListReq) (*GetAddressListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAddressList not implemented")
+}
+func (UnimplementedUserServer) GetAddressDetail(context.Context, *GetAddressDetailReq) (*GetAddressDetailResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAddressDetail not implemented")
+}
+func (UnimplementedUserServer) AddAddress(context.Context, *AddAddressReq) (*AddAddressResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAddress not implemented")
+}
+func (UnimplementedUserServer) UpdateAddress(context.Context, *UpdateAddressReq) (*UpdateAddressResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAddress not implemented")
+}
+func (UnimplementedUserServer) DeleteAddress(context.Context, *DeleteAddressReq) (*DeleteAddressResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAddress not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -214,24 +352,6 @@ func _User_VerifyCaptcha_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_VerifyMailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyMailCodeReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).VerifyMailCode(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: User_VerifyMailCode_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).VerifyMailCode(ctx, req.(*VerifyMailCodeReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _User_SendRegisterMailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendRegisterMailCodeReq)
 	if err := dec(in); err != nil {
@@ -286,6 +406,168 @@ func _User_UploadPreviewAvatar_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_Login_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).Login(ctx, req.(*LoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).RefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_RefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).RefreshToken(ctx, req.(*RefreshTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetUserInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserInfo(ctx, req.(*GetUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateUserInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateUserInfo(ctx, req.(*UpdateUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAddressListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetAddressList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetAddressList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetAddressList(ctx, req.(*GetAddressListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetAddressDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAddressDetailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetAddressDetail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetAddressDetail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetAddressDetail(ctx, req.(*GetAddressDetailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_AddAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddAddressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).AddAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_AddAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).AddAddress(ctx, req.(*AddAddressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAddressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateAddress(ctx, req.(*UpdateAddressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DeleteAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAddressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DeleteAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DeleteAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DeleteAddress(ctx, req.(*DeleteAddressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -302,10 +584,6 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_VerifyCaptcha_Handler,
 		},
 		{
-			MethodName: "VerifyMailCode",
-			Handler:    _User_VerifyMailCode_Handler,
-		},
-		{
 			MethodName: "SendRegisterMailCode",
 			Handler:    _User_SendRegisterMailCode_Handler,
 		},
@@ -316,6 +594,42 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadPreviewAvatar",
 			Handler:    _User_UploadPreviewAvatar_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _User_Login_Handler,
+		},
+		{
+			MethodName: "RefreshToken",
+			Handler:    _User_RefreshToken_Handler,
+		},
+		{
+			MethodName: "GetUserInfo",
+			Handler:    _User_GetUserInfo_Handler,
+		},
+		{
+			MethodName: "UpdateUserInfo",
+			Handler:    _User_UpdateUserInfo_Handler,
+		},
+		{
+			MethodName: "GetAddressList",
+			Handler:    _User_GetAddressList_Handler,
+		},
+		{
+			MethodName: "GetAddressDetail",
+			Handler:    _User_GetAddressDetail_Handler,
+		},
+		{
+			MethodName: "AddAddress",
+			Handler:    _User_AddAddress_Handler,
+		},
+		{
+			MethodName: "UpdateAddress",
+			Handler:    _User_UpdateAddress_Handler,
+		},
+		{
+			MethodName: "DeleteAddress",
+			Handler:    _User_DeleteAddress_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

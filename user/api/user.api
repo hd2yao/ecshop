@@ -81,17 +81,6 @@ type (
 		Email   string `json:"email"`
 		CodeId  string `json:"code_id,optional"` // 用于测试环境返回验证码
 	}
-	// 邮件验证码验证请求
-	VerifyMailCodeRequest {
-		Email string `json:"email"` // 邮箱地址
-		Code  string `json:"code"` // 验证码
-	}
-	// 邮件验证码验证响应
-	VerifyMailCodeResponse {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Valid   bool   `json:"valid"`
-	}
 	// 注册时发送邮件验证码请求（需要先验证图形验证码）
 	SendRegisterMailCodeRequest {
 		CaptchaId   string `json:"captcha_id"` // 图形验证码ID
@@ -118,7 +107,6 @@ type (
 		Code     int      `json:"code"`
 		Message  string   `json:"message"`
 		UserId   int64    `json:"user_id,optional"` // 用户ID
-		Token    string   `json:"token,optional"` // 访问令牌
 		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
 	}
 	// 用户信息
@@ -145,6 +133,140 @@ type (
 	}
 )
 
+// ===== 用户登录相关结构体 =====
+type (
+	// 用户登录请求
+	LoginRequest {
+		Email    string `json:"email,optional"` // 邮箱地址（邮箱和手机号二选一）
+		Phone    string `json:"phone,optional"` // 手机号（邮箱和手机号二选一）
+		Password string `json:"password" validate:"required,min=6"` // 密码
+	}
+	// 用户登录响应
+	LoginResponse {
+		Code                  int      `json:"code"`
+		Message               string   `json:"message"`
+		UserId                int64    `json:"user_id,optional"` // 用户ID
+		AccessToken           string   `json:"access_token,optional"` // 访问令牌（2小时）
+		RefreshToken          string   `json:"refresh_token,optional"` // 刷新令牌（7天）
+		AccessTokenExpireTime string   `json:"access_token_expire_time,optional"` // Access Token 过期时间（ISO 8601格式）
+		UserInfo              UserInfo `json:"user_info,optional"` // 用户信息
+	}
+)
+
+// ===== Token 刷新相关结构体 =====
+type (
+	// Token 刷新请求
+	RefreshTokenRequest {
+		RefreshToken string `json:"refresh_token" validate:"required"` // Refresh Token
+	}
+	// Token 刷新响应
+	RefreshTokenResponse {
+		Code                  int    `json:"code"`
+		Message               string `json:"message"`
+		AccessToken           string `json:"access_token,optional"` // 新的 Access Token
+		RefreshToken          string `json:"refresh_token,optional"` // 新的 Refresh Token
+		AccessTokenExpireTime string `json:"access_token_expire_time,optional"` // Access Token 过期时间（ISO 8601格式）
+	}
+)
+
+// ===== 用户信息查询相关结构体 =====
+type (
+	// 获取当前用户信息响应
+	GetUserInfoResponse {
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		UserInfo UserInfo `json:"user_info,optional"` // 用户信息
+	}
+	// 修改用户信息请求
+	UpdateUserInfoRequest {
+		Name   string `json:"name,optional"` // 用户昵称
+		Avatar string `json:"avatar,optional"` // 头像OSS地址
+		Phone  string `json:"phone,optional"` // 手机号
+		Sex    int    `json:"sex,optional"` // 性别：0女 1男
+	}
+	// 修改用户信息响应
+	UpdateUserInfoResponse {
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		UserInfo UserInfo `json:"user_info,optional"` // 更新后的用户信息
+	}
+)
+
+// ===== 用户地址管理相关结构体 =====
+type (
+	// 地址信息
+	UserAddress {
+		Id            int64  `json:"id"`
+		UserId        int64  `json:"user_id"`
+		DefaultStatus int    `json:"default_status"` // 是否默认：0否 1是
+		ReceiveName   string `json:"receive_name"` // 收货人姓名
+		Phone         string `json:"phone"` // 收货人电话
+		Province      string `json:"province"` // 省/直辖市
+		City          string `json:"city"` // 市
+		Region        string `json:"region"` // 区
+		DetailAddress string `json:"detail_address"` // 详细地址
+		CreateTime    string `json:"create_time"` // 创建时间
+		UpdateTime    string `json:"update_time"` // 更新时间
+	}
+	// 获取用户全部地址列表响应
+	GetAddressListResponse {
+		Code        int           `json:"code"`
+		Message     string        `json:"message"`
+		AddressList []UserAddress `json:"address_list,optional"`
+	}
+	// 获取地址详情请求
+	GetAddressDetailRequest {
+		AddressId int64 `path:"id"` // 地址ID
+	}
+	// 获取地址详情响应
+	GetAddressDetailResponse {
+		Code    int         `json:"code"`
+		Message string      `json:"message"`
+		Address UserAddress `json:"address,optional"`
+	}
+	// 新增地址请求
+	AddAddressRequest {
+		DefaultStatus int    `json:"default_status,optional,default=0"` // 是否默认：0否 1是
+		ReceiveName   string `json:"receive_name" validate:"required"` // 收货人姓名
+		Phone         string `json:"phone" validate:"required"` // 收货人电话
+		Province      string `json:"province" validate:"required"` // 省/直辖市
+		City          string `json:"city" validate:"required"` // 市
+		Region        string `json:"region" validate:"required"` // 区
+		DetailAddress string `json:"detail_address" validate:"required"` // 详细地址
+	}
+	// 新增地址响应
+	AddAddressResponse {
+		Code      int    `json:"code"`
+		Message   string `json:"message"`
+		AddressId int64  `json:"address_id,optional"` // 新增的地址ID
+	}
+	// 修改地址请求
+	UpdateAddressRequest {
+		AddressId     int64  `path:"id"` // 地址ID
+		DefaultStatus int    `json:"default_status,optional,default=0"` // 是否默认：0否 1是
+		ReceiveName   string `json:"receive_name" validate:"required"` // 收货人姓名
+		Phone         string `json:"phone" validate:"required"` // 收货人电话
+		Province      string `json:"province" validate:"required"` // 省/直辖市
+		City          string `json:"city" validate:"required"` // 市
+		Region        string `json:"region" validate:"required"` // 区
+		DetailAddress string `json:"detail_address" validate:"required"` // 详细地址
+	}
+	// 修改地址响应
+	UpdateAddressResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
+	// 删除地址请求
+	DeleteAddressRequest {
+		AddressId int64 `path:"id"` // 地址ID
+	}
+	// 删除地址响应
+	DeleteAddressResponse {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
 // ===== 验证码服务 =====
 @server (
 	group:  captcha
@@ -166,24 +288,9 @@ service user-api {
 	prefix: /api/mail
 )
 service user-api {
-	@doc "验证邮件验证码"
-	@handler VerifyMailCode
-	post /verify (VerifyMailCodeRequest) returns (VerifyMailCodeResponse)
-
 	@doc "注册时发送邮件验证码（需要先验证图形验证码）"
 	@handler SendRegisterMailCode
 	post /register/send (SendRegisterMailCodeRequest) returns (SendMailCodeResponse)
-}
-
-// ===== 用户注册服务 =====
-@server (
-	group:  user
-	prefix: /api/user
-)
-service user-api {
-	@doc "用户注册"
-	@handler Register
-	post /register (RegisterRequest) returns (RegisterResponse)
 }
 
 // ===== 文件上传服务 =====
@@ -195,5 +302,68 @@ service user-api {
 	@doc "头像上传预览（注册和更新通用）"
 	@handler UploadPreviewAvatar
 	post /avatar/preview returns (UploadPreviewAvatarResponse)
+}
+
+// ===== 用户注册服务 =====
+@server (
+	group:  user
+	prefix: /api/user
+)
+service user-api {
+	@doc "用户注册"
+	@handler Register
+	post /register (RegisterRequest) returns (RegisterResponse)
+
+	@doc "用户登录"
+	@handler Login
+	post /login (LoginRequest) returns (LoginResponse)
+
+	@doc "刷新Token"
+	@handler RefreshToken
+	post /refresh-token (RefreshTokenRequest) returns (RefreshTokenResponse)
+}
+
+// ===== 用户信息服务（需要JWT认证）=====
+@server (
+	group:      user
+	prefix:     /api/user
+	middleware: JWTAuth // 启用JWT认证中间件
+)
+service user-api {
+	@doc "获取当前登录用户信息"
+	@handler GetUserInfo
+	get /info returns (GetUserInfoResponse)
+
+	@doc "修改用户个人信息"
+	@handler UpdateUserInfo
+	put /info (UpdateUserInfoRequest) returns (UpdateUserInfoResponse)
+}
+
+// ===== 用户地址管理服务（需要JWT认证）=====
+@server (
+	group:      address
+	prefix:     /api/user/address
+	middleware: JWTAuth // 启用JWT认证中间件
+)
+service user-api {
+	@doc "获取用户全部地址列表"
+	@handler GetAddressList
+	get /list returns (GetAddressListResponse)
+
+	@doc "获取地址详情"
+	@handler GetAddressDetail
+	get /:id (GetAddressDetailRequest) returns (GetAddressDetailResponse)
+
+	@doc "新增用户地址"
+	@handler AddAddress
+	post /add (AddAddressRequest) returns (AddAddressResponse)
+
+	@doc "修改用户地址"
+	@handler UpdateAddress
+	put /:id (UpdateAddressRequest) returns (UpdateAddressResponse)
+
+	@doc "删除用户地址"
+	@handler DeleteAddress
+	delete /:id (DeleteAddressRequest) returns (DeleteAddressResponse)
 }
 

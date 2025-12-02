@@ -30,14 +30,32 @@ var (
 )
 
 /**
+ * 缓存相关错误码 1101 开头
+ */
+var (
+	CacheNotFound = newError(1101001, "缓存未找到")
+	CacheEmpty    = newError(1101002, "缓存为空值")
+)
+
+/**
+ * 分布式锁相关错误码 1102 开头
+ */
+var (
+	LockFailed   = newError(1102001, "获取锁失败")
+	LockNotHeld  = newError(1102002, "锁未被持有")
+	LockExpired  = newError(1102003, "锁已过期")
+	UnlockFailed = newError(1102004, "释放锁失败")
+)
+
+/**
  * 用户微服务验证码相关  2101 开头
  */
 var (
 	UserPhoneError       = newError(2101001, "手机号不合法")
 	UserCodeFastLimited  = newError(2101002, "验证码发送太快了")
-	UserCodeError        = newError(2102003, "验证码错误")
-	UserCodeCaptchaError = newError(2102004, "图形验证码错误")
-	UserCodeEmailError   = newError(2102005, "邮箱验证码错误")
+	UserCodeError        = newError(2101003, "验证码错误")
+	UserCodeCaptchaError = newError(2101004, "图形验证码错误")
+	UserCodeEmailError   = newError(2101005, "邮箱验证码错误")
 )
 
 /**
@@ -49,22 +67,34 @@ var (
 	UserAccountPwdError   = newError(2102003, "用户账号或密码错误")
 )
 
+/**
+ * 用户微服务 Token 相关 2103 开头
+ */
+var (
+	UserTokenInvalid        = newError(2103001, "Token 无效")
+	UserTokenExpired        = newError(2103002, "Token 已过期")
+	UserTokenMalformed      = newError(2103003, "Token 格式错误")
+	UserRefreshTokenInvalid = newError(2103004, "Refresh Token 无效或已失效")
+)
+
 // HttpStatusCode 返回 HTTP 状态码
 func (e *AppError) HttpStatusCode() int {
 	switch e.Code() {
 	case Success.Code():
 		return http.StatusOK
-	case CommonServerError.Code(), CommonServerBusyError.Code(), CommonPanicErr.Code():
+	case CommonServerError.Code(), CommonServerBusyError.Code(), CommonPanicErr.Code(), UnlockFailed.Code():
 		return http.StatusInternalServerError
 	case CommonOpRepeat.Code(), CommonParamError.Code(), UserCodeFastLimited.Code(), UserCodeError.Code(), UserCodeCaptchaError.Code(), UserCodeEmailError.Code(),
-		UserAccountExist.Code(), UserAccountUnregister.Code(), UserAccountPwdError.Code():
+		UserAccountExist.Code(), UserAccountUnregister.Code(), UserAccountPwdError.Code(), LockNotHeld.Code(), LockExpired.Code():
 		return http.StatusBadRequest
-	case CommonNetworkAddressError.Code():
+	case CommonNetworkAddressError.Code(), CacheNotFound.Code(), CacheEmpty.Code():
 		return http.StatusNotFound
-	case CommonTooManyTry.Code():
+	case CommonTooManyTry.Code(), LockFailed.Code():
 		return http.StatusTooManyRequests
 	case UserPhoneError.Code():
 		return http.StatusForbidden
+	case UserTokenInvalid.Code(), UserTokenExpired.Code(), UserTokenMalformed.Code(), UserRefreshTokenInvalid.Code():
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

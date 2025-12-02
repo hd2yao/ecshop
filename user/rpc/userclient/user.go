@@ -14,33 +14,63 @@ import (
 )
 
 type (
+	AddAddressReq           = user.AddAddressReq
+	AddAddressResp          = user.AddAddressResp
+	AddressInfo             = user.AddressInfo
 	CaptchaConfig           = user.CaptchaConfig
+	DeleteAddressReq        = user.DeleteAddressReq
+	DeleteAddressResp       = user.DeleteAddressResp
 	DrawOptions             = user.DrawOptions
 	GenerateCaptchaReq      = user.GenerateCaptchaReq
 	GenerateCaptchaResp     = user.GenerateCaptchaResp
+	GetAddressDetailReq     = user.GetAddressDetailReq
+	GetAddressDetailResp    = user.GetAddressDetailResp
+	GetAddressListReq       = user.GetAddressListReq
+	GetAddressListResp      = user.GetAddressListResp
+	GetUserInfoReq          = user.GetUserInfoReq
+	GetUserInfoResp         = user.GetUserInfoResp
+	LoginReq                = user.LoginReq
+	LoginResp               = user.LoginResp
+	RefreshTokenReq         = user.RefreshTokenReq
+	RefreshTokenResp        = user.RefreshTokenResp
 	RegisterReq             = user.RegisterReq
 	RegisterResp            = user.RegisterResp
 	SendMailCodeResp        = user.SendMailCodeResp
 	SendRegisterMailCodeReq = user.SendRegisterMailCodeReq
+	UpdateAddressReq        = user.UpdateAddressReq
+	UpdateAddressResp       = user.UpdateAddressResp
+	UpdateUserInfoReq       = user.UpdateUserInfoReq
+	UpdateUserInfoResp      = user.UpdateUserInfoResp
 	UploadPreviewAvatarReq  = user.UploadPreviewAvatarReq
 	UploadPreviewAvatarResp = user.UploadPreviewAvatarResp
 	UserInfo                = user.UserInfo
 	VerifyCaptchaReq        = user.VerifyCaptchaReq
 	VerifyCaptchaResp       = user.VerifyCaptchaResp
-	VerifyMailCodeReq       = user.VerifyMailCodeReq
-	VerifyMailCodeResp      = user.VerifyMailCodeResp
 
 	User interface {
 		// 图形验证码
 		GenerateCaptcha(ctx context.Context, in *GenerateCaptchaReq, opts ...grpc.CallOption) (*GenerateCaptchaResp, error)
 		VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, opts ...grpc.CallOption) (*VerifyCaptchaResp, error)
 		// 邮件验证码
-		VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error)
 		SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error)
 		// 用户注册
 		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
 		// 头像上传
 		UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error)
+		// 用户登录
+		Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+		// 刷新Token
+		RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error)
+		// 获取用户信息
+		GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
+		// 修改用户信息
+		UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error)
+		// 用户地址管理
+		GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error)
+		GetAddressDetail(ctx context.Context, in *GetAddressDetailReq, opts ...grpc.CallOption) (*GetAddressDetailResp, error)
+		AddAddress(ctx context.Context, in *AddAddressReq, opts ...grpc.CallOption) (*AddAddressResp, error)
+		UpdateAddress(ctx context.Context, in *UpdateAddressReq, opts ...grpc.CallOption) (*UpdateAddressResp, error)
+		DeleteAddress(ctx context.Context, in *DeleteAddressReq, opts ...grpc.CallOption) (*DeleteAddressResp, error)
 	}
 
 	defaultUser struct {
@@ -66,11 +96,6 @@ func (m *defaultUser) VerifyCaptcha(ctx context.Context, in *VerifyCaptchaReq, o
 }
 
 // 邮件验证码
-func (m *defaultUser) VerifyMailCode(ctx context.Context, in *VerifyMailCodeReq, opts ...grpc.CallOption) (*VerifyMailCodeResp, error) {
-	client := user.NewUserClient(m.cli.Conn())
-	return client.VerifyMailCode(ctx, in, opts...)
-}
-
 func (m *defaultUser) SendRegisterMailCode(ctx context.Context, in *SendRegisterMailCodeReq, opts ...grpc.CallOption) (*SendMailCodeResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.SendRegisterMailCode(ctx, in, opts...)
@@ -86,4 +111,54 @@ func (m *defaultUser) Register(ctx context.Context, in *RegisterReq, opts ...grp
 func (m *defaultUser) UploadPreviewAvatar(ctx context.Context, in *UploadPreviewAvatarReq, opts ...grpc.CallOption) (*UploadPreviewAvatarResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.UploadPreviewAvatar(ctx, in, opts...)
+}
+
+// 用户登录
+func (m *defaultUser) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.Login(ctx, in, opts...)
+}
+
+// 刷新Token
+func (m *defaultUser) RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*RefreshTokenResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.RefreshToken(ctx, in, opts...)
+}
+
+// 获取用户信息
+func (m *defaultUser) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetUserInfo(ctx, in, opts...)
+}
+
+// 修改用户信息
+func (m *defaultUser) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoReq, opts ...grpc.CallOption) (*UpdateUserInfoResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateUserInfo(ctx, in, opts...)
+}
+
+// 用户地址管理
+func (m *defaultUser) GetAddressList(ctx context.Context, in *GetAddressListReq, opts ...grpc.CallOption) (*GetAddressListResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetAddressList(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetAddressDetail(ctx context.Context, in *GetAddressDetailReq, opts ...grpc.CallOption) (*GetAddressDetailResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetAddressDetail(ctx, in, opts...)
+}
+
+func (m *defaultUser) AddAddress(ctx context.Context, in *AddAddressReq, opts ...grpc.CallOption) (*AddAddressResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.AddAddress(ctx, in, opts...)
+}
+
+func (m *defaultUser) UpdateAddress(ctx context.Context, in *UpdateAddressReq, opts ...grpc.CallOption) (*UpdateAddressResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateAddress(ctx, in, opts...)
+}
+
+func (m *defaultUser) DeleteAddress(ctx context.Context, in *DeleteAddressReq, opts ...grpc.CallOption) (*DeleteAddressResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.DeleteAddress(ctx, in, opts...)
 }

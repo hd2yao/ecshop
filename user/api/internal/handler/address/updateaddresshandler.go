@@ -1,24 +1,25 @@
-package mail
+package address
 
 import (
 	"net/http"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
-	"github.com/hd2yao/ecshop/user/api/internal/logic/mail"
+	"github.com/hd2yao/ecshop/user/api/internal/logic/address"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func VerifyMailCodeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 修改用户地址
+func UpdateAddressHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.VerifyMailCodeRequest
+		var req types.UpdateAddressRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := mail.NewVerifyMailCodeLogic(r.Context(), svcCtx)
-		resp, err := l.VerifyMailCode(&req)
+		l := address.NewUpdateAddressLogic(r.Context(), svcCtx)
+		resp, err := l.UpdateAddress(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

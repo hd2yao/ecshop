@@ -10,6 +10,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"github.com/hd2yao/ecshop/common/captcha"
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
 )
@@ -32,14 +33,14 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(in *user.SendRegisterMa
 	// 1. 参数验证
 	if in.CaptchaId == "" || in.CaptchaCode == "" {
 		return &user.SendMailCodeResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "图形验证码ID和验证码不能为空",
 		}, nil
 	}
 
 	if in.Email == "" {
 		return &user.SendMailCodeResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "邮箱地址不能为空",
 		}, nil
 	}
@@ -48,7 +49,7 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(in *user.SendRegisterMa
 	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	if !emailRegex.MatchString(in.Email) {
 		return &user.SendMailCodeResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "邮箱格式不正确",
 		}, nil
 	}
@@ -58,8 +59,8 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(in *user.SendRegisterMa
 	if !c.Verify(in.CaptchaId, in.CaptchaCode, true) {
 		l.Errorf("图形验证码验证失败: captcha_id=%s", in.CaptchaId)
 		return &user.SendMailCodeResp{
-			Code:    400,
-			Message: "图形验证码错误",
+			Code:    int32(errcode.UserCodeCaptchaError.Code()),
+			Message: errcode.UserCodeCaptchaError.Msg(),
 		}, nil
 	}
 
@@ -68,14 +69,14 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(in *user.SendRegisterMa
 	if err != nil && err != sql.ErrNoRows {
 		l.Errorf("查询用户失败: %v", err)
 		return &user.SendMailCodeResp{
-			Code:    500,
-			Message: "系统错误",
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 	if existingUser != nil {
 		return &user.SendMailCodeResp{
-			Code:    400,
-			Message: "该邮箱已被注册",
+			Code:    int32(errcode.UserAccountExist.Code()),
+			Message: errcode.UserAccountExist.Msg(),
 		}, nil
 	}
 
@@ -90,7 +91,7 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(in *user.SendRegisterMa
 	if err != nil {
 		l.Errorf("发送邮件验证码失败: %v", err)
 		return &user.SendMailCodeResp{
-			Code:    500,
+			Code:    int32(errcode.CommonServerError.Code()),
 			Message: fmt.Sprintf("发送邮件验证码失败: %v", err),
 		}, nil
 	}
@@ -98,8 +99,8 @@ func (l *SendRegisterMailCodeLogic) SendRegisterMailCode(in *user.SendRegisterMa
 	l.Infof("注册邮件验证码发送成功: email=%s", in.Email)
 
 	return &user.SendMailCodeResp{
-		Code:    200,
-		Message: "邮件验证码发送成功",
+		Code:    int32(errcode.Success.Code()),
+		Message: errcode.Success.Msg(),
 		Email:   in.Email,
 		CodeId:  code, // 测试环境返回验证码
 	}, nil

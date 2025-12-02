@@ -1,39 +1,47 @@
 package app
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+	"net/http"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
 
 	"github.com/hd2yao/ecshop/common/errcode"
 )
 
-type response struct {
-	ctx  *gin.Context
+// Response 响应结构
+type Response struct {
+	ctx  context.Context
+	w    http.ResponseWriter
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data,omitempty"`
 }
 
-func NewResponse(ctx *gin.Context) *response {
-	return &response{ctx: ctx}
+// NewResponse 创建响应实例
+func NewResponse(ctx context.Context, w http.ResponseWriter) *Response {
+	return &Response{
+		ctx: ctx,
+		w:   w,
+	}
 }
 
 // Success 带数据的成功响应
-func (r *response) Success(data interface{}) {
+func (r *Response) Success(data interface{}) {
 	r.Code = errcode.Success.Code()
 	r.Msg = errcode.Success.Msg()
 	r.Data = data
-	r.ctx.JSON(errcode.Success.HttpStatusCode(), r)
+	httpx.WriteJsonCtx(r.ctx, r.w, errcode.Success.HttpStatusCode(), r)
 }
 
 // SuccessOk 不带数据的成功响应
-// 针对只需要知道成功状态的接口响应，简化接口程序的调用
-func (r *response) SuccessOk() {
+func (r *Response) SuccessOk() {
 	r.Success("")
 }
 
 // Error 带错误信息的响应
-func (r *response) Error(err *errcode.AppError) {
+func (r *Response) Error(err *errcode.AppError) {
 	r.Code = err.Code()
 	r.Msg = err.Msg()
-	r.ctx.JSON(err.HttpStatusCode(), r)
+	httpx.WriteJsonCtx(r.ctx, r.w, err.HttpStatusCode(), r)
 }

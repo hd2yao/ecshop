@@ -35,11 +35,6 @@ func (s *UserServer) VerifyCaptcha(ctx context.Context, in *user.VerifyCaptchaRe
 }
 
 // 邮件验证码
-func (s *UserServer) VerifyMailCode(ctx context.Context, in *user.VerifyMailCodeReq) (*user.VerifyMailCodeResp, error) {
-	l := logic.NewVerifyMailCodeLogic(ctx, s.svcCtx)
-	return l.VerifyMailCode(in)
-}
-
 func (s *UserServer) SendRegisterMailCode(ctx context.Context, in *user.SendRegisterMailCodeReq) (*user.SendMailCodeResp, error) {
 	l := logic.NewSendRegisterMailCodeLogic(ctx, s.svcCtx)
 	return l.SendRegisterMailCode(in)
@@ -55,4 +50,54 @@ func (s *UserServer) Register(ctx context.Context, in *user.RegisterReq) (*user.
 func (s *UserServer) UploadPreviewAvatar(ctx context.Context, in *user.UploadPreviewAvatarReq) (*user.UploadPreviewAvatarResp, error) {
 	l := logic.NewUploadPreviewAvatarLogic(ctx, s.svcCtx)
 	return l.UploadPreviewAvatar(in)
+}
+
+// 用户登录
+func (s *UserServer) Login(ctx context.Context, in *user.LoginReq) (*user.LoginResp, error) {
+	l := logic.NewLoginLogic(ctx, s.svcCtx)
+	return l.Login(in)
+}
+
+// 刷新Token
+func (s *UserServer) RefreshToken(ctx context.Context, in *user.RefreshTokenReq) (*user.RefreshTokenResp, error) {
+	l := logic.NewRefreshTokenLogic(ctx, s.svcCtx)
+	return l.RefreshToken(in)
+}
+
+// 获取用户信息
+func (s *UserServer) GetUserInfo(ctx context.Context, in *user.GetUserInfoReq) (*user.GetUserInfoResp, error) {
+	l := logic.NewGetUserInfoLogic(ctx, s.svcCtx)
+	return l.GetUserInfo(in)
+}
+
+// 修改用户信息
+func (s *UserServer) UpdateUserInfo(ctx context.Context, in *user.UpdateUserInfoReq) (*user.UpdateUserInfoResp, error) {
+	l := logic.NewUpdateUserInfoLogic(ctx, s.svcCtx)
+	return l.UpdateUserInfo(in)
+}
+
+// 用户地址管理
+func (s *UserServer) GetAddressList(ctx context.Context, in *user.GetAddressListReq) (*user.GetAddressListResp, error) {
+	l := logic.NewGetAddressListLogic(ctx, s.svcCtx)
+	return l.GetAddressList(in)
+}
+
+func (s *UserServer) GetAddressDetail(ctx context.Context, in *user.GetAddressDetailReq) (*user.GetAddressDetailResp, error) {
+	l := logic.NewGetAddressDetailLogic(ctx, s.svcCtx)
+	return l.GetAddressDetail(in)
+}
+
+func (s *UserServer) AddAddress(ctx context.Context, in *user.AddAddressReq) (*user.AddAddressResp, error) {
+	l := logic.NewAddAddressLogic(ctx, s.svcCtx)
+	return l.AddAddress(in)
+}
+
+func (s *UserServer) UpdateAddress(ctx context.Context, in *user.UpdateAddressReq) (*user.UpdateAddressResp, error) {
+	l := logic.NewUpdateAddressLogic(ctx, s.svcCtx)
+	return l.UpdateAddress(in)
+}
+
+func (s *UserServer) DeleteAddress(ctx context.Context, in *user.DeleteAddressReq) (*user.DeleteAddressResp, error) {
+	l := logic.NewDeleteAddressLogic(ctx, s.svcCtx)
+	return l.DeleteAddress(in)
 }

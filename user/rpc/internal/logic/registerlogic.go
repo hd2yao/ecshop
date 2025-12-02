@@ -14,6 +14,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/model"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -38,8 +39,8 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	// 1. 参数验证
 	if in.Email == "" || in.EmailCode == "" || in.Password == "" || in.Name == "" {
 		return &user.RegisterResp{
-			Code:    400,
-			Message: "邮箱、验证码、密码和昵称不能为空",
+			Code:    int32(errcode.CommonParamError.Code()),
+			Message: errcode.CommonParamError.Msg(),
 		}, nil
 	}
 
@@ -47,7 +48,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	if !emailRegex.MatchString(in.Email) {
 		return &user.RegisterResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "邮箱格式不正确",
 		}, nil
 	}
@@ -55,7 +56,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	// 3. 验证密码长度
 	if len(in.Password) < 6 {
 		return &user.RegisterResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "密码长度至少6位",
 		}, nil
 	}
@@ -63,7 +64,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	// 4. 验证昵称长度
 	if len(in.Name) < 2 || len(in.Name) > 32 {
 		return &user.RegisterResp{
-			Code:    400,
+			Code:    int32(errcode.CommonParamError.Code()),
 			Message: "昵称长度应在2-32位之间",
 		}, nil
 	}
@@ -72,8 +73,8 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	if !l.svcCtx.MailService.VerifyCode(in.Email, in.EmailCode) {
 		l.Errorf("邮箱验证码验证失败: email=%s, code=%s", in.Email, in.EmailCode)
 		return &user.RegisterResp{
-			Code:    400,
-			Message: "邮箱验证码错误或已过期",
+			Code:    int32(errcode.UserCodeEmailError.Code()),
+			Message: errcode.UserCodeEmailError.Msg(),
 		}, nil
 	}
 
@@ -82,14 +83,14 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	if err != nil && err != sql.ErrNoRows {
 		l.Errorf("查询用户失败: %v", err)
 		return &user.RegisterResp{
-			Code:    500,
-			Message: "系统错误",
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 	if existingUser != nil {
 		return &user.RegisterResp{
-			Code:    400,
-			Message: "该邮箱已被注册",
+			Code:    int32(errcode.UserAccountExist.Code()),
+			Message: errcode.UserAccountExist.Msg(),
 		}, nil
 	}
 
@@ -99,13 +100,13 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		if err != nil && err != sql.ErrNoRows {
 			l.Errorf("查询用户失败: %v", err)
 			return &user.RegisterResp{
-				Code:    500,
-				Message: "系统错误",
+				Code:    int32(errcode.CommonServerError.Code()),
+				Message: errcode.CommonServerError.Msg(),
 			}, nil
 		}
 		if existingUserByPhone != nil {
 			return &user.RegisterResp{
-				Code:    400,
+				Code:    int32(errcode.UserAccountExist.Code()),
 				Message: "该手机号已被注册",
 			}, nil
 		}
@@ -116,8 +117,8 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	if err != nil {
 		l.Errorf("密码加密失败: %v", err)
 		return &user.RegisterResp{
-			Code:    500,
-			Message: "系统错误",
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 
@@ -126,8 +127,8 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	if err != nil {
 		l.Errorf("生成用户密钥失败: %v", err)
 		return &user.RegisterResp{
-			Code:    500,
-			Message: "系统错误",
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: errcode.CommonServerError.Msg(),
 		}, nil
 	}
 
@@ -164,7 +165,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	if err != nil {
 		l.Errorf("插入用户失败: %v", err)
 		return &user.RegisterResp{
-			Code:    500,
+			Code:    int32(errcode.CommonServerError.Code()),
 			Message: "注册失败",
 		}, nil
 	}
@@ -173,7 +174,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	if err != nil {
 		l.Errorf("获取用户ID失败: %v", err)
 		return &user.RegisterResp{
-			Code:    500,
+			Code:    int32(errcode.CommonServerError.Code()),
 			Message: "注册失败",
 		}, nil
 	}
@@ -200,9 +201,6 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 		}
 	}
 
-	// 13. 生成访问令牌 (这里简单使用用户ID，实际项目中应该使用JWT)
-	token := generateToken(userId)
-
 	// 13. 返回用户信息
 	userInfo := &user.UserInfo{
 		Id:         userId,
@@ -218,10 +216,9 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	l.Infof("用户注册成功: userId=%d, email=%s", userId, in.Email)
 
 	return &user.RegisterResp{
-		Code:     200,
-		Message:  "注册成功",
+		Code:     int32(errcode.Success.Code()),
+		Message:  errcode.Success.Msg(),
 		UserId:   userId,
-		Token:    token,
 		UserInfo: userInfo,
 	}, nil
 }
@@ -233,11 +230,6 @@ func generateSecret() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
-}
-
-// generateToken 生成访问令牌 (简单实现，实际项目应使用JWT)
-func generateToken(userId int64) string {
-	return fmt.Sprintf("token_%d_%d", userId, time.Now().Unix())
 }
 
 // isValidURL 简单的URL验证

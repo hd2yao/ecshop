@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -35,11 +36,13 @@ func (l *VerifyCaptchaLogic) VerifyCaptcha(req *types.VerifyRequest) (resp *type
 	rpcResp, err := l.svcCtx.UserRpc.VerifyCaptcha(l.ctx, rpcReq)
 	if err != nil {
 		l.Errorf("调用RPC验证验证码失败: %v", err)
-		return &types.VerifyResponse{
-			Code:    500,
-			Message: "验证码验证失败",
-			Valid:   false,
-		}, nil
+		return nil, errcode.CommonServerError
+	}
+
+	// 检查RPC响应的错误码
+	if rpcResp.Code != int32(errcode.Success.Code()) && !rpcResp.Valid {
+		// 验证失败，返回验证码错误
+		return nil, errcode.UserCodeCaptchaError
 	}
 
 	return &types.VerifyResponse{

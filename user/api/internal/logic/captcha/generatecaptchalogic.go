@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -48,10 +49,12 @@ func (l *GenerateCaptchaLogic) GenerateCaptcha(req *types.CaptchaRequest) (resp 
 	rpcResp, err := l.svcCtx.UserRpc.GenerateCaptcha(l.ctx, rpcReq)
 	if err != nil {
 		l.Errorf("调用RPC生成验证码失败: %v", err)
-		return &types.CaptchaResponse{
-			Code:    500,
-			Message: "验证码生成失败",
-		}, nil
+		return nil, errcode.CommonServerError
+	}
+
+	// 检查RPC响应的错误码
+	if rpcResp.Code != int32(errcode.Success.Code()) {
+		return nil, errcode.CommonServerError
 	}
 
 	return &types.CaptchaResponse{

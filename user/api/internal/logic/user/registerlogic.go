@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/user/api/internal/svc"
 	"github.com/hd2yao/ecshop/user/api/internal/types"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -38,21 +39,27 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 	})
 	if err != nil {
 		l.Errorf("RPC调用失败: %v", err)
-		return &types.RegisterResponse{
-			Code:    500,
-			Message: "系统错误",
-		}, nil
+		return nil, errcode.CommonServerError
 	}
 
-	// 2. 转换响应数据
+	// 2. 检查RPC响应的错误码
+	if rpcResp.Code != int32(errcode.Success.Code()) {
+		// 根据RPC返回的错误码找到对应的AppError
+		if appErr := l.getAppErrorByCode(int(rpcResp.Code)); appErr != nil {
+			return nil, appErr
+		}
+		// 如果找不到对应的错误码，返回通用服务错误
+		return nil, errcode.CommonServerError
+	}
+
+	// 3. 构建成功响应
 	resp = &types.RegisterResponse{
 		Code:    int(rpcResp.Code),
 		Message: rpcResp.Message,
 		UserId:  rpcResp.UserId,
-		Token:   rpcResp.Token,
 	}
 
-	// 3. 转换用户信息
+	// 4. 转换用户信息
 	if rpcResp.UserInfo != nil {
 		resp.UserInfo = types.UserInfo{
 			Id:         rpcResp.UserInfo.Id,
@@ -67,4 +74,20 @@ func (l *RegisterLogic) Register(req *types.RegisterRequest) (resp *types.Regist
 	}
 
 	return resp, nil
+}
+
+// getAppErrorByCode 根据错误码获取对应的AppError
+func (l *RegisterLogic) getAppErrorByCode(code int) *errcode.AppError {
+	switch code {
+	case errcode.CommonParamError.Code():
+		return errcode.CommonParamError
+	case errcode.CommonServerError.Code():
+		return errcode.CommonServerError
+	case errcode.UserCodeEmailError.Code():
+		return errcode.UserCodeEmailError
+	case errcode.UserAccountExist.Code():
+		return errcode.UserAccountExist
+	default:
+		return nil
+	}
 }

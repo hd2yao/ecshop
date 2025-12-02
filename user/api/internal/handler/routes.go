@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	address "github.com/hd2yao/ecshop/user/api/internal/handler/address"
 	captcha "github.com/hd2yao/ecshop/user/api/internal/handler/captcha"
 	mail "github.com/hd2yao/ecshop/user/api/internal/handler/mail"
 	upload "github.com/hd2yao/ecshop/user/api/internal/handler/upload"
@@ -16,6 +17,45 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.JWTAuth},
+			[]rest.Route{
+				{
+					// 获取地址详情
+					Method:  http.MethodGet,
+					Path:    "/:id",
+					Handler: address.GetAddressDetailHandler(serverCtx),
+				},
+				{
+					// 修改用户地址
+					Method:  http.MethodPut,
+					Path:    "/:id",
+					Handler: address.UpdateAddressHandler(serverCtx),
+				},
+				{
+					// 删除用户地址
+					Method:  http.MethodDelete,
+					Path:    "/:id",
+					Handler: address.DeleteAddressHandler(serverCtx),
+				},
+				{
+					// 新增用户地址
+					Method:  http.MethodPost,
+					Path:    "/add",
+					Handler: address.AddAddressHandler(serverCtx),
+				},
+				{
+					// 获取用户全部地址列表
+					Method:  http.MethodGet,
+					Path:    "/list",
+					Handler: address.GetAddressListHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/user/address"),
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{
@@ -42,12 +82,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/register/send",
 				Handler: mail.SendRegisterMailCodeHandler(serverCtx),
 			},
-			{
-				// 验证邮件验证码
-				Method:  http.MethodPost,
-				Path:    "/verify",
-				Handler: mail.VerifyMailCodeHandler(serverCtx),
-			},
 		},
 		rest.WithPrefix("/api/mail"),
 	)
@@ -67,12 +101,45 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 用户登录
+				Method:  http.MethodPost,
+				Path:    "/login",
+				Handler: user.LoginHandler(serverCtx),
+			},
+			{
+				// 刷新Token
+				Method:  http.MethodPost,
+				Path:    "/refresh-token",
+				Handler: user.RefreshTokenHandler(serverCtx),
+			},
+			{
 				// 用户注册
 				Method:  http.MethodPost,
 				Path:    "/register",
 				Handler: user.RegisterHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/api/user"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.JWTAuth},
+			[]rest.Route{
+				{
+					// 获取当前登录用户信息（包含地址列表）
+					Method:  http.MethodGet,
+					Path:    "/info",
+					Handler: user.GetUserInfoHandler(serverCtx),
+				},
+				{
+					// 修改用户个人信息
+					Method:  http.MethodPut,
+					Path:    "/info",
+					Handler: user.UpdateUserInfoHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/api/user"),
 	)
 }

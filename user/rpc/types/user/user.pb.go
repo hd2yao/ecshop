@@ -82,6 +82,159 @@ func (x *GenerateCaptchaReq) GetDrawOpts() *DrawOptions {
 	return nil
 }
 
+// 辅助结构
+type CaptchaConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Width         int32                  `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`
+	Height        int32                  `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
+	Length        int32                  `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`
+	BgColor       string                 `protobuf:"bytes,4,opt,name=bg_color,json=bgColor,proto3" json:"bg_color,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CaptchaConfig) Reset() {
+	*x = CaptchaConfig{}
+	mi := &file_rpc_user_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CaptchaConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CaptchaConfig) ProtoMessage() {}
+
+func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CaptchaConfig.ProtoReflect.Descriptor instead.
+func (*CaptchaConfig) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CaptchaConfig) GetWidth() int32 {
+	if x != nil {
+		return x.Width
+	}
+	return 0
+}
+
+func (x *CaptchaConfig) GetHeight() int32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
+}
+
+func (x *CaptchaConfig) GetLength() int32 {
+	if x != nil {
+		return x.Length
+	}
+	return 0
+}
+
+func (x *CaptchaConfig) GetBgColor() string {
+	if x != nil {
+		return x.BgColor
+	}
+	return ""
+}
+
+type DrawOptions struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UseCustomDraw bool                   `protobuf:"varint,1,opt,name=use_custom_draw,json=useCustomDraw,proto3" json:"use_custom_draw,omitempty"`
+	DrawText      bool                   `protobuf:"varint,2,opt,name=draw_text,json=drawText,proto3" json:"draw_text,omitempty"`
+	DrawHollow    bool                   `protobuf:"varint,3,opt,name=draw_hollow,json=drawHollow,proto3" json:"draw_hollow,omitempty"`
+	DrawSine      bool                   `protobuf:"varint,4,opt,name=draw_sine,json=drawSine,proto3" json:"draw_sine,omitempty"`
+	DrawSlimLine  int32                  `protobuf:"varint,5,opt,name=draw_slim_line,json=drawSlimLine,proto3" json:"draw_slim_line,omitempty"`
+	DrawNoiseText string                 `protobuf:"bytes,6,opt,name=draw_noise_text,json=drawNoiseText,proto3" json:"draw_noise_text,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DrawOptions) Reset() {
+	*x = DrawOptions{}
+	mi := &file_rpc_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DrawOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DrawOptions) ProtoMessage() {}
+
+func (x *DrawOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DrawOptions.ProtoReflect.Descriptor instead.
+func (*DrawOptions) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DrawOptions) GetUseCustomDraw() bool {
+	if x != nil {
+		return x.UseCustomDraw
+	}
+	return false
+}
+
+func (x *DrawOptions) GetDrawText() bool {
+	if x != nil {
+		return x.DrawText
+	}
+	return false
+}
+
+func (x *DrawOptions) GetDrawHollow() bool {
+	if x != nil {
+		return x.DrawHollow
+	}
+	return false
+}
+
+func (x *DrawOptions) GetDrawSine() bool {
+	if x != nil {
+		return x.DrawSine
+	}
+	return false
+}
+
+func (x *DrawOptions) GetDrawSlimLine() int32 {
+	if x != nil {
+		return x.DrawSlimLine
+	}
+	return 0
+}
+
+func (x *DrawOptions) GetDrawNoiseText() string {
+	if x != nil {
+		return x.DrawNoiseText
+	}
+	return ""
+}
+
 type GenerateCaptchaResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
@@ -95,7 +248,7 @@ type GenerateCaptchaResp struct {
 
 func (x *GenerateCaptchaResp) Reset() {
 	*x = GenerateCaptchaResp{}
-	mi := &file_rpc_user_proto_msgTypes[1]
+	mi := &file_rpc_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -107,7 +260,7 @@ func (x *GenerateCaptchaResp) String() string {
 func (*GenerateCaptchaResp) ProtoMessage() {}
 
 func (x *GenerateCaptchaResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[1]
+	mi := &file_rpc_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -120,7 +273,7 @@ func (x *GenerateCaptchaResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateCaptchaResp.ProtoReflect.Descriptor instead.
 func (*GenerateCaptchaResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{1}
+	return file_rpc_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GenerateCaptchaResp) GetCode() int32 {
@@ -168,7 +321,7 @@ type VerifyCaptchaReq struct {
 
 func (x *VerifyCaptchaReq) Reset() {
 	*x = VerifyCaptchaReq{}
-	mi := &file_rpc_user_proto_msgTypes[2]
+	mi := &file_rpc_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -180,7 +333,7 @@ func (x *VerifyCaptchaReq) String() string {
 func (*VerifyCaptchaReq) ProtoMessage() {}
 
 func (x *VerifyCaptchaReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[2]
+	mi := &file_rpc_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +346,7 @@ func (x *VerifyCaptchaReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyCaptchaReq.ProtoReflect.Descriptor instead.
 func (*VerifyCaptchaReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{2}
+	return file_rpc_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *VerifyCaptchaReq) GetCaptchaId() string {
@@ -221,7 +374,7 @@ type VerifyCaptchaResp struct {
 
 func (x *VerifyCaptchaResp) Reset() {
 	*x = VerifyCaptchaResp{}
-	mi := &file_rpc_user_proto_msgTypes[3]
+	mi := &file_rpc_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -233,7 +386,7 @@ func (x *VerifyCaptchaResp) String() string {
 func (*VerifyCaptchaResp) ProtoMessage() {}
 
 func (x *VerifyCaptchaResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[3]
+	mi := &file_rpc_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -246,7 +399,7 @@ func (x *VerifyCaptchaResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyCaptchaResp.ProtoReflect.Descriptor instead.
 func (*VerifyCaptchaResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{3}
+	return file_rpc_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *VerifyCaptchaResp) GetCode() int32 {
@@ -283,7 +436,7 @@ type SendMailCodeResp struct {
 
 func (x *SendMailCodeResp) Reset() {
 	*x = SendMailCodeResp{}
-	mi := &file_rpc_user_proto_msgTypes[4]
+	mi := &file_rpc_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +448,7 @@ func (x *SendMailCodeResp) String() string {
 func (*SendMailCodeResp) ProtoMessage() {}
 
 func (x *SendMailCodeResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[4]
+	mi := &file_rpc_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +461,7 @@ func (x *SendMailCodeResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendMailCodeResp.ProtoReflect.Descriptor instead.
 func (*SendMailCodeResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{4}
+	return file_rpc_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SendMailCodeResp) GetCode() int32 {
@@ -337,118 +490,6 @@ func (x *SendMailCodeResp) GetCodeId() string {
 		return x.CodeId
 	}
 	return ""
-}
-
-type VerifyMailCodeReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VerifyMailCodeReq) Reset() {
-	*x = VerifyMailCodeReq{}
-	mi := &file_rpc_user_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VerifyMailCodeReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VerifyMailCodeReq) ProtoMessage() {}
-
-func (x *VerifyMailCodeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VerifyMailCodeReq.ProtoReflect.Descriptor instead.
-func (*VerifyMailCodeReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *VerifyMailCodeReq) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *VerifyMailCodeReq) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
-
-type VerifyMailCodeResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Valid         bool                   `protobuf:"varint,3,opt,name=valid,proto3" json:"valid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VerifyMailCodeResp) Reset() {
-	*x = VerifyMailCodeResp{}
-	mi := &file_rpc_user_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VerifyMailCodeResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VerifyMailCodeResp) ProtoMessage() {}
-
-func (x *VerifyMailCodeResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VerifyMailCodeResp.ProtoReflect.Descriptor instead.
-func (*VerifyMailCodeResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *VerifyMailCodeResp) GetCode() int32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-func (x *VerifyMailCodeResp) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-func (x *VerifyMailCodeResp) GetValid() bool {
-	if x != nil {
-		return x.Valid
-	}
-	return false
 }
 
 // 注册时发送邮件验证码
@@ -618,8 +659,7 @@ type RegisterResp struct {
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	UserId        int64                  `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
-	UserInfo      *UserInfo              `protobuf:"bytes,5,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	UserInfo      *UserInfo              `protobuf:"bytes,4,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -675,14 +715,289 @@ func (x *RegisterResp) GetUserId() int64 {
 	return 0
 }
 
-func (x *RegisterResp) GetToken() string {
+func (x *RegisterResp) GetUserInfo() *UserInfo {
 	if x != nil {
-		return x.Token
+		return x.UserInfo
+	}
+	return nil
+}
+
+// 头像管理相关
+type UploadPreviewAvatarReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileData      []byte                 `protobuf:"bytes,1,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`  // 文件数据
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`                  // 文件名
+	FileSize      int64                  `protobuf:"varint,3,opt,name=file_size,json=fileSize,proto3" json:"file_size,omitempty"` // 文件大小
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadPreviewAvatarReq) Reset() {
+	*x = UploadPreviewAvatarReq{}
+	mi := &file_rpc_user_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadPreviewAvatarReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadPreviewAvatarReq) ProtoMessage() {}
+
+func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadPreviewAvatarReq.ProtoReflect.Descriptor instead.
+func (*UploadPreviewAvatarReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UploadPreviewAvatarReq) GetFileData() []byte {
+	if x != nil {
+		return x.FileData
+	}
+	return nil
+}
+
+func (x *UploadPreviewAvatarReq) GetFilename() string {
+	if x != nil {
+		return x.Filename
 	}
 	return ""
 }
 
-func (x *RegisterResp) GetUserInfo() *UserInfo {
+func (x *UploadPreviewAvatarReq) GetFileSize() int64 {
+	if x != nil {
+		return x.FileSize
+	}
+	return 0
+}
+
+type UploadPreviewAvatarResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	PreviewKey    string                 `protobuf:"bytes,3,opt,name=preview_key,json=previewKey,proto3" json:"preview_key,omitempty"` // 预览标识
+	PreviewUrl    string                 `protobuf:"bytes,4,opt,name=preview_url,json=previewUrl,proto3" json:"preview_url,omitempty"` // 预览图片URL
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadPreviewAvatarResp) Reset() {
+	*x = UploadPreviewAvatarResp{}
+	mi := &file_rpc_user_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadPreviewAvatarResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadPreviewAvatarResp) ProtoMessage() {}
+
+func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadPreviewAvatarResp.ProtoReflect.Descriptor instead.
+func (*UploadPreviewAvatarResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UploadPreviewAvatarResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UploadPreviewAvatarResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UploadPreviewAvatarResp) GetPreviewKey() string {
+	if x != nil {
+		return x.PreviewKey
+	}
+	return ""
+}
+
+func (x *UploadPreviewAvatarResp) GetPreviewUrl() string {
+	if x != nil {
+		return x.PreviewUrl
+	}
+	return ""
+}
+
+// 用户登录相关
+type LoginReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`       // 邮箱（邮箱和手机号二选一）
+	Phone         string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`       // 手机号（邮箱和手机号二选一）
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"` // 密码
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginReq) Reset() {
+	*x = LoginReq{}
+	mi := &file_rpc_user_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginReq) ProtoMessage() {}
+
+func (x *LoginReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginReq.ProtoReflect.Descriptor instead.
+func (*LoginReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *LoginReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *LoginReq) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *LoginReq) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginResp struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Code                  int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message               string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserId                int64                  `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AccessToken           string                 `protobuf:"bytes,4,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`                                   // Access Token (2小时)
+	RefreshToken          string                 `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`                                // Refresh Token (7天)
+	AccessTokenExpireTime string                 `protobuf:"bytes,6,opt,name=access_token_expire_time,json=accessTokenExpireTime,proto3" json:"access_token_expire_time,omitempty"` // Access Token 过期时间（ISO 8601格式）
+	UserInfo              *UserInfo              `protobuf:"bytes,7,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *LoginResp) Reset() {
+	*x = LoginResp{}
+	mi := &file_rpc_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResp) ProtoMessage() {}
+
+func (x *LoginResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResp.ProtoReflect.Descriptor instead.
+func (*LoginResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *LoginResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *LoginResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *LoginResp) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *LoginResp) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *LoginResp) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *LoginResp) GetAccessTokenExpireTime() string {
+	if x != nil {
+		return x.AccessTokenExpireTime
+	}
+	return ""
+}
+
+func (x *LoginResp) GetUserInfo() *UserInfo {
 	if x != nil {
 		return x.UserInfo
 	}
@@ -705,7 +1020,7 @@ type UserInfo struct {
 
 func (x *UserInfo) Reset() {
 	*x = UserInfo{}
-	mi := &file_rpc_user_proto_msgTypes[10]
+	mi := &file_rpc_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -717,7 +1032,7 @@ func (x *UserInfo) String() string {
 func (*UserInfo) ProtoMessage() {}
 
 func (x *UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[10]
+	mi := &file_rpc_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -730,7 +1045,7 @@ func (x *UserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
 func (*UserInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{10}
+	return file_rpc_user_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UserInfo) GetId() int64 {
@@ -789,32 +1104,29 @@ func (x *UserInfo) GetCreateTime() string {
 	return ""
 }
 
-// 辅助结构
-type CaptchaConfig struct {
+// Token 刷新相关
+type RefreshTokenReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Width         int32                  `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`
-	Height        int32                  `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
-	Length        int32                  `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`
-	BgColor       string                 `protobuf:"bytes,4,opt,name=bg_color,json=bgColor,proto3" json:"bg_color,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"` // Refresh Token
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CaptchaConfig) Reset() {
-	*x = CaptchaConfig{}
-	mi := &file_rpc_user_proto_msgTypes[11]
+func (x *RefreshTokenReq) Reset() {
+	*x = RefreshTokenReq{}
+	mi := &file_rpc_user_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CaptchaConfig) String() string {
+func (x *RefreshTokenReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CaptchaConfig) ProtoMessage() {}
+func (*RefreshTokenReq) ProtoMessage() {}
 
-func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[11]
+func (x *RefreshTokenReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -825,66 +1137,44 @@ func (x *CaptchaConfig) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CaptchaConfig.ProtoReflect.Descriptor instead.
-func (*CaptchaConfig) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{11}
+// Deprecated: Use RefreshTokenReq.ProtoReflect.Descriptor instead.
+func (*RefreshTokenReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *CaptchaConfig) GetWidth() int32 {
+func (x *RefreshTokenReq) GetRefreshToken() string {
 	if x != nil {
-		return x.Width
-	}
-	return 0
-}
-
-func (x *CaptchaConfig) GetHeight() int32 {
-	if x != nil {
-		return x.Height
-	}
-	return 0
-}
-
-func (x *CaptchaConfig) GetLength() int32 {
-	if x != nil {
-		return x.Length
-	}
-	return 0
-}
-
-func (x *CaptchaConfig) GetBgColor() string {
-	if x != nil {
-		return x.BgColor
+		return x.RefreshToken
 	}
 	return ""
 }
 
-type DrawOptions struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UseCustomDraw bool                   `protobuf:"varint,1,opt,name=use_custom_draw,json=useCustomDraw,proto3" json:"use_custom_draw,omitempty"`
-	DrawText      bool                   `protobuf:"varint,2,opt,name=draw_text,json=drawText,proto3" json:"draw_text,omitempty"`
-	DrawHollow    bool                   `protobuf:"varint,3,opt,name=draw_hollow,json=drawHollow,proto3" json:"draw_hollow,omitempty"`
-	DrawSine      bool                   `protobuf:"varint,4,opt,name=draw_sine,json=drawSine,proto3" json:"draw_sine,omitempty"`
-	DrawSlimLine  int32                  `protobuf:"varint,5,opt,name=draw_slim_line,json=drawSlimLine,proto3" json:"draw_slim_line,omitempty"`
-	DrawNoiseText string                 `protobuf:"bytes,6,opt,name=draw_noise_text,json=drawNoiseText,proto3" json:"draw_noise_text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type RefreshTokenResp struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Code                  int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message               string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	AccessToken           string                 `protobuf:"bytes,3,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`                                   // 新的 Access Token
+	RefreshToken          string                 `protobuf:"bytes,4,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`                                // 新的 Refresh Token（可选：滚动刷新）
+	AccessTokenExpireTime string                 `protobuf:"bytes,5,opt,name=access_token_expire_time,json=accessTokenExpireTime,proto3" json:"access_token_expire_time,omitempty"` // Access Token 过期时间（ISO 8601格式）
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
-func (x *DrawOptions) Reset() {
-	*x = DrawOptions{}
-	mi := &file_rpc_user_proto_msgTypes[12]
+func (x *RefreshTokenResp) Reset() {
+	*x = RefreshTokenResp{}
+	mi := &file_rpc_user_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DrawOptions) String() string {
+func (x *RefreshTokenResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DrawOptions) ProtoMessage() {}
+func (*RefreshTokenResp) ProtoMessage() {}
 
-func (x *DrawOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[12]
+func (x *RefreshTokenResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -895,178 +1185,1054 @@ func (x *DrawOptions) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DrawOptions.ProtoReflect.Descriptor instead.
-func (*DrawOptions) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{12}
+// Deprecated: Use RefreshTokenResp.ProtoReflect.Descriptor instead.
+func (*RefreshTokenResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *DrawOptions) GetUseCustomDraw() bool {
-	if x != nil {
-		return x.UseCustomDraw
-	}
-	return false
-}
-
-func (x *DrawOptions) GetDrawText() bool {
-	if x != nil {
-		return x.DrawText
-	}
-	return false
-}
-
-func (x *DrawOptions) GetDrawHollow() bool {
-	if x != nil {
-		return x.DrawHollow
-	}
-	return false
-}
-
-func (x *DrawOptions) GetDrawSine() bool {
-	if x != nil {
-		return x.DrawSine
-	}
-	return false
-}
-
-func (x *DrawOptions) GetDrawSlimLine() int32 {
-	if x != nil {
-		return x.DrawSlimLine
-	}
-	return 0
-}
-
-func (x *DrawOptions) GetDrawNoiseText() string {
-	if x != nil {
-		return x.DrawNoiseText
-	}
-	return ""
-}
-
-// 头像管理相关
-type UploadPreviewAvatarReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileData      []byte                 `protobuf:"bytes,1,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`  // 文件数据
-	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`                  // 文件名
-	FileSize      int64                  `protobuf:"varint,3,opt,name=file_size,json=fileSize,proto3" json:"file_size,omitempty"` // 文件大小
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadPreviewAvatarReq) Reset() {
-	*x = UploadPreviewAvatarReq{}
-	mi := &file_rpc_user_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadPreviewAvatarReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadPreviewAvatarReq) ProtoMessage() {}
-
-func (x *UploadPreviewAvatarReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadPreviewAvatarReq.ProtoReflect.Descriptor instead.
-func (*UploadPreviewAvatarReq) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *UploadPreviewAvatarReq) GetFileData() []byte {
-	if x != nil {
-		return x.FileData
-	}
-	return nil
-}
-
-func (x *UploadPreviewAvatarReq) GetFilename() string {
-	if x != nil {
-		return x.Filename
-	}
-	return ""
-}
-
-func (x *UploadPreviewAvatarReq) GetFileSize() int64 {
-	if x != nil {
-		return x.FileSize
-	}
-	return 0
-}
-
-type UploadPreviewAvatarResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	PreviewKey    string                 `protobuf:"bytes,3,opt,name=preview_key,json=previewKey,proto3" json:"preview_key,omitempty"` // 临时标识，注册时使用
-	PreviewUrl    string                 `protobuf:"bytes,4,opt,name=preview_url,json=previewUrl,proto3" json:"preview_url,omitempty"` // 预览图片URL
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadPreviewAvatarResp) Reset() {
-	*x = UploadPreviewAvatarResp{}
-	mi := &file_rpc_user_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadPreviewAvatarResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadPreviewAvatarResp) ProtoMessage() {}
-
-func (x *UploadPreviewAvatarResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_user_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadPreviewAvatarResp.ProtoReflect.Descriptor instead.
-func (*UploadPreviewAvatarResp) Descriptor() ([]byte, []int) {
-	return file_rpc_user_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *UploadPreviewAvatarResp) GetCode() int32 {
+func (x *RefreshTokenResp) GetCode() int32 {
 	if x != nil {
 		return x.Code
 	}
 	return 0
 }
 
-func (x *UploadPreviewAvatarResp) GetMessage() string {
+func (x *RefreshTokenResp) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-func (x *UploadPreviewAvatarResp) GetPreviewKey() string {
+func (x *RefreshTokenResp) GetAccessToken() string {
 	if x != nil {
-		return x.PreviewKey
+		return x.AccessToken
 	}
 	return ""
 }
 
-func (x *UploadPreviewAvatarResp) GetPreviewUrl() string {
+func (x *RefreshTokenResp) GetRefreshToken() string {
 	if x != nil {
-		return x.PreviewUrl
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *RefreshTokenResp) GetAccessTokenExpireTime() string {
+	if x != nil {
+		return x.AccessTokenExpireTime
+	}
+	return ""
+}
+
+// 获取用户信息相关
+type GetUserInfoReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID（从token中获取）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserInfoReq) Reset() {
+	*x = GetUserInfoReq{}
+	mi := &file_rpc_user_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserInfoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserInfoReq) ProtoMessage() {}
+
+func (x *GetUserInfoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserInfoReq.ProtoReflect.Descriptor instead.
+func (*GetUserInfoReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetUserInfoReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type GetUserInfoResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserInfo      *UserInfo              `protobuf:"bytes,3,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"` // 用户信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserInfoResp) Reset() {
+	*x = GetUserInfoResp{}
+	mi := &file_rpc_user_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserInfoResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserInfoResp) ProtoMessage() {}
+
+func (x *GetUserInfoResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserInfoResp.ProtoReflect.Descriptor instead.
+func (*GetUserInfoResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetUserInfoResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetUserInfoResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetUserInfoResp) GetUserInfo() *UserInfo {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
+// 修改用户信息相关
+type UpdateUserInfoReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                    // 用户昵称（可选）
+	Avatar        string                 `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar,omitempty"`                // 头像OSS地址（可选）
+	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`                  // 手机号（可选）
+	Sex           int32                  `protobuf:"varint,5,opt,name=sex,proto3" json:"sex,omitempty"`                     // 性别：0女 1男（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserInfoReq) Reset() {
+	*x = UpdateUserInfoReq{}
+	mi := &file_rpc_user_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserInfoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserInfoReq) ProtoMessage() {}
+
+func (x *UpdateUserInfoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserInfoReq.ProtoReflect.Descriptor instead.
+func (*UpdateUserInfoReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateUserInfoReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UpdateUserInfoReq) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoReq) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoReq) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoReq) GetSex() int32 {
+	if x != nil {
+		return x.Sex
+	}
+	return 0
+}
+
+type UpdateUserInfoResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserInfo      *UserInfo              `protobuf:"bytes,3,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"` // 更新后的用户信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserInfoResp) Reset() {
+	*x = UpdateUserInfoResp{}
+	mi := &file_rpc_user_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserInfoResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserInfoResp) ProtoMessage() {}
+
+func (x *UpdateUserInfoResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserInfoResp.ProtoReflect.Descriptor instead.
+func (*UpdateUserInfoResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpdateUserInfoResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateUserInfoResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateUserInfoResp) GetUserInfo() *UserInfo {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
+// 用户地址管理相关
+type AddressInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DefaultStatus int32                  `protobuf:"varint,3,opt,name=default_status,json=defaultStatus,proto3" json:"default_status,omitempty"` // 是否默认：0否 1是
+	ReceiveName   string                 `protobuf:"bytes,4,opt,name=receive_name,json=receiveName,proto3" json:"receive_name,omitempty"`        // 收货人姓名
+	Phone         string                 `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`                                       // 收货人电话
+	Province      string                 `protobuf:"bytes,6,opt,name=province,proto3" json:"province,omitempty"`                                 // 省/直辖市
+	City          string                 `protobuf:"bytes,7,opt,name=city,proto3" json:"city,omitempty"`                                         // 市
+	Region        string                 `protobuf:"bytes,8,opt,name=region,proto3" json:"region,omitempty"`                                     // 区
+	DetailAddress string                 `protobuf:"bytes,9,opt,name=detail_address,json=detailAddress,proto3" json:"detail_address,omitempty"`  // 详细地址
+	CreateTime    string                 `protobuf:"bytes,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`          // 创建时间
+	UpdateTime    string                 `protobuf:"bytes,11,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`          // 更新时间
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddressInfo) Reset() {
+	*x = AddressInfo{}
+	mi := &file_rpc_user_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddressInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddressInfo) ProtoMessage() {}
+
+func (x *AddressInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddressInfo.ProtoReflect.Descriptor instead.
+func (*AddressInfo) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *AddressInfo) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *AddressInfo) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AddressInfo) GetDefaultStatus() int32 {
+	if x != nil {
+		return x.DefaultStatus
+	}
+	return 0
+}
+
+func (x *AddressInfo) GetReceiveName() string {
+	if x != nil {
+		return x.ReceiveName
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetProvince() string {
+	if x != nil {
+		return x.Province
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetCity() string {
+	if x != nil {
+		return x.City
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetDetailAddress() string {
+	if x != nil {
+		return x.DetailAddress
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetCreateTime() string {
+	if x != nil {
+		return x.CreateTime
+	}
+	return ""
+}
+
+func (x *AddressInfo) GetUpdateTime() string {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return ""
+}
+
+// 获取用户全部地址列表
+type GetAddressListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAddressListReq) Reset() {
+	*x = GetAddressListReq{}
+	mi := &file_rpc_user_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAddressListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAddressListReq) ProtoMessage() {}
+
+func (x *GetAddressListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAddressListReq.ProtoReflect.Descriptor instead.
+func (*GetAddressListReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetAddressListReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type GetAddressListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	AddressList   []*AddressInfo         `protobuf:"bytes,3,rep,name=address_list,json=addressList,proto3" json:"address_list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAddressListResp) Reset() {
+	*x = GetAddressListResp{}
+	mi := &file_rpc_user_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAddressListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAddressListResp) ProtoMessage() {}
+
+func (x *GetAddressListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAddressListResp.ProtoReflect.Descriptor instead.
+func (*GetAddressListResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetAddressListResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetAddressListResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetAddressListResp) GetAddressList() []*AddressInfo {
+	if x != nil {
+		return x.AddressList
+	}
+	return nil
+}
+
+// 获取地址详情
+type GetAddressDetailReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`          // 用户ID
+	AddressId     int64                  `protobuf:"varint,2,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"` // 地址ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAddressDetailReq) Reset() {
+	*x = GetAddressDetailReq{}
+	mi := &file_rpc_user_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAddressDetailReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAddressDetailReq) ProtoMessage() {}
+
+func (x *GetAddressDetailReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAddressDetailReq.ProtoReflect.Descriptor instead.
+func (*GetAddressDetailReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetAddressDetailReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *GetAddressDetailReq) GetAddressId() int64 {
+	if x != nil {
+		return x.AddressId
+	}
+	return 0
+}
+
+type GetAddressDetailResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Address       *AddressInfo           `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAddressDetailResp) Reset() {
+	*x = GetAddressDetailResp{}
+	mi := &file_rpc_user_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAddressDetailResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAddressDetailResp) ProtoMessage() {}
+
+func (x *GetAddressDetailResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAddressDetailResp.ProtoReflect.Descriptor instead.
+func (*GetAddressDetailResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetAddressDetailResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetAddressDetailResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetAddressDetailResp) GetAddress() *AddressInfo {
+	if x != nil {
+		return x.Address
+	}
+	return nil
+}
+
+// 新增地址
+type AddAddressReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DefaultStatus int32                  `protobuf:"varint,2,opt,name=default_status,json=defaultStatus,proto3" json:"default_status,omitempty"`
+	ReceiveName   string                 `protobuf:"bytes,3,opt,name=receive_name,json=receiveName,proto3" json:"receive_name,omitempty"`
+	Phone         string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	Province      string                 `protobuf:"bytes,5,opt,name=province,proto3" json:"province,omitempty"`
+	City          string                 `protobuf:"bytes,6,opt,name=city,proto3" json:"city,omitempty"`
+	Region        string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
+	DetailAddress string                 `protobuf:"bytes,8,opt,name=detail_address,json=detailAddress,proto3" json:"detail_address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddAddressReq) Reset() {
+	*x = AddAddressReq{}
+	mi := &file_rpc_user_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddAddressReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddAddressReq) ProtoMessage() {}
+
+func (x *AddAddressReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddAddressReq.ProtoReflect.Descriptor instead.
+func (*AddAddressReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *AddAddressReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AddAddressReq) GetDefaultStatus() int32 {
+	if x != nil {
+		return x.DefaultStatus
+	}
+	return 0
+}
+
+func (x *AddAddressReq) GetReceiveName() string {
+	if x != nil {
+		return x.ReceiveName
+	}
+	return ""
+}
+
+func (x *AddAddressReq) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *AddAddressReq) GetProvince() string {
+	if x != nil {
+		return x.Province
+	}
+	return ""
+}
+
+func (x *AddAddressReq) GetCity() string {
+	if x != nil {
+		return x.City
+	}
+	return ""
+}
+
+func (x *AddAddressReq) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *AddAddressReq) GetDetailAddress() string {
+	if x != nil {
+		return x.DetailAddress
+	}
+	return ""
+}
+
+type AddAddressResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	AddressId     int64                  `protobuf:"varint,3,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"` // 新增的地址ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddAddressResp) Reset() {
+	*x = AddAddressResp{}
+	mi := &file_rpc_user_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddAddressResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddAddressResp) ProtoMessage() {}
+
+func (x *AddAddressResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddAddressResp.ProtoReflect.Descriptor instead.
+func (*AddAddressResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *AddAddressResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *AddAddressResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *AddAddressResp) GetAddressId() int64 {
+	if x != nil {
+		return x.AddressId
+	}
+	return 0
+}
+
+// 修改地址
+type UpdateAddressReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AddressId     int64                  `protobuf:"varint,2,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
+	DefaultStatus int32                  `protobuf:"varint,3,opt,name=default_status,json=defaultStatus,proto3" json:"default_status,omitempty"`
+	ReceiveName   string                 `protobuf:"bytes,4,opt,name=receive_name,json=receiveName,proto3" json:"receive_name,omitempty"`
+	Phone         string                 `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
+	Province      string                 `protobuf:"bytes,6,opt,name=province,proto3" json:"province,omitempty"`
+	City          string                 `protobuf:"bytes,7,opt,name=city,proto3" json:"city,omitempty"`
+	Region        string                 `protobuf:"bytes,8,opt,name=region,proto3" json:"region,omitempty"`
+	DetailAddress string                 `protobuf:"bytes,9,opt,name=detail_address,json=detailAddress,proto3" json:"detail_address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAddressReq) Reset() {
+	*x = UpdateAddressReq{}
+	mi := &file_rpc_user_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAddressReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAddressReq) ProtoMessage() {}
+
+func (x *UpdateAddressReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAddressReq.ProtoReflect.Descriptor instead.
+func (*UpdateAddressReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *UpdateAddressReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UpdateAddressReq) GetAddressId() int64 {
+	if x != nil {
+		return x.AddressId
+	}
+	return 0
+}
+
+func (x *UpdateAddressReq) GetDefaultStatus() int32 {
+	if x != nil {
+		return x.DefaultStatus
+	}
+	return 0
+}
+
+func (x *UpdateAddressReq) GetReceiveName() string {
+	if x != nil {
+		return x.ReceiveName
+	}
+	return ""
+}
+
+func (x *UpdateAddressReq) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateAddressReq) GetProvince() string {
+	if x != nil {
+		return x.Province
+	}
+	return ""
+}
+
+func (x *UpdateAddressReq) GetCity() string {
+	if x != nil {
+		return x.City
+	}
+	return ""
+}
+
+func (x *UpdateAddressReq) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *UpdateAddressReq) GetDetailAddress() string {
+	if x != nil {
+		return x.DetailAddress
+	}
+	return ""
+}
+
+type UpdateAddressResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAddressResp) Reset() {
+	*x = UpdateAddressResp{}
+	mi := &file_rpc_user_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAddressResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAddressResp) ProtoMessage() {}
+
+func (x *UpdateAddressResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAddressResp.ProtoReflect.Descriptor instead.
+func (*UpdateAddressResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *UpdateAddressResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *UpdateAddressResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// 删除地址
+type DeleteAddressReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AddressId     int64                  `protobuf:"varint,2,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAddressReq) Reset() {
+	*x = DeleteAddressReq{}
+	mi := &file_rpc_user_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAddressReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAddressReq) ProtoMessage() {}
+
+func (x *DeleteAddressReq) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAddressReq.ProtoReflect.Descriptor instead.
+func (*DeleteAddressReq) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *DeleteAddressReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *DeleteAddressReq) GetAddressId() int64 {
+	if x != nil {
+		return x.AddressId
+	}
+	return 0
+}
+
+type DeleteAddressResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAddressResp) Reset() {
+	*x = DeleteAddressResp{}
+	mi := &file_rpc_user_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAddressResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAddressResp) ProtoMessage() {}
+
+func (x *DeleteAddressResp) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_user_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAddressResp.ProtoReflect.Descriptor instead.
+func (*DeleteAddressResp) Descriptor() ([]byte, []int) {
+	return file_rpc_user_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *DeleteAddressResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeleteAddressResp) GetMessage() string {
+	if x != nil {
+		return x.Message
 	}
 	return ""
 }
@@ -1079,7 +2245,20 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x12GenerateCaptchaReq\x12!\n" +
 	"\fcaptcha_type\x18\x01 \x01(\tR\vcaptchaType\x12+\n" +
 	"\x06config\x18\x02 \x01(\v2\x13.user.CaptchaConfigR\x06config\x12.\n" +
-	"\tdraw_opts\x18\x03 \x01(\v2\x11.user.DrawOptionsR\bdrawOpts\"\x99\x01\n" +
+	"\tdraw_opts\x18\x03 \x01(\v2\x11.user.DrawOptionsR\bdrawOpts\"p\n" +
+	"\rCaptchaConfig\x12\x14\n" +
+	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
+	"\x06height\x18\x02 \x01(\x05R\x06height\x12\x16\n" +
+	"\x06length\x18\x03 \x01(\x05R\x06length\x12\x19\n" +
+	"\bbg_color\x18\x04 \x01(\tR\abgColor\"\xde\x01\n" +
+	"\vDrawOptions\x12&\n" +
+	"\x0fuse_custom_draw\x18\x01 \x01(\bR\ruseCustomDraw\x12\x1b\n" +
+	"\tdraw_text\x18\x02 \x01(\bR\bdrawText\x12\x1f\n" +
+	"\vdraw_hollow\x18\x03 \x01(\bR\n" +
+	"drawHollow\x12\x1b\n" +
+	"\tdraw_sine\x18\x04 \x01(\bR\bdrawSine\x12$\n" +
+	"\x0edraw_slim_line\x18\x05 \x01(\x05R\fdrawSlimLine\x12&\n" +
+	"\x0fdraw_noise_text\x18\x06 \x01(\tR\rdrawNoiseText\"\x99\x01\n" +
 	"\x13GenerateCaptchaResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1d\n" +
@@ -1100,14 +2279,7 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x17\n" +
-	"\acode_id\x18\x04 \x01(\tR\x06codeId\"=\n" +
-	"\x11VerifyMailCodeReq\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\tR\x04code\"X\n" +
-	"\x12VerifyMailCodeResp\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
-	"\x05valid\x18\x03 \x01(\bR\x05valid\"\x92\x01\n" +
+	"\acode_id\x18\x04 \x01(\tR\x06codeId\"\x92\x01\n" +
 	"\x17SendRegisterMailCodeReq\x12\x1d\n" +
 	"\n" +
 	"captcha_id\x18\x01 \x01(\tR\tcaptchaId\x12!\n" +
@@ -1123,36 +2295,12 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12\x14\n" +
 	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x10\n" +
 	"\x03sex\x18\x06 \x01(\x05R\x03sex\x12\x16\n" +
-	"\x06avatar\x18\a \x01(\tR\x06avatar\"\x98\x01\n" +
+	"\x06avatar\x18\a \x01(\tR\x06avatar\"\x82\x01\n" +
 	"\fRegisterResp\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
-	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12\x14\n" +
-	"\x05token\x18\x04 \x01(\tR\x05token\x12+\n" +
-	"\tuser_info\x18\x05 \x01(\v2\x0e.user.UserInfoR\buserInfo\"\xbd\x01\n" +
-	"\bUserInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06avatar\x18\x03 \x01(\tR\x06avatar\x12\x14\n" +
-	"\x05email\x18\x04 \x01(\tR\x05email\x12\x14\n" +
-	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x10\n" +
-	"\x03sex\x18\x06 \x01(\x05R\x03sex\x12\x16\n" +
-	"\x06points\x18\a \x01(\x05R\x06points\x12\x1f\n" +
-	"\vcreate_time\x18\b \x01(\tR\n" +
-	"createTime\"p\n" +
-	"\rCaptchaConfig\x12\x14\n" +
-	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
-	"\x06height\x18\x02 \x01(\x05R\x06height\x12\x16\n" +
-	"\x06length\x18\x03 \x01(\x05R\x06length\x12\x19\n" +
-	"\bbg_color\x18\x04 \x01(\tR\abgColor\"\xde\x01\n" +
-	"\vDrawOptions\x12&\n" +
-	"\x0fuse_custom_draw\x18\x01 \x01(\bR\ruseCustomDraw\x12\x1b\n" +
-	"\tdraw_text\x18\x02 \x01(\bR\bdrawText\x12\x1f\n" +
-	"\vdraw_hollow\x18\x03 \x01(\bR\n" +
-	"drawHollow\x12\x1b\n" +
-	"\tdraw_sine\x18\x04 \x01(\bR\bdrawSine\x12$\n" +
-	"\x0edraw_slim_line\x18\x05 \x01(\x05R\fdrawSlimLine\x12&\n" +
-	"\x0fdraw_noise_text\x18\x06 \x01(\tR\rdrawNoiseText\"n\n" +
+	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12+\n" +
+	"\tuser_info\x18\x04 \x01(\v2\x0e.user.UserInfoR\buserInfo\"n\n" +
 	"\x16UploadPreviewAvatarReq\x12\x1b\n" +
 	"\tfile_data\x18\x01 \x01(\fR\bfileData\x12\x1a\n" +
 	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x1b\n" +
@@ -1163,14 +2311,133 @@ const file_rpc_user_proto_rawDesc = "" +
 	"\vpreview_key\x18\x03 \x01(\tR\n" +
 	"previewKey\x12\x1f\n" +
 	"\vpreview_url\x18\x04 \x01(\tR\n" +
-	"previewUrl2\xab\x03\n" +
+	"previewUrl\"R\n" +
+	"\bLoginReq\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x14\n" +
+	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"\x80\x02\n" +
+	"\tLoginResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\x03R\x06userId\x12!\n" +
+	"\faccess_token\x18\x04 \x01(\tR\vaccessToken\x12#\n" +
+	"\rrefresh_token\x18\x05 \x01(\tR\frefreshToken\x127\n" +
+	"\x18access_token_expire_time\x18\x06 \x01(\tR\x15accessTokenExpireTime\x12+\n" +
+	"\tuser_info\x18\a \x01(\v2\x0e.user.UserInfoR\buserInfo\"\xbd\x01\n" +
+	"\bUserInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06avatar\x18\x03 \x01(\tR\x06avatar\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email\x12\x14\n" +
+	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x10\n" +
+	"\x03sex\x18\x06 \x01(\x05R\x03sex\x12\x16\n" +
+	"\x06points\x18\a \x01(\x05R\x06points\x12\x1f\n" +
+	"\vcreate_time\x18\b \x01(\tR\n" +
+	"createTime\"6\n" +
+	"\x0fRefreshTokenReq\x12#\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\xc1\x01\n" +
+	"\x10RefreshTokenResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12!\n" +
+	"\faccess_token\x18\x03 \x01(\tR\vaccessToken\x12#\n" +
+	"\rrefresh_token\x18\x04 \x01(\tR\frefreshToken\x127\n" +
+	"\x18access_token_expire_time\x18\x05 \x01(\tR\x15accessTokenExpireTime\")\n" +
+	"\x0eGetUserInfoReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\"l\n" +
+	"\x0fGetUserInfoResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
+	"\tuser_info\x18\x03 \x01(\v2\x0e.user.UserInfoR\buserInfo\"\x80\x01\n" +
+	"\x11UpdateUserInfoReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06avatar\x18\x03 \x01(\tR\x06avatar\x12\x14\n" +
+	"\x05phone\x18\x04 \x01(\tR\x05phone\x12\x10\n" +
+	"\x03sex\x18\x05 \x01(\x05R\x03sex\"o\n" +
+	"\x12UpdateUserInfoResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
+	"\tuser_info\x18\x03 \x01(\v2\x0e.user.UserInfoR\buserInfo\"\xc7\x02\n" +
+	"\vAddressInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x03R\x06userId\x12%\n" +
+	"\x0edefault_status\x18\x03 \x01(\x05R\rdefaultStatus\x12!\n" +
+	"\freceive_name\x18\x04 \x01(\tR\vreceiveName\x12\x14\n" +
+	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1a\n" +
+	"\bprovince\x18\x06 \x01(\tR\bprovince\x12\x12\n" +
+	"\x04city\x18\a \x01(\tR\x04city\x12\x16\n" +
+	"\x06region\x18\b \x01(\tR\x06region\x12%\n" +
+	"\x0edetail_address\x18\t \x01(\tR\rdetailAddress\x12\x1f\n" +
+	"\vcreate_time\x18\n" +
+	" \x01(\tR\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\v \x01(\tR\n" +
+	"updateTime\",\n" +
+	"\x11GetAddressListReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\"x\n" +
+	"\x12GetAddressListResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x124\n" +
+	"\faddress_list\x18\x03 \x03(\v2\x11.user.AddressInfoR\vaddressList\"M\n" +
+	"\x13GetAddressDetailReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
+	"\n" +
+	"address_id\x18\x02 \x01(\x03R\taddressId\"q\n" +
+	"\x14GetAddressDetailResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12+\n" +
+	"\aaddress\x18\x03 \x01(\v2\x11.user.AddressInfoR\aaddress\"\xf7\x01\n" +
+	"\rAddAddressReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12%\n" +
+	"\x0edefault_status\x18\x02 \x01(\x05R\rdefaultStatus\x12!\n" +
+	"\freceive_name\x18\x03 \x01(\tR\vreceiveName\x12\x14\n" +
+	"\x05phone\x18\x04 \x01(\tR\x05phone\x12\x1a\n" +
+	"\bprovince\x18\x05 \x01(\tR\bprovince\x12\x12\n" +
+	"\x04city\x18\x06 \x01(\tR\x04city\x12\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\x12%\n" +
+	"\x0edetail_address\x18\b \x01(\tR\rdetailAddress\"]\n" +
+	"\x0eAddAddressResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1d\n" +
+	"\n" +
+	"address_id\x18\x03 \x01(\x03R\taddressId\"\x99\x02\n" +
+	"\x10UpdateAddressReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
+	"\n" +
+	"address_id\x18\x02 \x01(\x03R\taddressId\x12%\n" +
+	"\x0edefault_status\x18\x03 \x01(\x05R\rdefaultStatus\x12!\n" +
+	"\freceive_name\x18\x04 \x01(\tR\vreceiveName\x12\x14\n" +
+	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1a\n" +
+	"\bprovince\x18\x06 \x01(\tR\bprovince\x12\x12\n" +
+	"\x04city\x18\a \x01(\tR\x04city\x12\x16\n" +
+	"\x06region\x18\b \x01(\tR\x06region\x12%\n" +
+	"\x0edetail_address\x18\t \x01(\tR\rdetailAddress\"A\n" +
+	"\x11UpdateAddressResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"J\n" +
+	"\x10DeleteAddressReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
+	"\n" +
+	"address_id\x18\x02 \x01(\x03R\taddressId\"A\n" +
+	"\x11DeleteAddressResp\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x9d\a\n" +
 	"\x04User\x12F\n" +
 	"\x0fGenerateCaptcha\x12\x18.user.GenerateCaptchaReq\x1a\x19.user.GenerateCaptchaResp\x12@\n" +
-	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12C\n" +
-	"\x0eVerifyMailCode\x12\x17.user.VerifyMailCodeReq\x1a\x18.user.VerifyMailCodeResp\x12M\n" +
+	"\rVerifyCaptcha\x12\x16.user.VerifyCaptchaReq\x1a\x17.user.VerifyCaptchaResp\x12M\n" +
 	"\x14SendRegisterMailCode\x12\x1d.user.SendRegisterMailCodeReq\x1a\x16.user.SendMailCodeResp\x121\n" +
 	"\bRegister\x12\x11.user.RegisterReq\x1a\x12.user.RegisterResp\x12R\n" +
-	"\x13UploadPreviewAvatar\x12\x1c.user.UploadPreviewAvatarReq\x1a\x1d.user.UploadPreviewAvatarRespB\bZ\x06./userb\x06proto3"
+	"\x13UploadPreviewAvatar\x12\x1c.user.UploadPreviewAvatarReq\x1a\x1d.user.UploadPreviewAvatarResp\x12(\n" +
+	"\x05Login\x12\x0e.user.LoginReq\x1a\x0f.user.LoginResp\x12=\n" +
+	"\fRefreshToken\x12\x15.user.RefreshTokenReq\x1a\x16.user.RefreshTokenResp\x12:\n" +
+	"\vGetUserInfo\x12\x14.user.GetUserInfoReq\x1a\x15.user.GetUserInfoResp\x12C\n" +
+	"\x0eUpdateUserInfo\x12\x17.user.UpdateUserInfoReq\x1a\x18.user.UpdateUserInfoResp\x12C\n" +
+	"\x0eGetAddressList\x12\x17.user.GetAddressListReq\x1a\x18.user.GetAddressListResp\x12I\n" +
+	"\x10GetAddressDetail\x12\x19.user.GetAddressDetailReq\x1a\x1a.user.GetAddressDetailResp\x127\n" +
+	"\n" +
+	"AddAddress\x12\x13.user.AddAddressReq\x1a\x14.user.AddAddressResp\x12@\n" +
+	"\rUpdateAddress\x12\x16.user.UpdateAddressReq\x1a\x17.user.UpdateAddressResp\x12@\n" +
+	"\rDeleteAddress\x12\x16.user.DeleteAddressReq\x1a\x17.user.DeleteAddressRespB\bZ\x06./userb\x06proto3"
 
 var (
 	file_rpc_user_proto_rawDescOnce sync.Once
@@ -1184,45 +2451,83 @@ func file_rpc_user_proto_rawDescGZIP() []byte {
 	return file_rpc_user_proto_rawDescData
 }
 
-var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_rpc_user_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_rpc_user_proto_goTypes = []any{
 	(*GenerateCaptchaReq)(nil),      // 0: user.GenerateCaptchaReq
-	(*GenerateCaptchaResp)(nil),     // 1: user.GenerateCaptchaResp
-	(*VerifyCaptchaReq)(nil),        // 2: user.VerifyCaptchaReq
-	(*VerifyCaptchaResp)(nil),       // 3: user.VerifyCaptchaResp
-	(*SendMailCodeResp)(nil),        // 4: user.SendMailCodeResp
-	(*VerifyMailCodeReq)(nil),       // 5: user.VerifyMailCodeReq
-	(*VerifyMailCodeResp)(nil),      // 6: user.VerifyMailCodeResp
+	(*CaptchaConfig)(nil),           // 1: user.CaptchaConfig
+	(*DrawOptions)(nil),             // 2: user.DrawOptions
+	(*GenerateCaptchaResp)(nil),     // 3: user.GenerateCaptchaResp
+	(*VerifyCaptchaReq)(nil),        // 4: user.VerifyCaptchaReq
+	(*VerifyCaptchaResp)(nil),       // 5: user.VerifyCaptchaResp
+	(*SendMailCodeResp)(nil),        // 6: user.SendMailCodeResp
 	(*SendRegisterMailCodeReq)(nil), // 7: user.SendRegisterMailCodeReq
 	(*RegisterReq)(nil),             // 8: user.RegisterReq
 	(*RegisterResp)(nil),            // 9: user.RegisterResp
-	(*UserInfo)(nil),                // 10: user.UserInfo
-	(*CaptchaConfig)(nil),           // 11: user.CaptchaConfig
-	(*DrawOptions)(nil),             // 12: user.DrawOptions
-	(*UploadPreviewAvatarReq)(nil),  // 13: user.UploadPreviewAvatarReq
-	(*UploadPreviewAvatarResp)(nil), // 14: user.UploadPreviewAvatarResp
+	(*UploadPreviewAvatarReq)(nil),  // 10: user.UploadPreviewAvatarReq
+	(*UploadPreviewAvatarResp)(nil), // 11: user.UploadPreviewAvatarResp
+	(*LoginReq)(nil),                // 12: user.LoginReq
+	(*LoginResp)(nil),               // 13: user.LoginResp
+	(*UserInfo)(nil),                // 14: user.UserInfo
+	(*RefreshTokenReq)(nil),         // 15: user.RefreshTokenReq
+	(*RefreshTokenResp)(nil),        // 16: user.RefreshTokenResp
+	(*GetUserInfoReq)(nil),          // 17: user.GetUserInfoReq
+	(*GetUserInfoResp)(nil),         // 18: user.GetUserInfoResp
+	(*UpdateUserInfoReq)(nil),       // 19: user.UpdateUserInfoReq
+	(*UpdateUserInfoResp)(nil),      // 20: user.UpdateUserInfoResp
+	(*AddressInfo)(nil),             // 21: user.AddressInfo
+	(*GetAddressListReq)(nil),       // 22: user.GetAddressListReq
+	(*GetAddressListResp)(nil),      // 23: user.GetAddressListResp
+	(*GetAddressDetailReq)(nil),     // 24: user.GetAddressDetailReq
+	(*GetAddressDetailResp)(nil),    // 25: user.GetAddressDetailResp
+	(*AddAddressReq)(nil),           // 26: user.AddAddressReq
+	(*AddAddressResp)(nil),          // 27: user.AddAddressResp
+	(*UpdateAddressReq)(nil),        // 28: user.UpdateAddressReq
+	(*UpdateAddressResp)(nil),       // 29: user.UpdateAddressResp
+	(*DeleteAddressReq)(nil),        // 30: user.DeleteAddressReq
+	(*DeleteAddressResp)(nil),       // 31: user.DeleteAddressResp
 }
 var file_rpc_user_proto_depIdxs = []int32{
-	11, // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
-	12, // 1: user.GenerateCaptchaReq.draw_opts:type_name -> user.DrawOptions
-	10, // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
-	0,  // 3: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
-	2,  // 4: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
-	5,  // 5: user.User.VerifyMailCode:input_type -> user.VerifyMailCodeReq
-	7,  // 6: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
-	8,  // 7: user.User.Register:input_type -> user.RegisterReq
-	13, // 8: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
-	1,  // 9: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
-	3,  // 10: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
-	6,  // 11: user.User.VerifyMailCode:output_type -> user.VerifyMailCodeResp
-	4,  // 12: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
-	9,  // 13: user.User.Register:output_type -> user.RegisterResp
-	14, // 14: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
-	9,  // [9:15] is the sub-list for method output_type
-	3,  // [3:9] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	1,  // 0: user.GenerateCaptchaReq.config:type_name -> user.CaptchaConfig
+	2,  // 1: user.GenerateCaptchaReq.draw_opts:type_name -> user.DrawOptions
+	14, // 2: user.RegisterResp.user_info:type_name -> user.UserInfo
+	14, // 3: user.LoginResp.user_info:type_name -> user.UserInfo
+	14, // 4: user.GetUserInfoResp.user_info:type_name -> user.UserInfo
+	14, // 5: user.UpdateUserInfoResp.user_info:type_name -> user.UserInfo
+	21, // 6: user.GetAddressListResp.address_list:type_name -> user.AddressInfo
+	21, // 7: user.GetAddressDetailResp.address:type_name -> user.AddressInfo
+	0,  // 8: user.User.GenerateCaptcha:input_type -> user.GenerateCaptchaReq
+	4,  // 9: user.User.VerifyCaptcha:input_type -> user.VerifyCaptchaReq
+	7,  // 10: user.User.SendRegisterMailCode:input_type -> user.SendRegisterMailCodeReq
+	8,  // 11: user.User.Register:input_type -> user.RegisterReq
+	10, // 12: user.User.UploadPreviewAvatar:input_type -> user.UploadPreviewAvatarReq
+	12, // 13: user.User.Login:input_type -> user.LoginReq
+	15, // 14: user.User.RefreshToken:input_type -> user.RefreshTokenReq
+	17, // 15: user.User.GetUserInfo:input_type -> user.GetUserInfoReq
+	19, // 16: user.User.UpdateUserInfo:input_type -> user.UpdateUserInfoReq
+	22, // 17: user.User.GetAddressList:input_type -> user.GetAddressListReq
+	24, // 18: user.User.GetAddressDetail:input_type -> user.GetAddressDetailReq
+	26, // 19: user.User.AddAddress:input_type -> user.AddAddressReq
+	28, // 20: user.User.UpdateAddress:input_type -> user.UpdateAddressReq
+	30, // 21: user.User.DeleteAddress:input_type -> user.DeleteAddressReq
+	3,  // 22: user.User.GenerateCaptcha:output_type -> user.GenerateCaptchaResp
+	5,  // 23: user.User.VerifyCaptcha:output_type -> user.VerifyCaptchaResp
+	6,  // 24: user.User.SendRegisterMailCode:output_type -> user.SendMailCodeResp
+	9,  // 25: user.User.Register:output_type -> user.RegisterResp
+	11, // 26: user.User.UploadPreviewAvatar:output_type -> user.UploadPreviewAvatarResp
+	13, // 27: user.User.Login:output_type -> user.LoginResp
+	16, // 28: user.User.RefreshToken:output_type -> user.RefreshTokenResp
+	18, // 29: user.User.GetUserInfo:output_type -> user.GetUserInfoResp
+	20, // 30: user.User.UpdateUserInfo:output_type -> user.UpdateUserInfoResp
+	23, // 31: user.User.GetAddressList:output_type -> user.GetAddressListResp
+	25, // 32: user.User.GetAddressDetail:output_type -> user.GetAddressDetailResp
+	27, // 33: user.User.AddAddress:output_type -> user.AddAddressResp
+	29, // 34: user.User.UpdateAddress:output_type -> user.UpdateAddressResp
+	31, // 35: user.User.DeleteAddress:output_type -> user.DeleteAddressResp
+	22, // [22:36] is the sub-list for method output_type
+	8,  // [8:22] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_rpc_user_proto_init() }
@@ -1236,7 +2541,7 @@ func file_rpc_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_user_proto_rawDesc), len(file_rpc_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
