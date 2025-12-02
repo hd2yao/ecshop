@@ -33,21 +33,20 @@ type (
 	}
 	// 首页 Feed 查询请求
 	HomeFeedRequest {
-		UserId     int64  `form:"user_id,optional"`
-		DeviceId   string `form:"device_id,optional"`
-		Version    string `form:"version,optional"` // 指定的 feed 版本，缺省时使用最新
-		PageSize   int64  `form:"page_size,optional,default=10"`
-		Cursor     string `form:"cursor,optional"`
-		NeedDetail bool   `form:"need_detail,optional,default=true"` // true 返回详细食谱信息
+		UserId      int64  `json:"user_id"` // 用户id
+		FeedVersion string `json:"feed_version,optional"` // feed 流请求版本号
+		PullRefresh bool   `json:"pull_refresh,optional"` // 是否下拉刷新
+		Page        int64  `json:"page,optional"` // 页码
+		PageSize    int64  `json:"page_size,optional,default=10"` // 每页数量
 	}
 	// 首页 Feed 查询响应
 	HomeFeedResponse {
 		Code        int           `json:"code"`
 		Message     string        `json:"message"`
 		FeedVersion string        `json:"feed_version"`
+		CurrPage    int64         `json:"curr_page"`
+		HasNextPage bool          `json:"has_next_page"`
 		RecipesList []RecipesInfo `json:"recipes_list,optional"`
-		Cursor      string        `json:"cursor,optional"`
-		HasMore     bool          `json:"has_more"`
 	}
 )
 

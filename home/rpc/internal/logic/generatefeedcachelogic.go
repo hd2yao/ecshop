@@ -12,13 +12,6 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-// ===== 缓存 Key 定义 =====
-
-const (
-	homeRecipesHashKey         = "recipes_info"
-	homeFeedLatestVersionField = "latest_version"
-)
-
 type GenerateFeedCacheLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext

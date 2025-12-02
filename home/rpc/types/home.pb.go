@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.8
 // 	protoc        v5.29.3
-// source: rpc/home.proto
+// source: home.proto
 
 package home
 
@@ -36,7 +36,7 @@ type RecipesInfo struct {
 
 func (x *RecipesInfo) Reset() {
 	*x = RecipesInfo{}
-	mi := &file_rpc_home_proto_msgTypes[0]
+	mi := &file_home_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *RecipesInfo) String() string {
 func (*RecipesInfo) ProtoMessage() {}
 
 func (x *RecipesInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_home_proto_msgTypes[0]
+	mi := &file_home_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *RecipesInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecipesInfo.ProtoReflect.Descriptor instead.
 func (*RecipesInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_home_proto_rawDescGZIP(), []int{0}
+	return file_home_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RecipesInfo) GetId() int64 {
@@ -117,7 +117,7 @@ type GenerateFeedCacheReq struct {
 
 func (x *GenerateFeedCacheReq) Reset() {
 	*x = GenerateFeedCacheReq{}
-	mi := &file_rpc_home_proto_msgTypes[1]
+	mi := &file_home_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -129,7 +129,7 @@ func (x *GenerateFeedCacheReq) String() string {
 func (*GenerateFeedCacheReq) ProtoMessage() {}
 
 func (x *GenerateFeedCacheReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_home_proto_msgTypes[1]
+	mi := &file_home_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -142,7 +142,7 @@ func (x *GenerateFeedCacheReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateFeedCacheReq.ProtoReflect.Descriptor instead.
 func (*GenerateFeedCacheReq) Descriptor() ([]byte, []int) {
-	return file_rpc_home_proto_rawDescGZIP(), []int{1}
+	return file_home_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GenerateFeedCacheReq) GetOperator() string {
@@ -171,7 +171,7 @@ type GenerateFeedCacheResp struct {
 
 func (x *GenerateFeedCacheResp) Reset() {
 	*x = GenerateFeedCacheResp{}
-	mi := &file_rpc_home_proto_msgTypes[2]
+	mi := &file_home_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +183,7 @@ func (x *GenerateFeedCacheResp) String() string {
 func (*GenerateFeedCacheResp) ProtoMessage() {}
 
 func (x *GenerateFeedCacheResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_home_proto_msgTypes[2]
+	mi := &file_home_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +196,7 @@ func (x *GenerateFeedCacheResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateFeedCacheResp.ProtoReflect.Descriptor instead.
 func (*GenerateFeedCacheResp) Descriptor() ([]byte, []int) {
-	return file_rpc_home_proto_rawDescGZIP(), []int{2}
+	return file_home_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GenerateFeedCacheResp) GetCode() int32 {
@@ -241,7 +241,7 @@ type HomeFeedReq struct {
 
 func (x *HomeFeedReq) Reset() {
 	*x = HomeFeedReq{}
-	mi := &file_rpc_home_proto_msgTypes[3]
+	mi := &file_home_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -253,7 +253,7 @@ func (x *HomeFeedReq) String() string {
 func (*HomeFeedReq) ProtoMessage() {}
 
 func (x *HomeFeedReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_home_proto_msgTypes[3]
+	mi := &file_home_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -266,7 +266,7 @@ func (x *HomeFeedReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HomeFeedReq.ProtoReflect.Descriptor instead.
 func (*HomeFeedReq) Descriptor() ([]byte, []int) {
-	return file_rpc_home_proto_rawDescGZIP(), []int{3}
+	return file_home_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *HomeFeedReq) GetUserId() int64 {
@@ -318,7 +318,7 @@ type HomeFeedResp struct {
 
 func (x *HomeFeedResp) Reset() {
 	*x = HomeFeedResp{}
-	mi := &file_rpc_home_proto_msgTypes[4]
+	mi := &file_home_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -330,7 +330,7 @@ func (x *HomeFeedResp) String() string {
 func (*HomeFeedResp) ProtoMessage() {}
 
 func (x *HomeFeedResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_home_proto_msgTypes[4]
+	mi := &file_home_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +343,7 @@ func (x *HomeFeedResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HomeFeedResp.ProtoReflect.Descriptor instead.
 func (*HomeFeedResp) Descriptor() ([]byte, []int) {
-	return file_rpc_home_proto_rawDescGZIP(), []int{4}
+	return file_home_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *HomeFeedResp) GetCode() int32 {
@@ -388,11 +388,12 @@ func (x *HomeFeedResp) GetRecipesList() []*RecipesInfo {
 	return nil
 }
 
-var File_rpc_home_proto protoreflect.FileDescriptor
+var File_home_proto protoreflect.FileDescriptor
 
-const file_rpc_home_proto_rawDesc = "" +
+const file_home_proto_rawDesc = "" +
 	"\n" +
-	"\x0erpc/home.proto\x12\x04home\"\xee\x01\n" +
+	"\n" +
+	"home.proto\x12\x04home\"\xee\x01\n" +
 	"\vRecipesInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12!\n" +
 	"\frecipes_name\x18\x02 \x01(\tR\vrecipesName\x12\x1f\n" +
@@ -427,26 +428,26 @@ const file_rpc_home_proto_rawDesc = "" +
 	"\vGetHomeFeed\x12\x11.home.HomeFeedReq\x1a\x12.home.HomeFeedRespB\bZ\x06./homeb\x06proto3"
 
 var (
-	file_rpc_home_proto_rawDescOnce sync.Once
-	file_rpc_home_proto_rawDescData []byte
+	file_home_proto_rawDescOnce sync.Once
+	file_home_proto_rawDescData []byte
 )
 
-func file_rpc_home_proto_rawDescGZIP() []byte {
-	file_rpc_home_proto_rawDescOnce.Do(func() {
-		file_rpc_home_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_rpc_home_proto_rawDesc), len(file_rpc_home_proto_rawDesc)))
+func file_home_proto_rawDescGZIP() []byte {
+	file_home_proto_rawDescOnce.Do(func() {
+		file_home_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_home_proto_rawDesc), len(file_home_proto_rawDesc)))
 	})
-	return file_rpc_home_proto_rawDescData
+	return file_home_proto_rawDescData
 }
 
-var file_rpc_home_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_rpc_home_proto_goTypes = []any{
+var file_home_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_home_proto_goTypes = []any{
 	(*RecipesInfo)(nil),           // 0: home.RecipesInfo
 	(*GenerateFeedCacheReq)(nil),  // 1: home.GenerateFeedCacheReq
 	(*GenerateFeedCacheResp)(nil), // 2: home.GenerateFeedCacheResp
 	(*HomeFeedReq)(nil),           // 3: home.HomeFeedReq
 	(*HomeFeedResp)(nil),          // 4: home.HomeFeedResp
 }
-var file_rpc_home_proto_depIdxs = []int32{
+var file_home_proto_depIdxs = []int32{
 	0, // 0: home.GenerateFeedCacheResp.recipes_list:type_name -> home.RecipesInfo
 	0, // 1: home.HomeFeedResp.recipes_list:type_name -> home.RecipesInfo
 	1, // 2: home.Home.GenerateFeedCache:input_type -> home.GenerateFeedCacheReq
@@ -460,26 +461,26 @@ var file_rpc_home_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_rpc_home_proto_init() }
-func file_rpc_home_proto_init() {
-	if File_rpc_home_proto != nil {
+func init() { file_home_proto_init() }
+func file_home_proto_init() {
+	if File_home_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_home_proto_rawDesc), len(file_rpc_home_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_home_proto_rawDesc), len(file_home_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_rpc_home_proto_goTypes,
-		DependencyIndexes: file_rpc_home_proto_depIdxs,
-		MessageInfos:      file_rpc_home_proto_msgTypes,
+		GoTypes:           file_home_proto_goTypes,
+		DependencyIndexes: file_home_proto_depIdxs,
+		MessageInfos:      file_home_proto_msgTypes,
 	}.Build()
-	File_rpc_home_proto = out.File
-	file_rpc_home_proto_goTypes = nil
-	file_rpc_home_proto_depIdxs = nil
+	File_home_proto = out.File
+	file_home_proto_goTypes = nil
+	file_home_proto_depIdxs = nil
 }
