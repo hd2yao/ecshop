@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package home;
+
+option go_package = "./home";
+
+// 首页Feed服务
+service Home {
+  // 生成 feed 食谱缓存
+  rpc GenerateFeedCache(GenerateFeedCacheReq) returns (GenerateFeedCacheResp);
+  // 获取首页 feed 食谱列表
+  rpc GetHomeFeed(HomeFeedReq) returns (HomeFeedResp);
+}
+
+// 食谱详情
+message RecipesInfo {
+  int64 id = 1;
+  string recipes_name = 2;
+  string recipes_url = 3;
+  string recipes_user_name = 4;
+  string recipes_user_avatar = 5;
+  string recipes_description = 6;
+}
+
+// 生成缓存
+message GenerateFeedCacheReq {
+  string operator = 1;
+  bool force = 2;
+}
+
+message GenerateFeedCacheResp {
+  int32 code = 1;
+  string message = 2;
+  string feed_version = 3;
+  repeated RecipesInfo recipes_list = 4;
+}
+
+// 查询 feed
+message HomeFeedReq {
+  int64 user_id = 1;
+  string feed_version = 2;
+  bool pull_refresh = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message HomeFeedResp {
+  int32 code = 1;
+  string message = 2;
+  string feed_version = 3;
+  int32 curr_page = 4;
+  bool has_next_page = 5;
+  repeated RecipesInfo recipes_list = 6;
+}
+

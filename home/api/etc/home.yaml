@@ -1,0 +1,14 @@
+Name: home-api
+Host: 0.0.0.0
+Port: 8001
+Mode: dev
+
+# 日志格式配置 (default: go-zero默认格式, gin: Gin风格格式)
+LogFormat: gin
+
+# 首页 Feed RPC 服务配置
+HomeRpc:
+  Etcd:
+    Hosts:
+      - etcd:2379
+    Key: home.rpc

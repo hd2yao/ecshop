@@ -1,0 +1,67 @@
+syntax = "v1"
+
+info (
+	title:   "首页 Feed 流API"
+	desc:    "负责首页 Feed 流的消费与回传"
+	author:  "ecshop"
+	email:   "hd2yao@ecshop.com"
+	version: "v1.0.0"
+)
+
+// ===== Feed基础结构 =====
+type (
+	// 食谱详情（对应缓存中的 RecipesInfoEntity）
+	RecipesInfo {
+		Id                 int64  `json:"id"` // 食谱ID
+		RecipesName        string `json:"recipes_name"`
+		RecipesUrl         string `json:"recipes_url"`
+		RecipesUserName    string `json:"recipes_user_name"`
+		RecipesUserAvatar  string `json:"recipes_user_avatar"`
+		RecipesDescription string `json:"recipes_description"`
+	}
+	// 生成缓存请求
+	GenerateFeedCacheRequest {
+		Operator string `json:"operator,optional"` // 触发人或自动化标识
+		Force    bool   `json:"force,optional"` // true 时强制刷新
+	}
+	// 生成缓存响应
+	GenerateFeedCacheResponse {
+		Code        int           `json:"code"`
+		Message     string        `json:"message"`
+		FeedVersion string        `json:"feed_version"` // 当前版本号（时间戳）
+		RecipesList []RecipesInfo `json:"recipes_list"`
+	}
+	// 首页 Feed 查询请求
+	HomeFeedRequest {
+		UserId      int64  `json:"user_id"` // 用户id
+		FeedVersion string `json:"feed_version,optional"` // feed 流请求版本号
+		PullRefresh bool   `json:"pull_refresh,optional"` // 是否下拉刷新
+		Page        int64  `json:"page,optional"` // 页码
+		PageSize    int64  `json:"page_size,optional,default=10"` // 每页数量
+	}
+	// 首页 Feed 查询响应
+	HomeFeedResponse {
+		Code        int           `json:"code"`
+		Message     string        `json:"message"`
+		FeedVersion string        `json:"feed_version"`
+		CurrPage    int64         `json:"curr_page"`
+		HasNextPage bool          `json:"has_next_page"`
+		RecipesList []RecipesInfo `json:"recipes_list,optional"`
+	}
+)
+
+// ===== 首页 Feed 服务 =====
+@server (
+	group:  feed
+	prefix: /api/home/feed
+)
+service home-api {
+	@doc "生成首页 feed 食谱缓存（写入 Redis）"
+	@handler GenerateFeedCache
+	post /cache/generate (GenerateFeedCacheRequest) returns (GenerateFeedCacheResponse)
+
+	@doc "获取首页 feed 食谱列表"
+	@handler GetHomeFeed
+	get /recipes (HomeFeedRequest) returns (HomeFeedResponse)
+}
+
