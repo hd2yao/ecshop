@@ -1,0 +1,109 @@
+syntax = "v1"
+
+info (
+	title:   "美食服务 API"
+	desc:    "美食相关的 API 接口"
+	author:  "ecshop"
+	email:   "hd2yao@ecshop.com"
+	version: "v1.0.0"
+)
+
+// ===== 美食基础结构 =====
+type (
+	// 美食步骤详情
+	FoodStepDetail {
+		Step        string `json:"step"` // 步骤名称，如 "步骤1"
+		StepImgUrl  string `json:"stepImgUrl"` // 步骤图片URL（兼容 img 字段）
+		StepContent string `json:"stepContent"` // 步骤内容（兼容 content 字段）
+	}
+	// 美食清单项
+	FoodListItem {
+		RecipesTag   string `json:"recipesTag"` // 食材分类，如 "菜"、"肉"、"调味品"
+		RecipesName  string `json:"recipesName"` // 食材名称
+		RecipesSpecs string `json:"recipesSpecs"` // 食材规格/数量，如 "1500g"
+	}
+	// 美食信息
+	FoodInfo {
+		Id             int64            `json:"id"`
+		UserId         int64            `json:"userId"`
+		FoodName       string           `json:"foodName"`
+		FoodDes        string           `json:"foodDes"`
+		FoodCateTag    int              `json:"foodCateTag"` // 美食分类 1、私房菜  2、家常菜  3、硬菜 4、小吃 5、开胃菜 6、甜点 7、减脂餐 8、素菜 9、养生菜
+		FoodUrl        string           `json:"foodUrl"`
+		FoodVideoUrl   string           `json:"foodVideoUrl"`
+		FoodTime       int              `json:"foodTime"` // 美食制作时长  1、10分钟以内  2、10-30分钟  3、30-60分钟  4、1小时以上
+		FoodDifficulty int              `json:"foodDifficulty"` // 美食制作难度 1、简单  2、一般  3、较难  4、极难
+		FoodDetail     []FoodStepDetail `json:"foodDetail"` // 美食制作详情（结构化数据）
+		FoodList       []FoodListItem   `json:"foodList"` // 美食清单（结构化数据）
+		FoodStatus     int              `json:"foodStatus"` // 美食状态 0、有效 1、删除
+		SkuIds         []int64          `json:"skuIds"` // 美食关联的商品ids（结构化数据）
+		FoodCreatetime string           `json:"foodCreatetime"`
+		FoodUpdatetime string           `json:"foodUpdatetime"`
+	}
+	// 查询单个美食基础信息请求
+	GetFoodRequest {
+		FoodId int64 `path:"id"` // 美食ID
+	}
+	// 查询单个美食基础信息响应
+	GetFoodResponse {
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		FoodInfo FoodInfo `json:"foodInfo,optional"`
+	}
+	// 查询我的美食列表请求
+	GetMyFoodListRequest {
+		Page     int `json:"page,optional,default=1"` // 页码
+		PageSize int `json:"page_size,optional,default=10"` // 每页数量
+	}
+	// 查询我的美食列表响应
+	GetMyFoodListResponse {
+		Code     int        `json:"code"`
+		Message  string     `json:"message"`
+		Total    int        `json:"total"`
+		Page     int        `json:"page"`
+		PageSize int        `json:"pageSize"`
+		FoodList []FoodInfo `json:"foodList,optional"`
+	}
+	// 新增/修改美食信息请求
+	CreateOrUpdateFoodRequest {
+		Id             int64            `json:"id,optional"` // 如果为0或未提供，则为新增；否则为修改
+		FoodName       string           `json:"foodName" validate:"required"`
+		FoodDes        string           `json:"foodDes,optional"`
+		FoodCateTag    int              `json:"foodCateTag" validate:"required"`
+		FoodUrl        string           `json:"foodUrl,optional"`
+		FoodVideoUrl   string           `json:"foodVideoUrl,optional"`
+		FoodTime       int              `json:"foodTime,optional"`
+		FoodDifficulty int              `json:"foodDifficulty,optional"`
+		FoodDetail     []FoodStepDetail `json:"foodDetail,optional"` // 美食制作详情（结构化数据）
+		FoodList       []FoodListItem   `json:"foodList,optional"` // 美食清单（结构化数据）
+		SkuIds         []int64          `json:"skuIds,optional"` // 美食关联的商品ids（结构化数据）
+	}
+	// 新增/修改美食信息响应
+	CreateOrUpdateFoodResponse {
+		Code     int      `json:"code"`
+		Message  string   `json:"message"`
+		FoodId   int64    `json:"foodId,optional"` // 新增或修改的美食ID
+		FoodInfo FoodInfo `json:"foodInfo,optional"` // 美食信息
+	}
+)
+
+// ===== 美食服务（需要JWT认证）=====
+@server (
+	group:      food
+	prefix:     /api/food
+	middleware: JWTAuth // 启用JWT认证中间件
+)
+service food-api {
+	@doc "查询单个美食基础信息"
+	@handler GetFood
+	get /:id (GetFoodRequest) returns (GetFoodResponse)
+
+	@doc "查询我的美食列表"
+	@handler GetMyFoodList
+	get /my/list (GetMyFoodListRequest) returns (GetMyFoodListResponse)
+
+	@doc "新增/修改美食信息（food_id为0或未提供时为新增，否则为修改）"
+	@handler CreateOrUpdateFood
+	post /create-or-update (CreateOrUpdateFoodRequest) returns (CreateOrUpdateFoodResponse)
+}
+

@@ -9,7 +9,7 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 
 	"github.com/hd2yao/ecshop/common/errcode"
-	"github.com/hd2yao/ecshop/common/utils"
+	"github.com/hd2yao/ecshop/common/utils/jwt"
 )
 
 // 定义 Context Key 类型，避免冲突
