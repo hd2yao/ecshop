@@ -165,19 +165,10 @@ func (l *CreateOrUpdateFoodLogic) CreateOrUpdateFood(in *food.CreateOrUpdateFood
 		existingFood.FoodSkuIds = foodSkuIds
 		existingFood.FoodUpdatetime = now
 
-		err = l.svcCtx.FoodModel.Update(l.ctx, existingFood)
+		// 2.4 使用缓存服务更新美食信息（带分布式锁和缓存）
+		updatedFood, err := l.svcCtx.FoodModel.CacheService().CreateOrUpdateFood(l.ctx, existingFood)
 		if err != nil {
 			l.Errorf("更新美食信息失败: %v", err)
-			return &food.CreateOrUpdateFoodResp{
-				Code:    int32(errcode.CommonServerError.Code()),
-				Message: errcode.CommonServerError.Msg(),
-			}, nil
-		}
-
-		// 2.4 重新查询更新后的美食信息（确保数据一致性）
-		updatedFood, err := l.svcCtx.FoodModel.FindOne(l.ctx, existingFood.Id)
-		if err != nil {
-			l.Errorf("查询更新后的美食信息失败: %v", err)
 			return &food.CreateOrUpdateFoodResp{
 				Code:    int32(errcode.CommonServerError.Code()),
 				Message: errcode.CommonServerError.Msg(),
@@ -278,29 +269,10 @@ func (l *CreateOrUpdateFoodLogic) CreateOrUpdateFood(in *food.CreateOrUpdateFood
 			FoodUpdatetime: now,
 		}
 
-		result, err := l.svcCtx.FoodModel.Insert(l.ctx, newFood)
+		// 3.2 使用缓存服务创建美食信息（带分布式锁和缓存）
+		createdFood, err := l.svcCtx.FoodModel.CacheService().CreateOrUpdateFood(l.ctx, newFood)
 		if err != nil {
 			l.Errorf("新增美食信息失败: %v", err)
-			return &food.CreateOrUpdateFoodResp{
-				Code:    int32(errcode.CommonServerError.Code()),
-				Message: errcode.CommonServerError.Msg(),
-			}, nil
-		}
-
-		// 3.2 获取新插入的美食ID
-		foodId, err := result.LastInsertId()
-		if err != nil {
-			l.Errorf("获取新美食ID失败: %v", err)
-			return &food.CreateOrUpdateFoodResp{
-				Code:    int32(errcode.CommonServerError.Code()),
-				Message: errcode.CommonServerError.Msg(),
-			}, nil
-		}
-
-		// 3.3 查询新创建的美食信息
-		createdFood, err := l.svcCtx.FoodModel.FindOne(l.ctx, foodId)
-		if err != nil {
-			l.Errorf("查询新创建的美食信息失败: %v", err)
 			return &food.CreateOrUpdateFoodResp{
 				Code:    int32(errcode.CommonServerError.Code()),
 				Message: errcode.CommonServerError.Msg(),
@@ -360,7 +332,7 @@ func (l *CreateOrUpdateFoodLogic) CreateOrUpdateFood(in *food.CreateOrUpdateFood
 		return &food.CreateOrUpdateFoodResp{
 			Code:    int32(errcode.Success.Code()),
 			Message: errcode.Success.Msg(),
-			FoodId:  foodId,
+			FoodId:  createdFood.Id,
 			FoodInfo: &food.FoodInfo{
 				Id:             createdFood.Id,
 				UserId:         createdFood.UserId,

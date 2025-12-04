@@ -18,18 +18,29 @@ type (
 		foodModel
 		// 查询我的美食列表（根据 user_id，支持分页）
 		FindListByUserId(ctx context.Context, userId int64, page, pageSize int32) ([]*Food, int64, error)
+		// 扩展方法：带缓存的美食服务
+		CacheService() *FoodCacheService
 	}
 
 	customFoodModel struct {
 		*defaultFoodModel
+		cacheService *FoodCacheService
 	}
 )
 
 // NewFoodModel returns a model for the database table.
 func NewFoodModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) FoodModel {
-	return &customFoodModel{
+	model := &customFoodModel{
 		defaultFoodModel: newFoodModel(conn, c, opts...),
 	}
+	// 初始化缓存服务
+	model.cacheService = NewFoodCacheService(model)
+	return model
+}
+
+// CacheService 获取美食缓存服务
+func (m *customFoodModel) CacheService() *FoodCacheService {
+	return m.cacheService
 }
 
 // FindListByUserId 查询我的美食列表（根据 user_id 和分类，支持分页）
