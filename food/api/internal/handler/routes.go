@@ -32,7 +32,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					// 查询我的美食列表
 					Method:  http.MethodGet,
-					Path:    "/my/list",
+					Path:    "/list",
 					Handler: food.GetMyFoodListHandler(serverCtx),
 				},
 			}...,

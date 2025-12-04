@@ -100,7 +100,7 @@ service food-api {
 
 	@doc "查询我的美食列表"
 	@handler GetMyFoodList
-	get /my/list (GetMyFoodListRequest) returns (GetMyFoodListResponse)
+	get /list (GetMyFoodListRequest) returns (GetMyFoodListResponse)
 
 	@doc "新增/修改美食信息（food_id为0或未提供时为新增，否则为修改）"
 	@handler CreateOrUpdateFood
