@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	"github.com/hd2yao/ecshop/common/app"
 	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/common/middleware"
 	"github.com/hd2yao/ecshop/food/api/internal/svc"
@@ -38,13 +39,16 @@ func (l *GetMyFoodListLogic) GetMyFoodList(req *types.GetMyFoodListRequest) (res
 		}, nil
 	}
 
-	l.Infof("查询我的美食列表，用户ID: %d, 页码: %d, 每页: %d", userID, req.Page, req.PageSize)
+	// 2. 创建分页对象（统一处理分页参数验证和默认值）
+	pagination := app.NewPagination(req.Page, req.PageSize)
 
-	// 2. 调用 RPC 服务获取美食列表
+	l.Infof("查询我的美食列表，用户ID: %d, 页码: %d, 每页: %d", userID, pagination.Page, pagination.PageSize)
+
+	// 3. 调用 RPC 服务获取美食列表
 	rpcResp, err := l.svcCtx.FoodRpc.GetMyFoodList(l.ctx, &food.GetMyFoodListReq{
 		UserId:   userID,
-		Page:     int32(req.Page),
-		PageSize: int32(req.PageSize),
+		Page:     int32(pagination.Page),
+		PageSize: int32(pagination.PageSize),
 	})
 
 	if err != nil {
@@ -55,17 +59,20 @@ func (l *GetMyFoodListLogic) GetMyFoodList(req *types.GetMyFoodListRequest) (res
 		}, nil
 	}
 
-	// 3. 转换响应
+	// 4. 设置分页信息
+	pagination.SetTotalRows(int(rpcResp.Total))
+
+	// 5. 转换响应
 	resp = &types.GetMyFoodListResponse{
 		Code:     int(rpcResp.Code),
 		Message:  rpcResp.Message,
-		Total:    int(rpcResp.Total),
-		Page:     int(rpcResp.Page),
-		PageSize: int(rpcResp.PageSize),
+		Total:    pagination.TotalRows,
+		Page:     pagination.Page,
+		PageSize: pagination.PageSize,
 		FoodList: make([]types.FoodInfo, 0, len(rpcResp.FoodList)),
 	}
 
-	// 4. 转换美食列表
+	// 6. 转换美食列表
 	for _, foodInfo := range rpcResp.FoodList {
 		// 转换 FoodDetail
 		foodDetails := make([]types.FoodStepDetail, 0, len(foodInfo.FoodDetail))

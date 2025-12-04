@@ -35,18 +35,8 @@ func (l *GetMyFoodListLogic) GetMyFoodList(in *food.GetMyFoodListReq) (*food.Get
 		}, nil
 	}
 
-	// 设置默认分页参数
 	page := in.Page
-	if page <= 0 {
-		page = 1
-	}
 	pageSize := in.PageSize
-	if pageSize <= 0 {
-		pageSize = 10
-	}
-	if pageSize > 100 {
-		pageSize = 100 // 限制最大每页数量
-	}
 
 	l.Infof("查询我的美食列表，用户ID: %d, 页码: %d, 每页: %d", in.UserId, page, pageSize)
 
