@@ -91,40 +91,8 @@ func toFoodDTO(food *Food) *FoodDTO {
 	return dto
 }
 
-//// toFood 将 DTO 转换为 Food 模型
-//func (dto *FoodDTO) toFood() *Food {
-//	if dto == nil {
-//		return nil
-//	}
-//
-//	food := &Food{
-//		Id:             dto.Id,
-//		UserId:         dto.UserId,
-//		FoodName:       dto.FoodName,
-//		FoodDes:        dto.FoodDes,
-//		FoodCateTag:    dto.FoodCateTag,
-//		FoodUrl:        dto.FoodUrl,
-//		FoodVideoUrl:   dto.FoodVideoUrl,
-//		FoodTime:       dto.FoodTime,
-//		FoodDifficulty: dto.FoodDifficulty,
-//		FoodDetail:     dto.FoodDetail,
-//		FoodList:       dto.FoodList,
-//		FoodStatus:     dto.FoodStatus,
-//		FoodCreatetime: dto.FoodCreatetime,
-//		FoodUpdatetime: dto.FoodUpdatetime,
-//	}
-//
-//	// 处理 FoodSkuIds
-//	if dto.FoodSkuIds != "" {
-//		food.FoodSkuIds = sql.NullString{String: dto.FoodSkuIds, Valid: true}
-//	}
-//
-//	return food
-//}
-
 // CreateOrUpdateFood 新增/修改美食信息（带分布式锁和缓存）
-// 使用分布式互斥锁防止重复灌入数据，写完数据库+Redis后释放锁
-// 成功写入数据库后写Redis缓存，过期时间为2天+随机数
+// 使用分布式互斥锁防止重复灌入数据，写完数据库+Redis后释放锁,过期时间为2天+随机数
 func (s *FoodCacheService) CreateOrUpdateFood(ctx context.Context, food *Food) (*Food, error) {
 	// 判断是新增还是修改
 	if food.Id > 0 {
@@ -138,51 +106,48 @@ func (s *FoodCacheService) CreateOrUpdateFood(ctx context.Context, food *Food) (
 
 // createFood 新增美食信息（带分布式锁和缓存）
 func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, error) {
-	// 使用临时锁key（基于 user_id 和时间戳，防止并发创建）
+	// 使用临时锁 key（基于 user_id，防止并发创建）
 	lockKey := fmt.Sprintf(foodCreateLockKeyFmt, food.UserId)
 
 	// 使用 UpdateWithMutex 保证并发安全
 	var createdFood *Food
-	err := s.cache.UpdateWithMutex(ctx, lockKey, func() error {
+	var cacheKey string
+	err := s.cache.UpdateWithMutex(ctx, lockKey, func() (interface{}, error) {
 		// 1. 先插入数据库
 		result, err := s.foodModel.Insert(ctx, food)
 		if err != nil {
-			return fmt.Errorf("插入美食数据失败: %w", err)
+			return nil, fmt.Errorf("插入美食数据失败: %w", err)
 		}
 
-		// 2. 获取新插入的美食ID
+		// 2. 获取新插入的 food_id
 		foodId, err := result.LastInsertId()
 		if err != nil {
-			return fmt.Errorf("获取新美食ID失败: %w", err)
+			return nil, fmt.Errorf("获取新美食ID失败: %w", err)
 		}
 
 		// 3. 查询新创建的美食信息（确保数据完整性）
 		createdFood, err = s.foodModel.FindOne(ctx, foodId)
 		if err != nil {
-			return fmt.Errorf("查询新创建的美食信息失败: %w", err)
+			return nil, fmt.Errorf("查询新创建的美食信息失败: %w", err)
 		}
 
-		// 4. 成功写入数据库后，写入 Redis 缓存
-		// 过期时间为 2 天+随机数（48 小时 + 0-24 小时随机数 = 48-72 小时）
-		foodDTO := toFoodDTO(createdFood)
-		if foodDTO != nil {
-			cacheKey := fmt.Sprintf(foodDetailCacheKeyFmt, createdFood.Id)
-			// 计算过期时间：2天（48小时）+ 0-24小时随机数
-			randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
-			// s.cacheOpt.
-			expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
-			if err := s.cache.Set(ctx, cacheKey, foodDTO, expiry); err != nil {
-				// 缓存写入失败不影响主流程，只记录日志
-				// 这里不返回错误，因为数据库已经成功写入
-				return nil // 忽略缓存错误，保证数据一致性
-			}
-		}
+		// 4. 设置缓存key（用于后续写入缓存）
+		cacheKey = fmt.Sprintf(foodDetailCacheKeyFmt, createdFood.Id)
 
-		return nil
+		// 5. 返回数据用于更新缓存（注意：锁 key 和缓存 key 不同，需要在锁外写入）
+		return nil, nil
 	}, s.cacheOpt)
 
 	if err != nil {
 		return nil, err
+	}
+
+	// 在锁外写入缓存（因为锁key和缓存key不同）
+	if cacheKey != "" {
+		randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
+		expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
+		// 缓存写入失败不影响主流程
+		_ = s.cache.Set(ctx, cacheKey, toFoodDTO(food), expiry)
 	}
 
 	return createdFood, nil
@@ -193,43 +158,31 @@ func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, e
 	// 使用美食ID作为锁key
 	cacheKey := fmt.Sprintf(foodDetailCacheKeyFmt, food.Id)
 
-	// 使用 UpdateWithMutex 保证并发安全和强一致性
+	// 使用 UpdateWithMutex 保证并发安全和强一致性，并直接更新缓存
 	var updatedFood *Food
-	err := s.cache.UpdateWithMutex(ctx, cacheKey, func() error {
+	err := s.cache.UpdateWithMutex(ctx, cacheKey, func() (interface{}, error) {
 		// 1. 先更新数据库
 		if err := s.foodModel.Update(ctx, food); err != nil {
-			return fmt.Errorf("更新美食数据失败: %w", err)
+			return nil, fmt.Errorf("更新美食数据失败: %w", err)
 		}
 
 		// 2. 查询更新后的美食信息（确保数据完整性）
 		var err error
 		updatedFood, err = s.foodModel.FindOne(ctx, food.Id)
 		if err != nil {
-			return fmt.Errorf("查询更新后的美食信息失败: %w", err)
+			return nil, fmt.Errorf("查询更新后的美食信息失败: %w", err)
 		}
 
-		// 3. 成功写入数据库后，写入Redis缓存
-		foodDTO := toFoodDTO(updatedFood)
-		if foodDTO != nil {
-			// 计算过期时间：2天（48小时）+ 0-24小时随机数
-			randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
-			expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
-			if err := s.cache.Set(ctx, cacheKey, foodDTO, expiry); err != nil {
-				// 缓存写入失败不影响主流程，只记录日志
-				// 这里不返回错误，因为数据库已经成功写入
-				return nil // 忽略缓存错误，保证数据一致性
-			}
-		}
-
-		// 4. 删除相关缓存（用户列表缓存等）
-		s.invalidateRelatedCache(ctx, updatedFood.Id, updatedFood.UserId)
-
-		return nil
+		// 3. 返回更新后的数据，用于直接更新缓存（而不是删除）
+		return toFoodDTO(updatedFood), nil
 	}, s.cacheOpt)
 
 	if err != nil {
 		return nil, err
 	}
+
+	// 使相关列表缓存失效（详情缓存已在 UpdateWithMutex 中更新）
+	s.invalidateRelatedCache(ctx, updatedFood.Id, updatedFood.UserId)
 
 	return updatedFood, nil
 }
