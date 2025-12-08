@@ -3,6 +3,7 @@ module github.com/hd2yao/ecshop
 go 1.24.5
 
 require (
+	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/gin-gonic/gin v1.10.1
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
