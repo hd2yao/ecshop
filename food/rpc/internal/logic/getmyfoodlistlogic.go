@@ -40,8 +40,8 @@ func (l *GetMyFoodListLogic) GetMyFoodList(in *food.GetMyFoodListReq) (*food.Get
 
 	l.Infof("查询我的美食列表，用户ID: %d, 页码: %d, 每页: %d", in.UserId, page, pageSize)
 
-	// 2. 查询美食列表
-	foods, total, err := l.svcCtx.FoodModel.FindListByUserId(l.ctx, in.UserId, page, pageSize)
+	// 2. 查询美食列表（优先使用分页缓存，按需构建）
+	foodDTOs, total, err := l.svcCtx.FoodModel.CacheService().GetMyFoodPage(l.ctx, in.UserId, page, pageSize)
 	if err != nil {
 		l.Errorf("查询美食列表失败: %v", err)
 		return &food.GetMyFoodListResp{
@@ -51,8 +51,8 @@ func (l *GetMyFoodListLogic) GetMyFoodList(in *food.GetMyFoodListReq) (*food.Get
 	}
 
 	// 3. 转换数据格式
-	foodList := make([]*food.FoodInfo, 0, len(foods))
-	for _, foodData := range foods {
+	foodList := make([]*food.FoodInfo, 0, len(foodDTOs))
+	for _, foodData := range foodDTOs {
 		// 解析 JSON 字段为结构化数据
 		foodDetails, err := model.ParseFoodDetailFromJSON(foodData.FoodDetail)
 		if err != nil {
@@ -67,8 +67,8 @@ func (l *GetMyFoodListLogic) GetMyFoodList(in *food.GetMyFoodListReq) (*food.Get
 		}
 
 		var skuIds []int64
-		if foodData.FoodSkuIds.Valid && foodData.FoodSkuIds.String != "" {
-			skuIds, err = model.ParseSkuIdsFromJSON(foodData.FoodSkuIds.String)
+		if foodData.FoodSkuIds != "" {
+			skuIds, err = model.ParseSkuIdsFromJSON(foodData.FoodSkuIds)
 			if err != nil {
 				l.Errorf("解析 skuIds JSON 失败，美食ID: %d, 错误: %v", foodData.Id, err)
 				skuIds = []int64{} // 使用空数组
@@ -128,8 +128,8 @@ func (l *GetMyFoodListLogic) GetMyFoodList(in *food.GetMyFoodListReq) (*food.Get
 		Code:     int32(errcode.Success.Code()),
 		Message:  errcode.Success.Msg(),
 		Total:    int32(total),
-		Page:     int32(page),
-		PageSize: int32(pageSize),
+		Page:     page,
+		PageSize: pageSize,
 		FoodList: foodList,
 	}, nil
 }

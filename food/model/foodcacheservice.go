@@ -14,9 +14,11 @@ import (
 const (
 	foodDetailCacheKeyFmt = "detail_%d"
 	foodCreateLockKeyFmt  = "create_user_%d"
-	foodUserListKeyFmt    = "user_%d_list"
-	foodUserCountKeyFmt   = "count_%d"
 	foodInfoHashKey       = "info_hash"
+
+	// 我的美食分页缓存
+	foodMyPageKeyFmt  = "user_page_%d_%d" // userId, page
+	foodMyTotalKeyFmt = "user_total_%d"   // userId（自增统计）
 )
 
 // FoodCacheService 美食缓存服务
@@ -39,6 +41,12 @@ func NewFoodCacheService(foodModel FoodModel) *FoodCacheService {
 		cache:     redisPool.NewRedisCache("food", "info"),
 		cacheOpt:  redisPool.DefaultCacheOption(),
 	}
+}
+
+// MyFoodPageCache 我的美食列表分页缓存结构
+type MyFoodPageCache struct {
+	List  []FoodDTO `json:"list"`
+	Total int64     `json:"total"`
 }
 
 // FoodDTO 美食数据传输对象
@@ -147,8 +155,11 @@ func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, e
 		randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
 		expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
 		// 缓存写入失败不影响主流程
-		_ = s.cache.Set(ctx, cacheKey, toFoodDTO(food), expiry)
+		_ = s.cache.Set(ctx, cacheKey, toFoodDTO(createdFood), expiry)
 	}
+
+	// 维护总数自增（新增时）
+	s.incrMyTotal(ctx, createdFood.UserId, 1)
 
 	return createdFood, nil
 }
@@ -181,24 +192,7 @@ func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, e
 		return nil, err
 	}
 
-	// 使相关列表缓存失效（详情缓存已在 UpdateWithMutex 中更新）
-	s.invalidateRelatedCache(ctx, updatedFood.Id, updatedFood.UserId)
-
 	return updatedFood, nil
-}
-
-// invalidateRelatedCache 使相关缓存失效
-func (s *FoodCacheService) invalidateRelatedCache(ctx context.Context, foodId, userId int64) {
-	// 删除用户美食列表缓存
-	userListKey := fmt.Sprintf(foodUserListKeyFmt, userId)
-	_ = s.cache.Delete(ctx, userListKey)
-
-	// 删除用户美食总数缓存
-	userCountKey := fmt.Sprintf(foodUserCountKeyFmt, userId)
-	_ = s.cache.Delete(ctx, userCountKey)
-
-	// 删除Hash缓存中的对应字段（如果使用Hash缓存）
-	s.cache.HDel(ctx, foodInfoHashKey, fmt.Sprintf("%d", foodId))
 }
 
 // GetFoodById 根据 ID 获取美食信息（带缓存）
@@ -231,4 +225,66 @@ func (s *FoodCacheService) GetFoodById(ctx context.Context, foodId int64) (*Food
 	}
 
 	return &foodDTO, nil
+}
+
+// GetMyFoodPage 按需构建并获取“我的美食”分页缓存
+func (s *FoodCacheService) GetMyFoodPage(ctx context.Context, userId int64, page, pageSize int32) ([]FoodDTO, int64, error) {
+	pageKey := fmt.Sprintf(foodMyPageKeyFmt, userId, page)
+	totalKey := fmt.Sprintf(foodMyTotalKeyFmt, userId)
+	var pageCache MyFoodPageCache
+
+	// 使用 GetWithLoader 按需构建缓存，内置防击穿 + 自动续期
+	err := s.cache.GetWithLoader(ctx, pageKey, &pageCache, func() (interface{}, error) {
+		foods, total, err := s.foodModel.FindListByUserId(ctx, userId, page, pageSize)
+		if err != nil {
+			return nil, err
+		}
+
+		result := MyFoodPageCache{
+			List:  make([]FoodDTO, 0, len(foods)),
+			Total: total, // 默认使用数据库返回的总数（首次）
+		}
+
+		for _, f := range foods {
+			if f == nil {
+				continue
+			}
+			if dto := toFoodDTO(f); dto != nil {
+				result.List = append(result.List, *dto)
+			}
+		}
+
+		// 如果已有总数自增缓存，则覆盖为自增值；否则写入自增总数
+		var cachedTotal int64
+		if err := s.cache.Get(ctx, totalKey, &cachedTotal); err == nil {
+			result.Total = cachedTotal
+		} else {
+			// 初始化总数缓存，过期时间与分页一致
+			_ = s.cache.Set(ctx, totalKey, total, s.cacheOpt.BaseExpiry)
+		}
+
+		return result, nil
+	}, s.cacheOpt)
+
+	if err != nil {
+		if errors.Is(err, errcode.CacheNotFound) {
+			return []FoodDTO{}, 0, nil
+		}
+		return nil, 0, err
+	}
+
+	return pageCache.List, pageCache.Total, nil
+}
+
+// incrMyTotal 维护我的美食总数（自增/自减）
+func (s *FoodCacheService) incrMyTotal(ctx context.Context, userId int64, delta int64) {
+	key := fmt.Sprintf(foodMyTotalKeyFmt, userId)
+	if delta == 0 {
+		return
+	}
+	if delta > 0 {
+		_, _ = s.cache.Increment(ctx, key, delta)
+		return
+	}
+	_, _ = s.cache.Decrement(ctx, key, -delta)
 }
