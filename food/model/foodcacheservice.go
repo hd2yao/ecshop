@@ -15,12 +15,13 @@ import (
 )
 
 const (
-	foodDetailCacheKeyFmt = "detail_%d"
-	foodCreateLockKeyFmt  = "create_user_%d"
+	FoodDetailCacheKeyFmt = "detail_%d"
+	FoodCreateLockKeyFmt  = "create_lock_%d"
+	FoodUpdateLockKeyFmt  = "update_user_%d"
 
 	// 我的美食分页缓存
-	foodMyPageKeyFmt  = "user_page_%d_%d" // userId, page
-	foodMyTotalKeyFmt = "user_total_%d"   // userId（自增统计）
+	FoodMyPageKeyFmt  = "user_page_%d_%d" // userId, page
+	FoodMyTotalKeyFmt = "user_total_%d"   // userId（自增统计）
 )
 
 // FoodCacheService 美食缓存服务
@@ -70,8 +71,8 @@ type FoodDTO struct {
 	FoodUpdatetime time.Time `json:"food_updatetime"`
 }
 
-// toFoodDTO 将 Food 模型转换为 DTO
-func toFoodDTO(food *Food) *FoodDTO {
+// ToFoodDTO 将 Food 模型转换为 DTO
+func ToFoodDTO(food *Food) *FoodDTO {
 	if food == nil {
 		return nil
 	}
@@ -117,7 +118,7 @@ func (s *FoodCacheService) CreateOrUpdateFood(ctx context.Context, food *Food) (
 // createFood 新增美食信息（带分布式锁和缓存）
 func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, error) {
 	// 使用临时锁 key（基于 user_id，防止并发创建）
-	lockKey := fmt.Sprintf(foodCreateLockKeyFmt, food.UserId)
+	lockKey := fmt.Sprintf(FoodCreateLockKeyFmt, food.UserId)
 
 	// 使用 UpdateWithMutex 保证并发安全
 	var createdFood *Food
@@ -142,7 +143,7 @@ func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, e
 		}
 
 		// 4. 设置缓存key（用于后续写入缓存）
-		cacheKey = fmt.Sprintf(foodDetailCacheKeyFmt, createdFood.Id)
+		cacheKey = fmt.Sprintf(FoodDetailCacheKeyFmt, createdFood.Id)
 
 		// 5. 返回数据用于更新缓存（注意：锁 key 和缓存 key 不同，需要在锁外写入）
 		return nil, nil
@@ -157,7 +158,7 @@ func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, e
 		randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
 		expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
 		// 缓存写入失败不影响主流程
-		_ = s.cache.Set(ctx, cacheKey, toFoodDTO(createdFood), expiry)
+		_ = s.cache.Set(ctx, cacheKey, ToFoodDTO(createdFood), expiry)
 	}
 
 	// 维护总数自增（新增时）
@@ -172,7 +173,7 @@ func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, e
 // updateFood 修改美食信息（带分布式锁和缓存）
 func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, error) {
 	// 使用美食ID作为锁key
-	cacheKey := fmt.Sprintf(foodDetailCacheKeyFmt, food.Id)
+	cacheKey := fmt.Sprintf(FoodDetailCacheKeyFmt, food.Id)
 
 	// 使用 UpdateWithMutex 保证并发安全和强一致性，并直接更新缓存
 	var updatedFood *Food
@@ -190,7 +191,7 @@ func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, e
 		}
 
 		// 3. 返回更新后的数据，用于直接更新缓存（而不是删除）
-		return toFoodDTO(updatedFood), nil
+		return ToFoodDTO(updatedFood), nil
 	}, s.cacheOpt)
 
 	if err != nil {
@@ -209,7 +210,7 @@ func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, e
 // 2. 缓存未命中时使用分布式锁防止击穿
 // 3. 数据不存在时设置空值缓存防止穿透
 func (s *FoodCacheService) GetFoodById(ctx context.Context, foodId int64) (*FoodDTO, error) {
-	cacheKey := fmt.Sprintf(foodDetailCacheKeyFmt, foodId)
+	cacheKey := fmt.Sprintf(FoodDetailCacheKeyFmt, foodId)
 	var foodDTO FoodDTO
 
 	err := s.cache.GetWithLoader(ctx, cacheKey, &foodDTO, func() (interface{}, error) {
@@ -222,7 +223,7 @@ func (s *FoodCacheService) GetFoodById(ctx context.Context, foodId int64) (*Food
 			return nil, err
 		}
 
-		return toFoodDTO(food), nil
+		return ToFoodDTO(food), nil
 	}, s.cacheOpt)
 
 	if err != nil {
@@ -237,8 +238,8 @@ func (s *FoodCacheService) GetFoodById(ctx context.Context, foodId int64) (*Food
 
 // GetMyFoodPage 按需构建并获取“我的美食”分页缓存
 func (s *FoodCacheService) GetMyFoodPage(ctx context.Context, userId int64, page, pageSize int32) ([]FoodDTO, int64, error) {
-	pageKey := fmt.Sprintf(foodMyPageKeyFmt, userId, page)
-	totalKey := fmt.Sprintf(foodMyTotalKeyFmt, userId)
+	pageKey := fmt.Sprintf(FoodMyPageKeyFmt, userId, page)
+	totalKey := fmt.Sprintf(FoodMyTotalKeyFmt, userId)
 	var pageCache MyFoodPageCache
 
 	// 使用 GetWithLoader 按需构建缓存，内置防击穿 + 自动续期
@@ -257,7 +258,7 @@ func (s *FoodCacheService) GetMyFoodPage(ctx context.Context, userId int64, page
 			if f == nil {
 				continue
 			}
-			if dto := toFoodDTO(f); dto != nil {
+			if dto := ToFoodDTO(f); dto != nil {
 				result.List = append(result.List, *dto)
 			}
 		}
@@ -286,7 +287,7 @@ func (s *FoodCacheService) GetMyFoodPage(ctx context.Context, userId int64, page
 
 // incrMyTotal 维护我的美食总数（自增/自减）
 func (s *FoodCacheService) incrMyTotal(ctx context.Context, userId int64, delta int64) {
-	key := fmt.Sprintf(foodMyTotalKeyFmt, userId)
+	key := fmt.Sprintf(FoodMyTotalKeyFmt, userId)
 	if delta == 0 {
 		return
 	}
@@ -323,7 +324,7 @@ func (s *FoodCacheService) sendFoodUpdateMessage(ctx context.Context, foodID, us
 			// 记录日志，但不影响主流程
 			logx.Errorf("美食 MQ 生产消息-发送失败: foodID=%d, userID=%d, error=%v", foodID, userID, err)
 		} else {
-			logx.Infof("美食 MQ 生产消息-发送成功: foodID=%d, userID=%d, MessageID=%s, QueueOffset=%d", 
+			logx.Infof("美食 MQ 生产消息-发送成功: foodID=%d, userID=%d, MessageID=%s, QueueOffset=%d",
 				foodID, userID, result.MessageID, result.QueueOffset)
 		}
 	}()

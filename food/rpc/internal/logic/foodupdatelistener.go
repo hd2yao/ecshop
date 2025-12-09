@@ -14,14 +14,7 @@ import (
 	"github.com/hd2yao/ecshop/food/rpc/internal/svc"
 )
 
-const (
-	// 每页大小
-	pageSize = 20
-	// 缓存 key 前缀（与 foodcacheservice.go 保持一致）
-	foodUpdateLockKeyFmt = "food:update:lock:%d" // user_id
-	userFoodPageKeyFmt   = "user_page_%d_%d"     // user_id, page
-	userFoodTotalKeyFmt  = "user_total_%d"       // user_id
-)
+const pageSize = 20
 
 // FoodUpdateListener 美食更新监听器
 type FoodUpdateListener struct {
@@ -44,15 +37,15 @@ func NewFoodUpdateListener(svcCtx *svc.ServiceContext) *FoodUpdateListener {
 // ConsumeMessage 消费消息
 func (l *FoodUpdateListener) ConsumeMessage(ctx context.Context, msgs []*rocketmq.Message) (rocketmq.ConsumeStatus, error) {
 	l.logger.Infof("美食 MQ 消费消息-收到 %d 条消息", len(msgs))
-	
+
 	for i, msg := range msgs {
-		l.logger.Infof("美食 MQ 消费消息-第 %d/%d 条: MessageID=%s, Topic=%s, Tag=%s, Key=%s", 
+		l.logger.Infof("美食 MQ 消费消息-第 %d/%d 条: MessageID=%s, Topic=%s, Tag=%s, Key=%s",
 			i+1, len(msgs), msg.MessageID, msg.Topic, msg.Tag, msg.Key)
-		
+
 		// 解析消息
 		var foodMsg model.FoodUpdateMQMessage
 		if err := msg.UnmarshalBody(&foodMsg); err != nil {
-			l.logger.Errorf("美食 MQ 消费消息-解析消息体失败: MessageID=%s, error=%v, body=%s", 
+			l.logger.Errorf("美食 MQ 消费消息-解析消息体失败: MessageID=%s, error=%v, body=%s",
 				msg.MessageID, err, msg.GetBodyString())
 			continue
 		}
@@ -63,7 +56,7 @@ func (l *FoodUpdateListener) ConsumeMessage(ctx context.Context, msgs []*rocketm
 		l.logger.Infof("美食 MQ 消费消息-开始处理: foodID=%d, userID=%d", foodID, userID)
 
 		// 使用分布式锁，同一个用户同时间只能操作一次，避免重复请求
-		lockKey := fmt.Sprintf(foodUpdateLockKeyFmt, userID)
+		lockKey := fmt.Sprintf(model.FoodUpdateLockKeyFmt, userID)
 
 		// 通过阻塞的方式进行加锁，跟新增/更新美食操作互斥，并发操作时进行阻塞
 		err := l.lock.ExecuteWithLock(ctx, lockKey, 10*time.Second, 3*time.Second, func() error {
@@ -74,7 +67,7 @@ func (l *FoodUpdateListener) ConsumeMessage(ctx context.Context, msgs []*rocketm
 			l.logger.Errorf("美食 MQ 消费消息-处理失败: foodID=%d, userID=%d, error=%v", foodID, userID, err)
 			return rocketmq.ConsumeLater, err
 		}
-		
+
 		l.logger.Infof("美食 MQ 消费消息-处理成功: foodID=%d, userID=%d", foodID, userID)
 	}
 
@@ -85,7 +78,7 @@ func (l *FoodUpdateListener) ConsumeMessage(ctx context.Context, msgs []*rocketm
 // rebuildUserPageCache 重建用户分页缓存
 func (l *FoodUpdateListener) rebuildUserPageCache(ctx context.Context, userID int64) error {
 	// 1. 计算我的美食列表总数
-	totalKey := fmt.Sprintf(userFoodTotalKeyFmt, userID)
+	totalKey := fmt.Sprintf(model.FoodMyTotalKeyFmt, userID)
 	var total int64
 	if err := l.cache.Get(ctx, totalKey, &total); err != nil {
 		// 如果缓存中没有总数，从数据库查询
@@ -109,7 +102,7 @@ func (l *FoodUpdateListener) rebuildUserPageCache(ctx context.Context, userID in
 	// 2. 循环构建美食分页缓存（只重建已存在的缓存页）
 	for page := 1; page <= pageNums; page++ {
 		// 美食分页缓存 key
-		pageKey := fmt.Sprintf(userFoodPageKeyFmt, userID, page)
+		pageKey := fmt.Sprintf(model.FoodMyPageKeyFmt, userID, page)
 
 		// 先从缓存中获取一下
 		var existingCache model.MyFoodPageCache
@@ -136,7 +129,7 @@ func (l *FoodUpdateListener) rebuildUserPageCache(ctx context.Context, userID in
 			if f == nil {
 				continue
 			}
-			if dto := toFoodDTO(f); dto != nil {
+			if dto := model.ToFoodDTO(f); dto != nil {
 				result.List = append(result.List, *dto)
 			}
 		}
@@ -153,35 +146,4 @@ func (l *FoodUpdateListener) rebuildUserPageCache(ctx context.Context, userID in
 	}
 
 	return nil
-}
-
-// toFoodDTO 将 Food 模型转换为 DTO
-func toFoodDTO(f *model.Food) *model.FoodDTO {
-	if f == nil {
-		return nil
-	}
-
-	dto := &model.FoodDTO{
-		Id:             f.Id,
-		UserId:         f.UserId,
-		FoodName:       f.FoodName,
-		FoodDes:        f.FoodDes,
-		FoodCateTag:    f.FoodCateTag,
-		FoodUrl:        f.FoodUrl,
-		FoodVideoUrl:   f.FoodVideoUrl,
-		FoodTime:       f.FoodTime,
-		FoodDifficulty: f.FoodDifficulty,
-		FoodDetail:     f.FoodDetail,
-		FoodList:       f.FoodList,
-		FoodStatus:     f.FoodStatus,
-		FoodCreatetime: f.FoodCreatetime,
-		FoodUpdatetime: f.FoodUpdatetime,
-	}
-
-	// 处理 FoodSkuIds（sql.NullString）
-	if f.FoodSkuIds.Valid {
-		dto.FoodSkuIds = f.FoodSkuIds.String
-	}
-
-	return dto
 }
