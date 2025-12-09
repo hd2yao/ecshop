@@ -7,14 +7,16 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/zeromicro/go-zero/core/logx"
+
 	"github.com/hd2yao/ecshop/common/errcode"
 	redisPool "github.com/hd2yao/ecshop/common/redis"
+	"github.com/hd2yao/ecshop/common/rocketmq"
 )
 
 const (
 	foodDetailCacheKeyFmt = "detail_%d"
 	foodCreateLockKeyFmt  = "create_user_%d"
-	foodInfoHashKey       = "info_hash"
 
 	// 我的美食分页缓存
 	foodMyPageKeyFmt  = "user_page_%d_%d" // userId, page
@@ -161,6 +163,9 @@ func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, e
 	// 维护总数自增（新增时）
 	s.incrMyTotal(ctx, createdFood.UserId, 1)
 
+	// 发送 RocketMQ 消息，异步更新分页缓存
+	s.sendFoodUpdateMessage(ctx, createdFood.Id, createdFood.UserId)
+
 	return createdFood, nil
 }
 
@@ -191,6 +196,9 @@ func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, e
 	if err != nil {
 		return nil, err
 	}
+
+	// 发送 RocketMQ 消息，异步更新分页缓存
+	s.sendFoodUpdateMessage(ctx, updatedFood.Id, updatedFood.UserId)
 
 	return updatedFood, nil
 }
@@ -287,4 +295,36 @@ func (s *FoodCacheService) incrMyTotal(ctx context.Context, userId int64, delta 
 		return
 	}
 	_, _ = s.cache.Decrement(ctx, key, -delta)
+}
+
+// sendFoodUpdateMessage 发送美食更新消息到 RocketMQ
+func (s *FoodCacheService) sendFoodUpdateMessage(ctx context.Context, foodID, userID int64) {
+	// 使用 goroutine 异步发送，避免阻塞主流程
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				// RocketMQ 未初始化时，忽略错误
+			}
+		}()
+
+		// 获取 RocketMQ 实例（可能未初始化，使用 recover 捕获 panic）
+		rocketMQ := rocketmq.GetRocketMQ()
+
+		// 创建消息
+		msg := FoodUpdateMQMessage{
+			FoodID: foodID,
+			UserID: userID,
+		}
+
+		// 发送消息（异步发送，失败不影响主流程）
+		logx.Infof("美食 MQ 生产消息-准备发送: Topic=food_cache_update, Tag=update, foodID=%d, userID=%d", foodID, userID)
+		result, err := rocketMQ.SendMessage(context.Background(), "food_cache_update", "update", msg)
+		if err != nil {
+			// 记录日志，但不影响主流程
+			logx.Errorf("美食 MQ 生产消息-发送失败: foodID=%d, userID=%d, error=%v", foodID, userID, err)
+		} else {
+			logx.Infof("美食 MQ 生产消息-发送成功: foodID=%d, userID=%d, MessageID=%s, QueueOffset=%d", 
+				foodID, userID, result.MessageID, result.QueueOffset)
+		}
+	}()
 }
