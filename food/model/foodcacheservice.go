@@ -35,6 +35,7 @@ type FoodCacheService struct {
 	foodModel FoodModel
 	cache     *redisPool.RedisCache
 	cacheOpt  *redisPool.CacheOption
+	lock      *redisPool.LockExecutor
 }
 
 // NewFoodCacheService 创建美食缓存服务
@@ -43,6 +44,7 @@ func NewFoodCacheService(foodModel FoodModel) *FoodCacheService {
 		foodModel: foodModel,
 		cache:     redisPool.NewRedisCache("food", "info"),
 		cacheOpt:  redisPool.DefaultCacheOption(),
+		lock:      redisPool.NewLockExecutor(),
 	}
 }
 
@@ -117,48 +119,41 @@ func (s *FoodCacheService) CreateOrUpdateFood(ctx context.Context, food *Food) (
 
 // createFood 新增美食信息（带分布式锁和缓存）
 func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, error) {
-	// 使用临时锁 key（基于 user_id，防止并发创建）
-	lockKey := fmt.Sprintf(FoodCreateLockKeyFmt, food.UserId)
+	// 使用用户级分布式锁，统一串行写/读重建
+	lockKey := fmt.Sprintf(FoodUpdateLockKeyFmt, food.UserId)
 
-	// 使用 UpdateWithMutex 保证并发安全
 	var createdFood *Food
-	var cacheKey string
-	err := s.cache.UpdateWithMutex(ctx, lockKey, func() (interface{}, error) {
+
+	err := s.lock.ExecuteWithLock(ctx, lockKey, 10*time.Second, 3*time.Second, func() error {
 		// 1. 先插入数据库
 		result, err := s.foodModel.Insert(ctx, food)
 		if err != nil {
-			return nil, fmt.Errorf("插入美食数据失败: %w", err)
+			return fmt.Errorf("插入美食数据失败: %w", err)
 		}
 
 		// 2. 获取新插入的 food_id
 		foodId, err := result.LastInsertId()
 		if err != nil {
-			return nil, fmt.Errorf("获取新美食ID失败: %w", err)
+			return fmt.Errorf("获取新美食ID失败: %w", err)
 		}
 
 		// 3. 查询新创建的美食信息（确保数据完整性）
 		createdFood, err = s.foodModel.FindOne(ctx, foodId)
 		if err != nil {
-			return nil, fmt.Errorf("查询新创建的美食信息失败: %w", err)
+			return fmt.Errorf("查询新创建的美食信息失败: %w", err)
 		}
 
-		// 4. 设置缓存key（用于后续写入缓存）
-		cacheKey = fmt.Sprintf(FoodDetailCacheKeyFmt, createdFood.Id)
+		// 4. 写入明细缓存（锁内写，保证与写库一致）
+		cacheKey := fmt.Sprintf(FoodDetailCacheKeyFmt, createdFood.Id)
+		randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
+		expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
+		_ = s.cache.Set(ctx, cacheKey, ToFoodDTO(createdFood), expiry)
 
-		// 5. 返回数据用于更新缓存（注意：锁 key 和缓存 key 不同，需要在锁外写入）
-		return nil, nil
-	}, s.cacheOpt)
+		return nil
+	})
 
 	if err != nil {
 		return nil, err
-	}
-
-	// 在锁外写入缓存（因为锁key和缓存key不同）
-	if cacheKey != "" {
-		randomSeconds := rand.Int63n(int64(s.cacheOpt.RandomExpiry.Seconds()))
-		expiry := s.cacheOpt.BaseExpiry + time.Duration(randomSeconds)*time.Second
-		// 缓存写入失败不影响主流程
-		_ = s.cache.Set(ctx, cacheKey, ToFoodDTO(createdFood), expiry)
 	}
 
 	// 维护总数自增（新增时）
@@ -172,27 +167,30 @@ func (s *FoodCacheService) createFood(ctx context.Context, food *Food) (*Food, e
 
 // updateFood 修改美食信息（带分布式锁和缓存）
 func (s *FoodCacheService) updateFood(ctx context.Context, food *Food) (*Food, error) {
-	// 使用美食ID作为锁key
+	// 使用用户级分布式锁，统一串行写/读重建
+	lockKey := fmt.Sprintf(FoodUpdateLockKeyFmt, food.UserId)
 	cacheKey := fmt.Sprintf(FoodDetailCacheKeyFmt, food.Id)
 
-	// 使用 UpdateWithMutex 保证并发安全和强一致性，并直接更新缓存
 	var updatedFood *Food
-	err := s.cache.UpdateWithMutex(ctx, cacheKey, func() (interface{}, error) {
-		// 1. 先更新数据库
-		if err := s.foodModel.Update(ctx, food); err != nil {
-			return nil, fmt.Errorf("更新美食数据失败: %w", err)
-		}
+	err := s.lock.ExecuteWithLock(ctx, lockKey, 10*time.Second, 3*time.Second, func() error {
+		// 使用 UpdateWithMutex 保证并发安全和强一致性，并直接更新缓存
+		return s.cache.UpdateWithMutex(ctx, cacheKey, func() (interface{}, error) {
+			// 1. 先更新数据库
+			if err := s.foodModel.Update(ctx, food); err != nil {
+				return nil, fmt.Errorf("更新美食数据失败: %w", err)
+			}
 
-		// 2. 查询更新后的美食信息（确保数据完整性）
-		var err error
-		updatedFood, err = s.foodModel.FindOne(ctx, food.Id)
-		if err != nil {
-			return nil, fmt.Errorf("查询更新后的美食信息失败: %w", err)
-		}
+			// 2. 查询更新后的美食信息（确保数据完整性）
+			var err error
+			updatedFood, err = s.foodModel.FindOne(ctx, food.Id)
+			if err != nil {
+				return nil, fmt.Errorf("查询更新后的美食信息失败: %w", err)
+			}
 
-		// 3. 返回更新后的数据，用于直接更新缓存（而不是删除）
-		return ToFoodDTO(updatedFood), nil
-	}, s.cacheOpt)
+			// 3. 返回更新后的数据，用于直接更新缓存（而不是删除）
+			return ToFoodDTO(updatedFood), nil
+		}, s.cacheOpt)
+	})
 
 	if err != nil {
 		return nil, err
@@ -241,39 +239,42 @@ func (s *FoodCacheService) GetMyFoodPage(ctx context.Context, userId int64, page
 	pageKey := fmt.Sprintf(FoodMyPageKeyFmt, userId, page)
 	totalKey := fmt.Sprintf(FoodMyTotalKeyFmt, userId)
 	var pageCache MyFoodPageCache
+	lockKey := fmt.Sprintf(FoodUpdateLockKeyFmt, userId)
 
-	// 使用 GetWithLoader 按需构建缓存，内置防击穿 + 自动续期
-	err := s.cache.GetWithLoader(ctx, pageKey, &pageCache, func() (interface{}, error) {
-		foods, total, err := s.foodModel.FindListByUserId(ctx, userId, page, pageSize)
-		if err != nil {
-			return nil, err
-		}
-
-		result := MyFoodPageCache{
-			List:  make([]FoodDTO, 0, len(foods)),
-			Total: total, // 默认使用数据库返回的总数（首次）
-		}
-
-		for _, f := range foods {
-			if f == nil {
-				continue
+	err := s.lock.ExecuteWithLock(ctx, lockKey, 5*time.Second, 2*time.Second, func() error {
+		// 使用 GetWithLoader 按需构建缓存，内置防击穿 + 自动续期
+		return s.cache.GetWithLoader(ctx, pageKey, &pageCache, func() (interface{}, error) {
+			foods, total, err := s.foodModel.FindListByUserId(ctx, userId, page, pageSize)
+			if err != nil {
+				return nil, err
 			}
-			if dto := ToFoodDTO(f); dto != nil {
-				result.List = append(result.List, *dto)
+
+			result := MyFoodPageCache{
+				List:  make([]FoodDTO, 0, len(foods)),
+				Total: total, // 默认使用数据库返回的总数（首次）
 			}
-		}
 
-		// 如果已有总数自增缓存，则覆盖为自增值；否则写入自增总数
-		var cachedTotal int64
-		if err := s.cache.Get(ctx, totalKey, &cachedTotal); err == nil {
-			result.Total = cachedTotal
-		} else {
-			// 初始化总数缓存，过期时间与分页一致
-			_ = s.cache.Set(ctx, totalKey, total, s.cacheOpt.BaseExpiry)
-		}
+			for _, f := range foods {
+				if f == nil {
+					continue
+				}
+				if dto := ToFoodDTO(f); dto != nil {
+					result.List = append(result.List, *dto)
+				}
+			}
 
-		return result, nil
-	}, s.cacheOpt)
+			// 如果已有总数自增缓存，则覆盖为自增值；否则写入自增总数
+			var cachedTotal int64
+			if err := s.cache.Get(ctx, totalKey, &cachedTotal); err == nil {
+				result.Total = cachedTotal
+			} else {
+				// 初始化总数缓存，过期时间与分页一致
+				_ = s.cache.Set(ctx, totalKey, total, s.cacheOpt.BaseExpiry)
+			}
+
+			return result, nil
+		}, s.cacheOpt)
+	})
 
 	if err != nil {
 		if errors.Is(err, errcode.CacheNotFound) {
