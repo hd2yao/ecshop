@@ -11,11 +11,12 @@ import (
 
 // Response 响应结构
 type Response struct {
-	ctx  context.Context
-	w    http.ResponseWriter
-	Code int         `json:"code"`
-	Msg  string      `json:"msg"`
-	Data interface{} `json:"data,omitempty"`
+	ctx        context.Context
+	w          http.ResponseWriter
+	Code       int         `json:"code"`
+	Msg        string      `json:"msg"`
+	Data       interface{} `json:"data,omitempty"`
+	Pagination *Pagination `json:"pagination,omitempty"`
 }
 
 // NewResponse 创建响应实例
@@ -24,6 +25,12 @@ func NewResponse(ctx context.Context, w http.ResponseWriter) *Response {
 		ctx: ctx,
 		w:   w,
 	}
+}
+
+// SetPagination 设置分页信息
+func (r *Response) SetPagination(pagination *Pagination) *Response {
+	r.Pagination = pagination
+	return r
 }
 
 // Success 带数据的成功响应

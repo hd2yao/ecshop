@@ -182,3 +182,53 @@ services:
     networks:
       - backend
     restart: always
+
+  rocketmq-namesrv:
+    build:
+      context: ./rocketmq
+    container_name: rocketmq-namesrv
+    environment:
+      - TZ=${TZ}
+    ports:
+      - "${ROCKETMQ_NAMESRV_PORT}:9876"              # NameServer 端口
+    volumes:
+      - ${DATA_PATH_HOST}/rocketmq/namesrv/logs:/home/rocketmq/logs
+    networks:
+      - backend
+    restart: always
+
+  rocketmq-broker:
+    build:
+      context: ./rocketmq-broker
+    container_name: rocketmq-broker
+    environment:
+      - TZ=${TZ}
+      - NAMESRV_ADDR=rocketmq-namesrv:9876            # NameServer 地址
+    ports:
+      - "${ROCKETMQ_BROKER_PORT}:10911"               # Broker 端口
+      - "${ROCKETMQ_BROKER_VIP_PORT}:10912"           # Broker VIP 端口
+    volumes:
+      - ${DATA_PATH_HOST}/rocketmq/broker/logs:/home/rocketmq/logs
+      - ${DATA_PATH_HOST}/rocketmq/broker/store:/home/rocketmq/store
+      - ./rocketmq-broker/broker.conf:/home/rocketmq/rocketmq-5.1.4/conf/broker.conf
+    depends_on:
+      - rocketmq-namesrv                             # 依赖 NameServer
+    networks:
+      - backend
+    restart: always
+
+  rocketmq-console:
+    build:
+      context: ./rocketmq-console
+    container_name: rocketmq-console
+    environment:
+      - TZ=${TZ}
+      - ROCKETMQ_CONFIG_NAMESRVADDR=${ROCKETMQ_CONSOLE_CONNECT_HOST}:${ROCKETMQ_CONSOLE_CONNECT_PORT}  # NameServer 地址
+      - SERVER_PORT=8082                                     # Dashboard 默认使用 8082
+    ports:
+      - "${ROCKETMQ_CONSOLE_PORT}:8082"               # Console 端口
+    depends_on:
+      - rocketmq-namesrv                             # 依赖 NameServer
+    networks:
+      - backend
+    restart: always

@@ -11,7 +11,7 @@ import (
 
 	"github.com/hd2yao/ecshop/common/errcode"
 	redisPool "github.com/hd2yao/ecshop/common/redis"
-	"github.com/hd2yao/ecshop/common/utils"
+	"github.com/hd2yao/ecshop/common/utils/jwt"
 	"github.com/hd2yao/ecshop/user/model"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"

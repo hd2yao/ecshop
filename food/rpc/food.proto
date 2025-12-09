@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package food;
+
+option go_package = "./food";
+
+// 美食服务
+service Food {
+  // 查询单个美食基础信息
+  rpc GetFood(GetFoodReq) returns (GetFoodResp);
+  // 查询我的美食列表
+  rpc GetMyFoodList(GetMyFoodListReq) returns (GetMyFoodListResp);
+  // 新增/修改美食信息
+  rpc CreateOrUpdateFood(CreateOrUpdateFoodReq) returns (CreateOrUpdateFoodResp);
+}
+
+// 美食步骤详情
+message FoodStepDetail {
+  string step = 1;           // 步骤名称，如 "步骤1"
+  string step_img_url = 2;   // 步骤图片URL（对应 JSON 中的 stepImgUrl 或 img）
+  string step_content = 3;   // 步骤内容（对应 JSON 中的 stepContent 或 content）
+}
+
+// 美食清单项
+message FoodListItem {
+  string recipes_tag = 1;    // 食材分类，如 "菜"、"肉"、"调味品"
+  string recipes_name = 2;   // 食材名称
+  string recipes_specs = 3;  // 食材规格/数量，如 "1500g"
+}
+
+// 美食信息
+message FoodInfo {
+  int64 id = 1;
+  int64 user_id = 2;
+  string food_name = 3;
+  string food_des = 4;
+  int32 food_cate_tag = 5;
+  string food_url = 6;
+  string food_video_url = 7;
+  int32 food_time = 8;
+  int32 food_difficulty = 9;
+  repeated FoodStepDetail food_detail = 10; // 美食制作详情（结构化数据）
+  repeated FoodListItem food_list = 11;      // 美食清单（结构化数据）
+  int32 food_status = 12;
+  repeated int64 sku_ids = 13;               // 美食关联的商品ids（结构化数据）
+  string food_createtime = 14;
+  string food_updatetime = 15;
+}
+
+// 获取美食详情
+message GetFoodReq {
+  int64 food_id = 1;
+}
+
+message GetFoodResp {
+  int32 code = 1;
+  string message = 2;
+  FoodInfo food_info = 3;
+}
+
+// 查询我的美食列表
+message GetMyFoodListReq {
+  int64 user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message GetMyFoodListResp {
+  int32 code = 1;
+  string message = 2;
+  int32 total = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+  repeated FoodInfo food_list = 6;
+}
+
+// 新增/修改美食信息
+message CreateOrUpdateFoodReq {
+  int64 food_id = 1; // 如果为0或未提供，则为新增；否则为修改
+  int64 user_id = 2;
+  string food_name = 3;
+  string food_des = 4;
+  int32 food_cate_tag = 5;
+  string food_url = 6;
+  string food_video_url = 7;
+  int32 food_time = 8;
+  int32 food_difficulty = 9;
+  repeated FoodStepDetail food_detail = 10; // 美食制作详情（结构化数据）
+  repeated FoodListItem food_list = 11;      // 美食清单（结构化数据）
+  repeated int64 sku_ids = 12;               // 美食关联的商品ids（结构化数据，可选）
+}
+
+message CreateOrUpdateFoodResp {
+  int32 code = 1;
+  string message = 2;
+  int64 food_id = 3; // 新增或修改的美食ID
+  FoodInfo food_info = 4; // 美食信息
+}

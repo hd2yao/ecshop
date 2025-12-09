@@ -90,8 +90,7 @@ func NewRedisCache(module, business string) *RedisCache {
 //   - 串行转并发：使用非阻塞锁，只有一个线程加载数据，其他线程轮询等待缓存更新
 //
 // 适用场景：需要保证数据库和缓存强一致性的场景（如用户信息、账户设置）
-// 优化说明：当缓存过期时，只有一个线程获取锁并加载数据，其他线程不等待锁，
-//           而是轮询检查缓存是否已更新，实现从"串行"到"并发"的性能提升
+// 优化说明：当缓存过期时，只有一个线程获取锁并加载数据，其他线程不等待锁，而是轮询检查缓存是否已更新，实现从"串行"到"并发"的性能提升
 func (c *RedisCache) GetWithLoader(
 	ctx context.Context,
 	key string,
@@ -185,16 +184,18 @@ func (c *RedisCache) GetWithLoader(
 	return c.waitForCacheUpdate(ctx, cacheKey, result, opt)
 }
 
-// UpdateWithMutex 在分布式锁保护下更新缓存和数据库
-//
+// UpdateWithMutex 更新数据并直接更新缓存（带分布式锁）
 // 用于写操作，保证缓存和数据库的强一致性
 // 使用与 GetWithLoader 相同的互斥锁，保证读写互斥
 //
-// 使用场景：更新用户信息、修改订单状态等需要强一致性的写操作
+// 参数说明：
+//   - updater: 更新数据库的函数，返回更新后的数据（用于更新缓存），如果返回 nil 则删除缓存
+//   - 立即更新缓存: 适用于读多写少场景
+//   - 延迟更新缓存(cache aside): 删除缓存，让下次读取时重新加载
 func (c *RedisCache) UpdateWithMutex(
 	ctx context.Context,
 	key string,
-	updater func() error,
+	updater func() (interface{}, error), // 返回更新后的数据
 	opt *CacheOption,
 ) error {
 	if opt == nil {
@@ -205,14 +206,25 @@ func (c *RedisCache) UpdateWithMutex(
 
 	// 使用分布式锁保证读写互斥
 	return c.lockExecutor.ExecuteWithLock(ctx, lockKey, 10*time.Second, 3*time.Second, func() error {
-		// 执行更新操作（更新数据库）
-		if err := updater(); err != nil {
+		// 执行更新操作（更新数据库），获取更新后的数据
+		updatedData, err := updater()
+		if err != nil {
 			return fmt.Errorf("更新数据失败: %w", err)
 		}
 
-		// 删除缓存，让下次读取时重新加载最新数据
-		cacheKey := c.keyBuilder.BuildKey(key)
-		_, _ = c.client.DelCtx(ctx, cacheKey)
+		// 如果返回了数据，直接更新缓存；否则删除缓存
+		if updatedData != nil {
+			// 计算过期时间：基础过期时间 + 随机时间（防止缓存雪崩）
+			expiry := c.calculateExpiry(opt)
+			if err := c.Set(ctx, key, updatedData, expiry); err != nil {
+				// 缓存写入失败不影响主流程，只记录日志
+				// 这里不返回错误，因为数据库已经成功写入
+			}
+		} else {
+			// 如果没有返回数据，删除缓存，让下次读取时重新加载
+			cacheKey := c.keyBuilder.BuildKey(key)
+			_, _ = c.client.DelCtx(ctx, cacheKey)
+		}
 
 		return nil
 	})

@@ -257,67 +257,65 @@ func (s *UserCacheService) CreateUser(ctx context.Context, user *User) error {
 func (s *UserCacheService) UpdateUser(ctx context.Context, user *User) error {
 	cacheKey := fmt.Sprintf("id:%d", user.Id)
 
-	return s.cache.UpdateWithMutex(ctx, cacheKey, func() error {
+	return s.cache.UpdateWithMutex(ctx, cacheKey, func() (interface{}, error) {
 		// 更新数据库
 		if err := s.userModel.Update(ctx, user); err != nil {
-			return err
+			return nil, err
 		}
 
 		// 删除相关缓存
 		s.invalidateUserCache(ctx, user.Id)
 
-		return nil
+		return nil, nil
 	}, s.cacheOpt)
 }
 
 // UpdateUserWithCache 更新用户信息并刷新缓存
-// 采用先更新数据库，再更新缓存的策略
+// 采用先更新数据库，再查询完整数据，最后更新缓存的策略
 func (s *UserCacheService) UpdateUserWithCache(ctx context.Context, user *User) error {
 	cacheKey := fmt.Sprintf("id:%d", user.Id)
 
-	return s.cache.UpdateWithMutex(ctx, cacheKey, func() error {
-		// 先查询旧数据，用于清理旧的索引缓存
-		oldUser, err := s.userModel.FindOne(ctx, user.Id)
-		if err != nil {
-			return err
-		}
+	// 先查询旧数据，用于清理旧的索引缓存（在锁外查询，减少锁持有时间）
+	oldUser, err := s.userModel.FindOne(ctx, user.Id)
+	if err != nil {
+		return err
+	}
 
-		// 更新数据库
+	// 使用 UpdateWithMutex 保证并发安全，并直接更新缓存
+	return s.cache.UpdateWithMutex(ctx, cacheKey, func() (interface{}, error) {
+		// 1. 更新数据库
 		if err := s.userModel.Update(ctx, user); err != nil {
-			return err
+			return nil, err
 		}
 
-		// 删除旧的索引缓存
-		if oldUser.Mail.Valid && oldUser.Mail.String != "" {
+		// 2. 查询更新后的完整用户信息（确保数据完整性，包括数据库自动更新的字段）
+		updatedUser, err := s.userModel.FindOne(ctx, user.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		// 3. 删除旧的索引缓存
+		if oldUser.Mail.Valid && oldUser.Mail.String != "" &&
+			(!updatedUser.Mail.Valid || updatedUser.Mail.String != oldUser.Mail.String) {
 			mailKey := fmt.Sprintf("mail:%s", oldUser.Mail.String)
 			_ = s.cache.Delete(ctx, mailKey)
 		}
-		if oldUser.Phone.Valid && oldUser.Phone.String != "" {
-			phoneKey := fmt.Sprintf("phone:%s", oldUser.Phone.String)
-			_ = s.cache.Delete(ctx, phoneKey)
+
+		// 4. 返回更新后的完整数据，用于更新主缓存（ID缓存）
+		userDTO := toUserDTO(updatedUser)
+		if userDTO == nil {
+			return nil, nil
 		}
 
-		// 设置新缓存
-		userDTO := toUserDTO(user)
-		if userDTO != nil {
-			// 按 ID 缓存
-			idKey := fmt.Sprintf("id:%d", user.Id)
-			_ = s.cache.Set(ctx, idKey, userDTO, s.cacheOpt.BaseExpiry+s.cacheOpt.RandomExpiry)
-
-			// 按邮箱缓存
-			if user.Mail.Valid && user.Mail.String != "" {
-				mailKey := fmt.Sprintf("mail:%s", user.Mail.String)
-				_ = s.cache.Set(ctx, mailKey, userDTO, s.cacheOpt.BaseExpiry+s.cacheOpt.RandomExpiry)
-			}
-
-			// 按手机号缓存
-			if user.Phone.Valid && user.Phone.String != "" {
-				phoneKey := fmt.Sprintf("phone:%s", user.Phone.String)
-				_ = s.cache.Set(ctx, phoneKey, userDTO, s.cacheOpt.BaseExpiry+s.cacheOpt.RandomExpiry)
-			}
+		// 5. 更新其他索引缓存（邮箱、手机号）
+		// 注意：ID缓存由 UpdateWithMutex 自动更新，这里只更新其他索引
+		if updatedUser.Mail.Valid && updatedUser.Mail.String != "" {
+			mailKey := fmt.Sprintf("mail:%s", updatedUser.Mail.String)
+			_ = s.cache.Set(ctx, mailKey, userDTO, s.cacheOpt.BaseExpiry+s.cacheOpt.RandomExpiry)
 		}
 
-		return nil
+		// 返回数据用于更新主缓存（ID缓存）
+		return userDTO, nil
 	}, s.cacheOpt)
 }
 

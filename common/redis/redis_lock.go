@@ -138,35 +138,6 @@ func (e *LockExecutor) ExecuteWithLock(
 	return fn()
 }
 
-// ExecuteWithTryLock 尝试在分布式锁保护下执行函数（非阻塞）
-//
-// 参数：
-//   - lockKey: 锁的键名
-//   - expiry: 锁的过期时间
-//   - fn: 要执行的业务逻辑函数
-//   - opts: 可选配置（如 WithWatchDog()）
-//
-// 返回值：
-//   - executed: 是否执行了函数
-//   - err: 执行过程中的错误
-//
-// 特点：
-//   - 非阻塞，获取不到锁立即返回
-//   - 自动处理加锁和解锁
-//   - 适合高并发场景，避免线程排队
-//
-// 使用场景：防止重复操作、高并发读场景等
-//
-// 示例：
-//
-//	executor := NewLockExecutor()
-//	executed, err := executor.ExecuteWithTryLock(ctx, "order:123", 10*time.Second, func() error {
-//	    // 创建订单
-//	    return createOrder()
-//	})
-//	if !executed {
-//	    return errors.New("请勿重复提交")
-//	}
 func (e *LockExecutor) ExecuteWithTryLock(
 	ctx context.Context,
 	lockKey string,
