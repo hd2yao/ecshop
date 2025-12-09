@@ -86,8 +86,20 @@ func (p *DefaultProducer) Start() error {
 		return fmt.Errorf("生产者已经启动")
 	}
 
+	nameServers := semicolonSplit(p.config.NameServer)
+	// 解析主机名为 IP 地址
+	resolvedServers := make([]string, 0, len(nameServers))
+	for _, addr := range nameServers {
+		resolved := resolveNameServerAddress(addr)
+		resolvedServers = append(resolvedServers, resolved)
+		if resolved != addr {
+			p.logger.Infof("NameServer 地址解析: %s -> %s", addr, resolved)
+		}
+	}
+	p.logger.Infof("RocketMQ NameServer 地址: %v (解析后: %v)", nameServers, resolvedServers)
+
 	opts := []producer.Option{
-		producer.WithNameServer(semicolonSplit(p.config.NameServer)),
+		producer.WithNameServer(resolvedServers),
 		producer.WithGroupName(p.config.Producer.GroupName),
 		producer.WithRetry(p.config.Producer.RetryTimes),
 		producer.WithSendMsgTimeout(time.Duration(p.config.Producer.SendMsgTimeout) * time.Millisecond),

@@ -164,8 +164,20 @@ func (c *DefaultConsumer) Start() error {
 		return fmt.Errorf("没有订阅任何主题，请先调用 Subscribe()")
 	}
 
+	nameServers := semicolonSplit(c.config.NameServer)
+	// 解析主机名为 IP 地址
+	resolvedServers := make([]string, 0, len(nameServers))
+	for _, addr := range nameServers {
+		resolved := resolveNameServerAddress(addr)
+		resolvedServers = append(resolvedServers, resolved)
+		if resolved != addr {
+			c.logger.Infof("NameServer 地址解析: %s -> %s", addr, resolved)
+		}
+	}
+	c.logger.Infof("RocketMQ NameServer 地址: %v (解析后: %v)", nameServers, resolvedServers)
+
 	opts := []consumer.Option{
-		consumer.WithNameServer(semicolonSplit(c.config.NameServer)),
+		consumer.WithNameServer(resolvedServers),
 		consumer.WithGroupName(c.config.Consumer.GroupName),
 		consumer.WithConsumerModel(toConsumeModel(c.config.Consumer.MessageModel)),
 		consumer.WithConsumeMessageBatchMaxSize(c.config.Consumer.ConsumeMessageBatchMaxSize),
@@ -173,7 +185,7 @@ func (c *DefaultConsumer) Start() error {
 	}
 	cons, err := rmq.NewPushConsumer(opts...)
 	if err != nil {
-		return fmt.Errorf("创建消费者失败: %w", err)
+		return fmt.Errorf("创建消费者失败: %w (NameServer: %v)", err, nameServers)
 	}
 
 	for topic, sub := range c.subscribes {

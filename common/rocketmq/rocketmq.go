@@ -3,6 +3,8 @@ package rocketmq
 import (
 	"context"
 	"fmt"
+	"net"
+	"strings"
 	"sync"
 )
 
@@ -176,5 +178,41 @@ func (r *RocketMQ) Shutdown() error {
 	}
 
 	return nil
+}
+
+// resolveNameServerAddress 解析 NameServer 地址，将主机名转换为 IP 地址
+func resolveNameServerAddress(addr string) string {
+	// 如果已经是 IP 地址格式，直接返回
+	if net.ParseIP(strings.Split(addr, ":")[0]) != nil {
+		return addr
+	}
+
+	// 尝试解析主机名
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		// 如果解析失败，返回原地址
+		return addr
+	}
+
+	// 解析主机名到 IP
+	ips, err := net.LookupIP(host)
+	if err != nil || len(ips) == 0 {
+		// 如果解析失败，返回原地址
+		return addr
+	}
+
+	// 使用第一个 IPv4 地址
+	for _, ip := range ips {
+		if ipv4 := ip.To4(); ipv4 != nil {
+			return net.JoinHostPort(ipv4.String(), port)
+		}
+	}
+
+	// 如果没有 IPv4，使用第一个地址
+	if len(ips) > 0 {
+		return net.JoinHostPort(ips[0].String(), port)
+	}
+
+	return addr
 }
 
