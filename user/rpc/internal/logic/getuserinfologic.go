@@ -79,19 +79,30 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.GetUserInfoReq) (*user.GetUserIn
 		createTime = userDTO.CreateTime.Format("2006-01-02 15:04:05")
 	}
 
-	// 3. 返回用户信息
+	// 3. 获取关注数和粉丝数（带缓存）
+	followCount, followerCount, err := l.svcCtx.GetFollowStat(l.ctx, in.UserId)
+	if err != nil {
+		l.Errorf("获取关注统计失败: %v", err)
+		// 关注统计获取失败不影响用户信息返回，使用默认值 0
+		followCount = 0
+		followerCount = 0
+	}
+
+	// 4. 返回用户信息
 	return &user.GetUserInfoResp{
 		Code:    int32(errcode.Success.Code()),
 		Message: errcode.Success.Msg(),
 		UserInfo: &user.UserInfo{
-			Id:         int64(userDTO.Id),
-			Name:       userDTO.Name,
-			Avatar:     userDTO.Avatar,
-			Email:      userDTO.Mail,
-			Phone:      userDTO.Phone,
-			Sex:        int32(userDTO.Sex),
-			Points:     int32(userDTO.Points),
-			CreateTime: createTime,
+			Id:            int64(userDTO.Id),
+			Name:          userDTO.Name,
+			Avatar:        userDTO.Avatar,
+			Email:         userDTO.Mail,
+			Phone:         userDTO.Phone,
+			Sex:           int32(userDTO.Sex),
+			Points:        int32(userDTO.Points),
+			CreateTime:    createTime,
+			FollowCount:   followCount,
+			FollowerCount: followerCount,
 		},
 	}, nil
 }

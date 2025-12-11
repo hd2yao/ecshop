@@ -62,14 +62,16 @@ func (l *GetUserInfoLogic) GetUserInfo() (resp *types.GetUserInfoResponse, err e
 	// 4. 如果成功，填充用户信息
 	if rpcResp.Code == int32(errcode.Success.Code()) && rpcResp.UserInfo != nil {
 		resp.UserInfo = types.UserInfo{
-			Id:         rpcResp.UserInfo.Id,
-			Name:       rpcResp.UserInfo.Name,
-			Avatar:     rpcResp.UserInfo.Avatar,
-			Email:      rpcResp.UserInfo.Email,
-			Phone:      rpcResp.UserInfo.Phone,
-			Sex:        int(rpcResp.UserInfo.Sex),
-			Points:     int(rpcResp.UserInfo.Points),
-			CreateTime: rpcResp.UserInfo.CreateTime,
+			Id:           rpcResp.UserInfo.Id,
+			Name:         rpcResp.UserInfo.Name,
+			Avatar:       rpcResp.UserInfo.Avatar,
+			Email:        rpcResp.UserInfo.Email,
+			Phone:        rpcResp.UserInfo.Phone,
+			Sex:          int(rpcResp.UserInfo.Sex),
+			Points:       int(rpcResp.UserInfo.Points),
+			CreateTime:   rpcResp.UserInfo.CreateTime,
+			FollowCount:  rpcResp.UserInfo.FollowCount,
+			FollowerCount: rpcResp.UserInfo.FollowerCount,
 		}
 	}
 

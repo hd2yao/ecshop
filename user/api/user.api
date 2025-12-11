@@ -111,14 +111,16 @@ type (
 	}
 	// 用户信息
 	UserInfo {
-		Id         int64  `json:"id"`
-		Name       string `json:"name"`
-		Avatar     string `json:"avatar"`
-		Email      string `json:"email"`
-		Phone      string `json:"phone"`
-		Sex        int    `json:"sex"`
-		Points     int    `json:"points"`
-		CreateTime string `json:"create_time"`
+		Id            int64  `json:"id"`
+		Name          string `json:"name"`
+		Avatar        string `json:"avatar"`
+		Email         string `json:"email"`
+		Phone         string `json:"phone"`
+		Sex           int    `json:"sex"`
+		Points        int    `json:"points"`
+		CreateTime    string `json:"create_time"`
+		FollowCount   int64  `json:"follow_count"` // 关注数
+		FollowerCount int64  `json:"follower_count"` // 粉丝数
 	}
 )
 

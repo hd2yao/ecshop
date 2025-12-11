@@ -155,6 +155,8 @@ message UserInfo {
   int32 sex = 6;
   int32 points = 7;
   string create_time = 8;
+  int64 follow_count = 9;    // 关注数
+  int64 follower_count = 10; // 粉丝数
 }
 
 // Token 刷新相关
