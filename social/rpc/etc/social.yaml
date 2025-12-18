@@ -1,0 +1,47 @@
+Name: social.rpc
+ListenOn: 0.0.0.0:9003
+Etcd:
+  Hosts:
+  - etcd:2379
+  Key: social.rpc
+
+# 数据库配置
+DataSource: "admin:123456@tcp(mysql:3306)/ecshop?charset=utf8mb4&parseTime=true&loc=Local"
+
+# 统一的Redis配置（用于数据缓存和业务数据存储）
+CacheRedis:
+  - Host: redis:6379
+    Type: node
+    Pass:
+
+# RocketMQ 配置
+# 注意：如果在 Docker 容器内运行，使用 "rocketmq-namesrv:9876"
+# 如果在宿主机运行，使用 "127.0.0.1:9876" 或实际 IP
+RocketMQ:
+  name_server: "rocketmq-namesrv:9876"
+  producer:
+    group_name: "social_producer_group"
+    send_msg_timeout: 3000
+    max_message_size: 4194304
+    compress_msg_body_over_howmuch: 4096
+    compress_level: 5
+    retry_times: 2
+    enable_msg_trace: false
+    vip_channel_enabled: false
+  consumer:
+    group_name: "social_consumer_group"
+    message_model: "CLUSTERING"
+    consume_from_where: "CONSUME_FROM_LAST_OFFSET"
+    consume_thread_min: 20
+    consume_thread_max: 20
+    consume_message_batch_max_size: 1
+    max_reconsume_times: 16
+    enable_msg_trace: false
+    vip_channel_enabled: false
+
+# 用户RPC服务配置（用于获取用户信息）
+UserRpc:
+  Etcd:
+    Hosts:
+    - etcd:2379
+    Key: user.rpc

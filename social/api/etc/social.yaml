@@ -1,0 +1,14 @@
+Name: social-api
+Host: 0.0.0.0
+Port: 8003
+Mode: dev
+
+# 日志格式配置 (default: go-zero默认格式, gin: Gin风格格式)
+LogFormat: gin
+
+# Social RPC服务配置
+SocialRpc:
+  Etcd:
+    Hosts:
+    - etcd:2379
+    Key: social.rpc

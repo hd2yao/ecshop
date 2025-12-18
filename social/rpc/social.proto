@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package social;
+option go_package = "./social";
+
+// 关注/取关/列表服务
+service Social {
+  // 博主关注
+  rpc BloggerFollow(FollowReq) returns (FollowResp);
+  // 博主取消关注
+  rpc BloggerUnfollow(FollowReq) returns (FollowResp);
+  // 粉丝关注（回关粉丝）
+  rpc FollowerFollow(FollowReq) returns (FollowResp);
+  // 粉丝取关（取消对粉丝的关注）
+  rpc FollowerUnfollow(FollowReq) returns (FollowResp);
+  // 粉丝列表（参数仅 user_id，0 或不填表示当前用户）
+  rpc FansList(FansListReq) returns (ListResp);
+  // 关注列表（无需 user_id，使用鉴权用户）
+  rpc FollowList(FollowListReq) returns (ListResp);
+}
+
+// 关注/取关请求
+// 注意：
+// - operator_id 由 API 层根据 token 解析后传入，表示操作者ID
+// - user_id 为目标用户ID（被关注/取关的用户）
+message FollowReq {
+  int64 operator_id = 1; // 操作者ID（当前登录用户）
+  int64 user_id     = 2; // 目标用户ID
+}
+
+// 通用响应
+message FollowResp {
+  int32 code    = 1;
+  string message = 2;
+}
+
+// 粉丝列表请求
+// - operator_id 为操作者ID（当前登录用户，用于计算 is_follow / is_mutual）
+// - user_id 为要查看粉丝列表的用户ID；为 0 时表示当前登录用户
+message FansListReq {
+  int64 operator_id = 1; // 操作者ID（当前登录用户）
+  int64 user_id     = 2; // 目标用户ID；0 表示当前用户
+  int64 page        = 3;
+  int64 size        = 4;
+}
+
+// 关注列表请求（仅分页）
+message FollowListReq {
+  int64 operator_id = 1; // 操作者ID（当前登录用户）
+  int64 page        = 2;
+  int64 size        = 3;
+}
+
+// 简要用户信息
+message UserBrief {
+  int64 user_id  = 1;
+  string name    = 2;
+  string avatar  = 3;
+  bool is_follow = 4; // 当前登录用户是否已关注
+  bool is_mutual = 5; // 是否互相关注
+}
+
+// 列表响应
+message ListResp {
+  int32 code     = 1;
+  string message = 2;
+  repeated UserBrief list = 3;
+  int64 total    = 4;
+  int64 page     = 5;
+  int64 size     = 6;
+}
+
