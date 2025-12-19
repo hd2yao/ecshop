@@ -39,10 +39,14 @@ type FoodCacheService struct {
 }
 
 // NewFoodCacheService 创建美食缓存服务
-func NewFoodCacheService(foodModel FoodModel) *FoodCacheService {
+// 如果 cache 为 nil，则创建新的 RedisCache 实例
+func NewFoodCacheService(foodModel FoodModel, cache *redisPool.RedisCache) *FoodCacheService {
+	if cache == nil {
+		cache = redisPool.NewRedisCache("food", "info")
+	}
 	return &FoodCacheService{
 		foodModel: foodModel,
-		cache:     redisPool.NewRedisCache("food", "info"),
+		cache:     cache,
 		cacheOpt:  redisPool.DefaultCacheOption(),
 		lock:      redisPool.NewLockExecutor(),
 	}

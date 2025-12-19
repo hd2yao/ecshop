@@ -35,10 +35,14 @@ const (
 )
 
 // NewUserCacheService 创建用户缓存服务
-func NewUserCacheService(userModel UserModel) *UserCacheService {
+// 如果 cache 为 nil，则创建新的 RedisCache 实例
+func NewUserCacheService(userModel UserModel, cache *redisPool.RedisCache) *UserCacheService {
+	if cache == nil {
+		cache = redisPool.NewRedisCache("user", "info")
+	}
 	return &UserCacheService{
 		userModel: userModel,
-		cache:     redisPool.NewRedisCache("user", "info"),
+		cache:     cache,
 		cacheOpt:  redisPool.DefaultCacheOption(),
 	}
 }

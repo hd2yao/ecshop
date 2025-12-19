@@ -2,13 +2,10 @@ package logic
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"github.com/hd2yao/ecshop/common/errcode"
-	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/social/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/social/rpc/types/social"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
@@ -51,72 +48,31 @@ func (l *FollowListLogic) FollowList(in *social.FollowListReq) (*social.ListResp
 
 	l.Infof("查询关注列表，用户ID: %d, 页码: %d, 每页: %d", userId, page, size)
 
-	// 3. 优先从 Redis list 读取
-	cache := redisPool.NewRedisCache("social", "follow_list")
-	followListKey := fmt.Sprintf("follow:%d", userId)
-
-	// 计算分页范围
-	start := (page - 1) * size
-	stop := start + size - 1
-
-	// 从 Redis list 读取
-	userIds, err := cache.LRange(l.ctx, followListKey, start, stop)
+	// 3. 从缓存服务获取关注列表
+	attentionIds, total, err := l.svcCtx.FollowCacheService.GetFollowList(l.ctx, userId, int32(page), int32(size))
 	if err != nil {
-		l.Errorf("从 Redis 读取关注列表失败: %v", err)
+		l.Errorf("获取关注列表失败: %v", err)
+		return &social.ListResp{
+			Code:    int32(errcode.CommonServerError.Code()),
+			Message: errcode.CommonServerError.Msg(),
+		}, nil
 	}
 
-	// 4. 如果 Redis 中没有数据，从数据库读取并写入 Redis
-	if len(userIds) == 0 {
-		offset := (page - 1) * size
-		attentions, total, err := l.svcCtx.UserAttentionModel.ListAttentions(l.ctx, userId, offset, size)
-		if err != nil {
-			l.Errorf("从数据库查询关注列表失败: %v", err)
-			return &social.ListResp{
-				Code:    int32(errcode.CommonServerError.Code()),
-				Message: errcode.CommonServerError.Msg(),
-			}, nil
-		}
-
-		// 写入 Redis list（从左侧插入，保持时间倒序）
-		if len(attentions) > 0 {
-			// 先清空列表（如果存在），然后重新构建
-			_ = cache.Delete(l.ctx, followListKey)
-			for i := len(attentions) - 1; i >= 0; i-- {
-				attentionIdStr := fmt.Sprintf("%d", attentions[i].AttentionId)
-				_, _ = cache.LPush(l.ctx, followListKey, attentionIdStr)
-			}
-			// 重新读取当前页
-			userIds, _ = cache.LRange(l.ctx, followListKey, start, stop)
-		} else {
-			// 没有数据，返回空列表
-			return &social.ListResp{
-				Code:    int32(errcode.Success.Code()),
-				Message: errcode.Success.Msg(),
-				List:    []*social.UserBrief{},
-				Total:   0,
-				Page:    page,
-				Size:    size,
-			}, nil
-		}
+	// 如果没有数据，返回空列表
+	if len(attentionIds) == 0 {
+		return &social.ListResp{
+			Code:    int32(errcode.Success.Code()),
+			Message: errcode.Success.Msg(),
+			List:    []*social.UserBrief{},
+			Total:   total,
+			Page:    page,
+			Size:    size,
+		}, nil
 	}
 
-	// 5. 获取总数（从 Redis list 长度或数据库）
-	total, err := cache.LLen(l.ctx, followListKey)
-	if err != nil || total == 0 {
-		// 如果 Redis 中没有总数，从数据库查询
-		_, total, err = l.svcCtx.UserAttentionModel.ListAttentions(l.ctx, userId, 0, 1)
-		if err != nil {
-			total = int64(len(userIds))
-		}
-	}
-
-	// 6. 批量获取用户信息并构建响应
-	userBriefs := make([]*social.UserBrief, 0, len(userIds))
-	for _, userIdStr := range userIds {
-		attentionId, err := strconv.ParseInt(userIdStr, 10, 64)
-		if err != nil {
-			continue
-		}
+	// 4. 批量获取用户信息并构建响应
+	userBriefs := make([]*social.UserBrief, 0, len(attentionIds))
+	for _, attentionId := range attentionIds {
 
 		// 调用 User RPC 获取用户信息
 		userInfo, err := l.svcCtx.UserRpc.GetUserInfo(l.ctx, &user.GetUserInfoReq{
@@ -143,7 +99,7 @@ func (l *FollowListLogic) FollowList(in *social.FollowListReq) (*social.ListResp
 		})
 	}
 
-	// 7. 返回结果
+	// 5. 返回结果
 	return &social.ListResp{
 		Code:    int32(errcode.Success.Code()),
 		Message: errcode.Success.Msg(),

@@ -10,7 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/hd2yao/ecshop/common/errcode"
-	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/common/utils/jwt"
 	"github.com/hd2yao/ecshop/user/model"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
@@ -119,8 +118,7 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 	}
 
 	// 7. 将 Refresh Token 存储到 Redis（7天过期）
-	refreshKey := redisPool.NewRedisKeyBuilder("user", "refresh_token").BuildKey(foundUser.Mail.String)
-	if err := redisPool.GetRedisClient().Setex(refreshKey, refreshToken, int(jwt.RefreshTokenExpiration.Seconds())); err != nil {
+	if err := l.svcCtx.RefreshTokenCache.Set(l.ctx, foundUser.Mail.String, refreshToken, jwt.RefreshTokenExpiration); err != nil {
 		l.Errorf("存储 refresh token 到 Redis 失败: %v", err)
 		// 不影响登录流程，只记录日志
 	}

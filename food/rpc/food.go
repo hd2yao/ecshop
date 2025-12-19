@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/hd2yao/ecshop/common/rocketmq"
+	"github.com/hd2yao/ecshop/food/model"
 	"github.com/hd2yao/ecshop/food/rpc/internal/config"
-	"github.com/hd2yao/ecshop/food/rpc/internal/logic"
 	"github.com/hd2yao/ecshop/food/rpc/internal/server"
 	"github.com/hd2yao/ecshop/food/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/food/rpc/types/food"
@@ -68,7 +68,7 @@ func startRocketMQConsumer(ctx *svc.ServiceContext) {
 	rmq := rocketmq.GetRocketMQ()
 
 	// 创建美食更新监听器
-	listener := logic.NewFoodUpdateListener(ctx)
+	listener := model.NewFoodUpdateListener(ctx.FoodModel, ctx.FoodCache)
 
 	// 订阅主题（使用标签过滤：create || update || delete）
 	selector := rocketmq.NewTagSelector("create || update || delete")

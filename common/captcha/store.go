@@ -1,17 +1,15 @@
 package captcha
 
 import (
+	"context"
 	"time"
-
-	"github.com/zeromicro/go-zero/core/stores/redis"
 
 	redisPool "github.com/hd2yao/ecshop/common/redis"
 )
 
 // CaptchaRedisStore 实现base64Captcha.Store接口的Redis存储
 type CaptchaRedisStore struct {
-	redis      *redis.Redis
-	keyBuilder *redisPool.RedisKeyBuilder
+	cache      *redisPool.RedisCache
 	expiration time.Duration
 }
 
@@ -21,27 +19,26 @@ func NewCaptchaRedisStore(module string, expiration time.Duration) *CaptchaRedis
 		expiration = 5 * time.Minute // 默认5分钟
 	}
 	return &CaptchaRedisStore{
-		redis:      redisPool.GetRedisClient(),
-		keyBuilder: redisPool.NewRedisKeyBuilder(module, "captcha"),
+		cache:      redisPool.NewRedisCache(module, "captcha"),
 		expiration: expiration,
 	}
 }
 
 // Set 存储验证码
 func (s *CaptchaRedisStore) Set(id, value string) error {
-	key := s.keyBuilder.BuildKey(id)
-	return s.redis.Setex(key, value, int(s.expiration.Seconds()))
+	ctx := context.Background()
+	return s.cache.Set(ctx, id, value, s.expiration)
 }
 
 // Get 获取验证码
 func (s *CaptchaRedisStore) Get(id string, clear bool) string {
-	key := s.keyBuilder.BuildKey(id)
-	val, err := s.redis.Get(key)
-	if err != nil {
+	ctx := context.Background()
+	var val string
+	if err := s.cache.Get(ctx, id, &val); err != nil {
 		return ""
 	}
 	if clear {
-		s.redis.Del(key)
+		_ = s.cache.Delete(ctx, id)
 	}
 	return val
 }

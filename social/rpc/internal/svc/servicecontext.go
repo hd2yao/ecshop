@@ -18,6 +18,9 @@ type ServiceContext struct {
 	UserFollowerModel  model.UserFollowerModel
 	UserRelationModel  model.UserRelationModel
 	UserRpc            userclient.User
+	FollowListCache    *redisPool.RedisCache
+	FansListCache      *redisPool.RedisCache
+	FollowCacheService *model.FollowCacheService
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -40,11 +43,26 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	// 初始化 User RPC 客户端
 	userRpc := userclient.NewUser(zrpc.MustNewClient(c.UserRpc))
 
+	// 初始化 Redis 缓存
+	followListCache := redisPool.NewRedisCache("social", "follow_list")
+	fansListCache := redisPool.NewRedisCache("social", "fans_list")
+
+	// 初始化关注/粉丝列表缓存服务
+	followCacheService := model.NewFollowCacheService(
+		userAttentionModel,
+		userFollowerModel,
+		followListCache,
+		fansListCache,
+	)
+
 	return &ServiceContext{
 		Config:             c,
 		UserAttentionModel: userAttentionModel,
 		UserFollowerModel:  userFollowerModel,
 		UserRelationModel:  userRelationModel,
 		UserRpc:            userRpc,
+		FollowListCache:    followListCache,
+		FansListCache:      fansListCache,
+		FollowCacheService: followCacheService,
 	}
 }

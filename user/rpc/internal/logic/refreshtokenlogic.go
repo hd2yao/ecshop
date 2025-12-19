@@ -9,7 +9,6 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"github.com/hd2yao/ecshop/common/errcode"
-	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/common/utils/jwt"
 	"github.com/hd2yao/ecshop/user/model"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
@@ -64,9 +63,8 @@ func (l *RefreshTokenLogic) RefreshToken(in *user.RefreshTokenReq) (*user.Refres
 	}
 
 	// 3. 从 Redis 验证 Refresh Token 是否有效
-	refreshKey := redisPool.NewRedisKeyBuilder("user", "refresh_token").BuildKey(claims.Email)
-	storedToken, err := redisPool.GetRedisClient().Get(refreshKey)
-	if err != nil || storedToken != in.RefreshToken {
+	var storedToken string
+	if err := l.svcCtx.RefreshTokenCache.Get(l.ctx, claims.Email, &storedToken); err != nil || storedToken != in.RefreshToken {
 		l.Errorf("Refresh Token 在 Redis 中不存在或不匹配: userId=%d, email=%s", claims.UserID, claims.Email)
 		return &user.RefreshTokenResp{
 			Code:    int32(errcode.UserRefreshTokenInvalid.Code()),
@@ -112,7 +110,7 @@ func (l *RefreshTokenLogic) RefreshToken(in *user.RefreshTokenReq) (*user.Refres
 	}
 
 	// 7. 更新 Redis 中的 Refresh Token
-	if err := redisPool.GetRedisClient().Setex(refreshKey, newRefreshToken, int(jwt.RefreshTokenExpiration.Seconds())); err != nil {
+	if err := l.svcCtx.RefreshTokenCache.Set(l.ctx, claims.Email, newRefreshToken, jwt.RefreshTokenExpiration); err != nil {
 		l.Errorf("更新 Redis 中的 Refresh Token 失败: %v", err)
 		// 不影响刷新流程，只记录日志
 	}

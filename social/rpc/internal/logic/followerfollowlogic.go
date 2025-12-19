@@ -2,13 +2,12 @@ package logic
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/common/rocketmq"
-	redisPool "github.com/hd2yao/ecshop/common/redis"
+	"github.com/hd2yao/ecshop/social/model"
 	"github.com/hd2yao/ecshop/social/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/social/rpc/types/social"
 )
@@ -56,33 +55,26 @@ func (l *FollowerFollowLogic) FollowerFollow(in *social.FollowReq) (*social.Foll
 
 	l.Infof("粉丝关注，粉丝：%d，博主：%d", operatorId, in.UserId)
 
-	// 4. 检查是否已经关注过（从 Redis list 中检查）
-	cache := redisPool.NewRedisCache("social", "fans_list")
-	fansListKey := fmt.Sprintf("fans:%d", in.UserId)
-	values, err := cache.LRange(l.ctx, fansListKey, 0, -1)
-	if err == nil {
-		operatorIdStr := fmt.Sprintf("%d", operatorId)
-		for _, v := range values {
-			if v == operatorIdStr {
-				l.Infof("粉丝关注，粉丝 uid：%d 已经存在列表中", operatorId)
-				return &social.FollowResp{
-					Code:    int32(errcode.CommonParamError.Code()),
-					Message: "已经关注过该用户",
-				}, nil
-			}
-		}
+	// 4. 检查是否已经关注过（从缓存中检查）
+	exists, err := l.svcCtx.FollowCacheService.CheckFansListContains(l.ctx, in.UserId, operatorId)
+	if err == nil && exists {
+		l.Infof("粉丝关注，粉丝 uid：%d 已经存在列表中", operatorId)
+		return &social.FollowResp{
+			Code:    int32(errcode.CommonParamError.Code()),
+			Message: "已经关注过该用户",
+		}, nil
 	}
 
 	// 5. 发布关注事件到 MQ
-	event := FollowEvent{
+	event := model.FollowEvent{
 		OperatorId: operatorId,
 		TargetId:   in.UserId,
-		Action:     FollowActionFollow,
-		Role:       FollowRoleFollower,
+		Action:     model.FollowActionFollow,
+		Role:       model.FollowRoleFollower,
 	}
 
 	rmq := rocketmq.GetRocketMQ()
-	_, err = rmq.SendMessage(l.ctx, MQTopicFollow, FollowRoleFollower, event)
+	_, err = rmq.SendMessage(l.ctx, model.MQTopicFollow, model.FollowRoleFollower, event)
 	if err != nil {
 		l.Errorf("发布粉丝关注事件失败: %v", err)
 		return &social.FollowResp{

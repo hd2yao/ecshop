@@ -14,7 +14,6 @@ import (
 
 	"github.com/hd2yao/ecshop/common/errcode"
 	"github.com/hd2yao/ecshop/common/oss"
-	redisPool "github.com/hd2yao/ecshop/common/redis"
 	"github.com/hd2yao/ecshop/user/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/user/rpc/types/user"
 )
@@ -107,8 +106,7 @@ func (l *UploadPreviewAvatarLogic) UploadPreviewAvatar(in *user.UploadPreviewAva
 		}, nil
 	}
 
-	Key := redisPool.NewRedisKeyBuilder("user", "preview_avatar").BuildKey(tempKey)
-	if err := redisPool.GetRedisClient().Setex(Key, result.Url, int(10*time.Minute.Seconds())); err != nil {
+	if err := l.svcCtx.PreviewAvatarCache.Set(l.ctx, tempKey, result.Url, 10*time.Minute); err != nil {
 		l.Errorf("保存临时信息失败: %v", err)
 		// 不影响上传结果，只记录日志
 	}

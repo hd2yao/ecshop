@@ -1,17 +1,15 @@
 package mail
 
 import (
+	"context"
 	"time"
-
-	"github.com/zeromicro/go-zero/core/stores/redis"
 
 	redisPool "github.com/hd2yao/ecshop/common/redis"
 )
 
 // MailCodeRedisStore 邮件验证码Redis存储
 type MailCodeRedisStore struct {
-	redis      *redis.Redis
-	keyBuilder *redisPool.RedisKeyBuilder
+	cache      *redisPool.RedisCache
 	expiration time.Duration
 }
 
@@ -21,27 +19,26 @@ func NewMailCodeRedisStore(module string, expiration time.Duration) *MailCodeRed
 		expiration = 10 * time.Minute // 默认10分钟，比图形验证码时间长一些
 	}
 	return &MailCodeRedisStore{
-		redis:      redisPool.GetRedisClient(),
-		keyBuilder: redisPool.NewRedisKeyBuilder(module, "mail"),
+		cache:      redisPool.NewRedisCache(module, "mail"),
 		expiration: expiration,
 	}
 }
 
 // Set 存储邮件验证码
 func (s *MailCodeRedisStore) Set(email, code string) error {
-	key := s.keyBuilder.BuildKey(email)
-	return s.redis.Setex(key, code, int(s.expiration.Seconds()))
+	ctx := context.Background()
+	return s.cache.Set(ctx, email, code, s.expiration)
 }
 
 // Get 获取邮件验证码
 func (s *MailCodeRedisStore) Get(email string, clear bool) string {
-	key := s.keyBuilder.BuildKey(email)
-	val, err := s.redis.Get(key)
-	if err != nil {
+	ctx := context.Background()
+	var val string
+	if err := s.cache.Get(ctx, email, &val); err != nil {
 		return ""
 	}
 	if clear {
-		s.redis.Del(key)
+		_ = s.cache.Delete(ctx, email)
 	}
 	return val
 }
@@ -54,16 +51,19 @@ func (s *MailCodeRedisStore) Verify(email, code string, clear bool) bool {
 
 // Exists 检查邮件验证码是否存在
 func (s *MailCodeRedisStore) Exists(email string) bool {
-	key := s.keyBuilder.BuildKey(email)
-	exists, _ := s.redis.Exists(key)
+	ctx := context.Background()
+	exists, _ := s.cache.Exists(ctx, email)
 	return exists
 }
 
 // GetTTL 获取验证码剩余有效时间
 func (s *MailCodeRedisStore) GetTTL(email string) time.Duration {
-	key := s.keyBuilder.BuildKey(email)
-	ttl, err := s.redis.Ttl(key)
+	ctx := context.Background()
+	ttl, err := s.cache.GetExpire(ctx, email)
 	if err != nil {
+		return 0
+	}
+	if ttl <= 0 {
 		return 0
 	}
 	return time.Duration(ttl) * time.Second

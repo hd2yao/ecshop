@@ -7,6 +7,8 @@ import (
 
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+
+	redisPool "github.com/hd2yao/ecshop/common/redis"
 )
 
 var _ FoodModel = (*customFoodModel)(nil)
@@ -29,12 +31,13 @@ type (
 )
 
 // NewFoodModel returns a model for the database table.
-func NewFoodModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) FoodModel {
+// 如果 foodCache 为 nil，则会在 NewFoodCacheService 中创建新的实例
+func NewFoodModel(conn sqlx.SqlConn, c cache.CacheConf, foodCache *redisPool.RedisCache, opts ...cache.Option) FoodModel {
 	model := &customFoodModel{
 		defaultFoodModel: newFoodModel(conn, c, opts...),
 	}
 	// 初始化缓存服务
-	model.cacheService = NewFoodCacheService(model)
+	model.cacheService = NewFoodCacheService(model, foodCache)
 	return model
 }
 

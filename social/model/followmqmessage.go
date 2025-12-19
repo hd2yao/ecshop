@@ -1,4 +1,4 @@
-package logic
+package model
 
 // 关注/取关事件定义
 const (

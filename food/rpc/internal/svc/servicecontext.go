@@ -13,6 +13,7 @@ import (
 type ServiceContext struct {
 	Config    config.Config
 	FoodModel model.FoodModel
+	FoodCache *redisPool.RedisCache
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -27,11 +28,15 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	// 初始化数据库连接
 	conn := sqlx.NewMysql(c.DataSource)
 
+	// 初始化 Redis 缓存
+	foodCache := redisPool.NewRedisCache("food", "info")
+
 	// 初始化美食模型（同时用于数据缓存和业务数据存储）
-	foodModel := model.NewFoodModel(conn, c.CacheRedis)
+	foodModel := model.NewFoodModel(conn, c.CacheRedis, foodCache)
 
 	return &ServiceContext{
 		Config:    c,
 		FoodModel: foodModel,
+		FoodCache: foodCache,
 	}
 }

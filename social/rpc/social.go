@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/hd2yao/ecshop/common/rocketmq"
+	"github.com/hd2yao/ecshop/social/model"
 	"github.com/hd2yao/ecshop/social/rpc/internal/config"
-	"github.com/hd2yao/ecshop/social/rpc/internal/logic"
 	"github.com/hd2yao/ecshop/social/rpc/internal/server"
 	"github.com/hd2yao/ecshop/social/rpc/internal/svc"
 	"github.com/hd2yao/ecshop/social/rpc/types/social"
@@ -61,12 +61,17 @@ func startRocketMQConsumer(ctx *svc.ServiceContext) {
 	rmq := rocketmq.GetRocketMQ()
 
 	// 创建关注/取关事件监听器
-	listener := logic.NewFollowEventListener(ctx)
+	listener := model.NewFollowEventListener(
+		ctx.UserAttentionModel,
+		ctx.UserFollowerModel,
+		ctx.UserRelationModel,
+		ctx.FollowCacheService,
+	)
 
 	// 订阅主题（使用标签过滤：blogger || follower）
 	selector := rocketmq.NewTagSelector("blogger || follower")
 	fmt.Println("正在订阅主题: social_follow")
-	if err := rmq.Subscribe(logic.MQTopicFollow, selector, listener); err != nil {
+	if err := rmq.Subscribe(model.MQTopicFollow, selector, listener); err != nil {
 		panic(fmt.Sprintf("订阅 RocketMQ 主题失败: %v", err))
 	}
 
