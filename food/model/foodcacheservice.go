@@ -323,8 +323,8 @@ func (s *FoodCacheService) sendFoodUpdateMessage(ctx context.Context, foodID, us
 		}
 
 		// 发送消息（异步发送，失败不影响主流程）
-		logx.Infof("美食 MQ 生产消息-准备发送: Topic=food_cache_update, Tag=update, foodID=%d, userID=%d", foodID, userID)
-		result, err := rocketMQ.SendMessage(context.Background(), "food_cache_update", "update", msg)
+		logx.Infof("美食 MQ 生产消息-准备发送: Topic=%s, Tag=%s, foodID=%d, userID=%d", MQTopicFoodUpdate, FoodTagUpdate, foodID, userID)
+		result, err := rocketMQ.SendMessage(context.Background(), MQTopicFoodUpdate, FoodTagUpdate, msg)
 		if err != nil {
 			// 记录日志，但不影响主流程
 			logx.Errorf("美食 MQ 生产消息-发送失败: foodID=%d, userID=%d, error=%v", foodID, userID, err)

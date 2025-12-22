@@ -71,9 +71,9 @@ func startRocketMQConsumer(ctx *svc.ServiceContext) {
 	listener := model.NewFoodUpdateListener(ctx.FoodModel, ctx.FoodCache)
 
 	// 订阅主题（使用标签过滤：create || update || delete）
-	selector := rocketmq.NewTagSelector("create || update || delete")
-	fmt.Println("正在订阅主题: food_cache_update")
-	if err := rmq.Subscribe("food_cache_update", selector, listener); err != nil {
+	selector := rocketmq.NewTagSelector(fmt.Sprintf("%s || %s || %s", model.FoodTagCreate, model.FoodTagUpdate, model.FoodTagDelete))
+	fmt.Printf("正在订阅主题: %s\n", model.MQTopicFoodUpdate)
+	if err := rmq.Subscribe(model.MQTopicFoodUpdate, selector, listener); err != nil {
 		panic(fmt.Sprintf("订阅 RocketMQ 主题失败: %v", err))
 	}
 
@@ -83,7 +83,7 @@ func startRocketMQConsumer(ctx *svc.ServiceContext) {
 		panic(fmt.Sprintf("启动 RocketMQ 消费者失败: %v", err))
 	}
 
-	fmt.Println("RocketMQ 消费者启动成功，已订阅主题: food_cache_update")
+	fmt.Printf("RocketMQ 消费者启动成功，已订阅主题: %s\n", model.MQTopicFoodUpdate)
 }
 
 // ensureTopicExists 确保 Topic 存在（通过发送一条消息来触发自动创建）
@@ -104,7 +104,7 @@ func ensureTopicExists(config rocketmq.Config) error {
 	}
 	
 	// 异步发送，不等待结果（因为这只是为了创建 Topic）
-	_ = rmq.SendMessageAsync(context.Background(), "food_cache_update", "init", initMsg, func(result *rocketmq.SendResult, err error) {
+	_ = rmq.SendMessageAsync(context.Background(), model.MQTopicFoodUpdate, model.FoodTagInit, initMsg, func(result *rocketmq.SendResult, err error) {
 		if err != nil {
 			fmt.Printf("Topic 初始化消息发送失败（可忽略）: %v\n", err)
 		} else {
