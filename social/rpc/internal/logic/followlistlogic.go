@@ -49,7 +49,7 @@ func (l *FollowListLogic) FollowList(in *social.FollowListReq) (*social.ListResp
 	l.Infof("查询关注列表，用户ID: %d, 页码: %d, 每页: %d", userId, page, size)
 
 	// 3. 从缓存服务获取关注列表
-	attentionIds, total, err := l.svcCtx.FollowCacheService.GetFollowList(l.ctx, userId, int32(page), int32(size))
+	attentionIds, total, err := l.svcCtx.FollowModel.CacheService().GetFollowList(l.ctx, userId, int32(page), int32(size))
 	if err != nil {
 		l.Errorf("获取关注列表失败: %v", err)
 		return &social.ListResp{
@@ -85,7 +85,7 @@ func (l *FollowListLogic) FollowList(in *social.FollowListReq) (*social.ListResp
 
 		// 判断是否互相关注（当前用户关注了该用户，且该用户也关注了当前用户）
 		isMutual := false
-		reverseAttention, err := l.svcCtx.UserAttentionModel.FindOneByUserAndAttention(l.ctx, attentionId, userId)
+		reverseAttention, err := l.svcCtx.FollowModel.UserAttentionModel().FindOneByUserAndAttention(l.ctx, attentionId, userId)
 		if err == nil && reverseAttention != nil && reverseAttention.IsDel == 0 {
 			isMutual = true
 		}

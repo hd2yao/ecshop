@@ -37,8 +37,8 @@ func (l *FollowerUnfollowLogic) FollowerUnfollow(in *social.FollowReq) (*social.
 	}
 	if in.UserId <= 0 {
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "目标用户ID无效",
+			Code:    int32(errcode.SocialTargetUserIdInvalid.Code()),
+			Message: errcode.SocialTargetUserIdInvalid.Msg(),
 		}, nil
 	}
 
@@ -48,20 +48,20 @@ func (l *FollowerUnfollowLogic) FollowerUnfollow(in *social.FollowReq) (*social.
 	// 3. 不能取关自己
 	if operatorId == in.UserId {
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "不能取关自己",
+			Code:    int32(errcode.SocialUnfollowSelfError.Code()),
+			Message: errcode.SocialUnfollowSelfError.Msg(),
 		}, nil
 	}
 
 	l.Infof("粉丝取关，粉丝：%d，博主：%d", operatorId, in.UserId)
 
 	// 4. 检查是否已经关注过（从缓存中检查）
-	exists, err := l.svcCtx.FollowCacheService.CheckFansListContains(l.ctx, in.UserId, operatorId)
+	exists, err := l.svcCtx.FollowModel.CacheService().CheckFansListContains(l.ctx, in.UserId, operatorId)
 	if err == nil && !exists {
 		l.Infof("粉丝取关，粉丝 uid：%d 已经不存在列表中，不可以取关", operatorId)
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "未关注该用户，无法取关",
+			Code:    int32(errcode.SocialUnfollowNotExists.Code()),
+			Message: errcode.SocialUnfollowNotExists.Msg(),
 		}, nil
 	}
 

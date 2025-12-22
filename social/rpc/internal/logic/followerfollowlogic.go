@@ -37,8 +37,8 @@ func (l *FollowerFollowLogic) FollowerFollow(in *social.FollowReq) (*social.Foll
 	}
 	if in.UserId <= 0 {
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "目标用户ID无效",
+			Code:    int32(errcode.SocialTargetUserIdInvalid.Code()),
+			Message: errcode.SocialTargetUserIdInvalid.Msg(),
 		}, nil
 	}
 
@@ -48,20 +48,20 @@ func (l *FollowerFollowLogic) FollowerFollow(in *social.FollowReq) (*social.Foll
 	// 3. 不能关注自己
 	if operatorId == in.UserId {
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "不能关注自己",
+			Code:    int32(errcode.SocialFollowSelfError.Code()),
+			Message: errcode.SocialFollowSelfError.Msg(),
 		}, nil
 	}
 
 	l.Infof("粉丝关注，粉丝：%d，博主：%d", operatorId, in.UserId)
 
 	// 4. 检查是否已经关注过（从缓存中检查）
-	exists, err := l.svcCtx.FollowCacheService.CheckFansListContains(l.ctx, in.UserId, operatorId)
+	exists, err := l.svcCtx.FollowModel.CacheService().CheckFansListContains(l.ctx, in.UserId, operatorId)
 	if err == nil && exists {
 		l.Infof("粉丝关注，粉丝 uid：%d 已经存在列表中", operatorId)
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "已经关注过该用户",
+			Code:    int32(errcode.SocialFollowAlreadyExists.Code()),
+			Message: errcode.SocialFollowAlreadyExists.Msg(),
 		}, nil
 	}
 

@@ -62,10 +62,10 @@ func startRocketMQConsumer(ctx *svc.ServiceContext) {
 
 	// 创建关注/取关事件监听器
 	listener := model.NewFollowEventListener(
-		ctx.UserAttentionModel,
-		ctx.UserFollowerModel,
-		ctx.UserRelationModel,
-		ctx.FollowCacheService,
+		ctx.FollowModel.UserAttentionModel(),
+		ctx.FollowModel.UserFollowerModel(),
+		ctx.FollowModel.UserRelationModel(),
+		ctx.FollowModel.CacheService(),
 	)
 
 	// 订阅主题（使用标签过滤：blogger || follower）

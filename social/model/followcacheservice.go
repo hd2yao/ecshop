@@ -42,7 +42,7 @@ func NewFollowCacheService(
 // GetFollowList 获取关注列表（带缓存）
 // 优先从 Redis list 读取，如果没有则从数据库加载并写入缓存
 func (s *FollowCacheService) GetFollowList(ctx context.Context, userId int64, page, size int32) ([]int64, int64, error) {
-	followListKey := fmt.Sprintf("follow:%d", userId)
+	followListKey := fmt.Sprintf("follow_%d", userId)
 
 	// 计算分页范围
 	start := (page - 1) * size
@@ -104,7 +104,7 @@ func (s *FollowCacheService) GetFollowList(ctx context.Context, userId int64, pa
 // GetFansList 获取粉丝列表（带缓存）
 // 优先从 Redis list 读取，如果没有则从数据库加载并写入缓存
 func (s *FollowCacheService) GetFansList(ctx context.Context, userId int64, page, size int32) ([]int64, int64, error) {
-	fansListKey := fmt.Sprintf("fans:%d", userId)
+	fansListKey := fmt.Sprintf("fans_%d", userId)
 
 	// 计算分页范围
 	start := (page - 1) * size
@@ -165,7 +165,7 @@ func (s *FollowCacheService) GetFansList(ctx context.Context, userId int64, page
 
 // AddToFollowList 添加用户到关注列表缓存（头插）
 func (s *FollowCacheService) AddToFollowList(ctx context.Context, userId, targetId int64) error {
-	followListKey := fmt.Sprintf("follow:%d", userId)
+	followListKey := fmt.Sprintf("follow_%d", userId)
 	targetIdStr := fmt.Sprintf("%d", targetId)
 	_, err := s.followListCache.LPush(ctx, followListKey, targetIdStr)
 	return err
@@ -173,13 +173,13 @@ func (s *FollowCacheService) AddToFollowList(ctx context.Context, userId, target
 
 // RemoveFromFollowList 从关注列表缓存中删除（删除整个列表，交给下次读重建）
 func (s *FollowCacheService) RemoveFromFollowList(ctx context.Context, userId int64) error {
-	followListKey := fmt.Sprintf("follow:%d", userId)
+	followListKey := fmt.Sprintf("follow_%d", userId)
 	return s.followListCache.Delete(ctx, followListKey)
 }
 
 // AddToFansList 添加用户到粉丝列表缓存（头插）
 func (s *FollowCacheService) AddToFansList(ctx context.Context, userId, followerId int64) error {
-	fansListKey := fmt.Sprintf("fans:%d", userId)
+	fansListKey := fmt.Sprintf("fans_%d", userId)
 	followerIdStr := fmt.Sprintf("%d", followerId)
 	_, err := s.fansListCache.LPush(ctx, fansListKey, followerIdStr)
 	return err
@@ -187,13 +187,13 @@ func (s *FollowCacheService) AddToFansList(ctx context.Context, userId, follower
 
 // RemoveFromFansList 从粉丝列表缓存中删除（删除整个列表，交给下次读重建）
 func (s *FollowCacheService) RemoveFromFansList(ctx context.Context, userId int64) error {
-	fansListKey := fmt.Sprintf("fans:%d", userId)
+	fansListKey := fmt.Sprintf("fans_%d", userId)
 	return s.fansListCache.Delete(ctx, fansListKey)
 }
 
 // CheckFollowListContains 检查关注列表缓存中是否包含指定用户
 func (s *FollowCacheService) CheckFollowListContains(ctx context.Context, userId, targetId int64) (bool, error) {
-	followListKey := fmt.Sprintf("follow:%d", userId)
+	followListKey := fmt.Sprintf("follow_%d", userId)
 	targetIdStr := fmt.Sprintf("%d", targetId)
 	values, err := s.followListCache.LRange(ctx, followListKey, 0, -1)
 	if err != nil {
@@ -209,7 +209,7 @@ func (s *FollowCacheService) CheckFollowListContains(ctx context.Context, userId
 
 // CheckFansListContains 检查粉丝列表缓存中是否包含指定用户
 func (s *FollowCacheService) CheckFansListContains(ctx context.Context, userId, followerId int64) (bool, error) {
-	fansListKey := fmt.Sprintf("fans:%d", userId)
+	fansListKey := fmt.Sprintf("fans_%d", userId)
 	followerIdStr := fmt.Sprintf("%d", followerId)
 	values, err := s.fansListCache.LRange(ctx, fansListKey, 0, -1)
 	if err != nil {

@@ -13,6 +13,7 @@ var codes = map[int]struct{}{}
  * 优惠券服务：510
  * 订单服务：610
  * 支付服务：710
+ * 社交服务：810，其中关注相关：8101 开头
  */
 
 /**
@@ -77,6 +78,17 @@ var (
 	UserRefreshTokenInvalid = newError(2103004, "Refresh Token 无效或已失效")
 )
 
+/**
+ * 社交微服务关注相关 8101 开头
+ */
+var (
+	SocialFollowSelfError      = newError(8101001, "不能关注自己")
+	SocialFollowAlreadyExists  = newError(8101002, "已经关注过该用户")
+	SocialUnfollowNotExists    = newError(8101003, "未关注该用户，无法取关")
+	SocialUnfollowSelfError    = newError(8101004, "不能取关自己")
+	SocialTargetUserIdInvalid  = newError(8101005, "目标用户 ID 无效")
+)
+
 // HttpStatusCode 返回 HTTP 状态码
 func (e *AppError) HttpStatusCode() int {
 	switch e.Code() {
@@ -85,7 +97,8 @@ func (e *AppError) HttpStatusCode() int {
 	case CommonServerError.Code(), CommonServerBusyError.Code(), CommonPanicErr.Code(), UnlockFailed.Code():
 		return http.StatusInternalServerError
 	case CommonOpRepeat.Code(), CommonParamError.Code(), UserCodeFastLimited.Code(), UserCodeError.Code(), UserCodeCaptchaError.Code(), UserCodeEmailError.Code(),
-		UserAccountExist.Code(), UserAccountUnregister.Code(), UserAccountPwdError.Code(), LockNotHeld.Code(), LockExpired.Code():
+		UserAccountExist.Code(), UserAccountUnregister.Code(), UserAccountPwdError.Code(), LockNotHeld.Code(), LockExpired.Code(),
+		SocialFollowSelfError.Code(), SocialFollowAlreadyExists.Code(), SocialUnfollowNotExists.Code(), SocialUnfollowSelfError.Code(), SocialTargetUserIdInvalid.Code():
 		return http.StatusBadRequest
 	case CommonNetworkAddressError.Code(), CacheNotFound.Code(), CacheEmpty.Code():
 		return http.StatusNotFound

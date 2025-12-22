@@ -53,7 +53,7 @@ func (l *FansListLogic) FansList(in *social.FansListReq) (*social.ListResp, erro
 	l.Infof("查询粉丝列表，用户ID: %d, 页码: %d, 每页: %d", userId, page, size)
 
 	// 2. 从缓存服务获取粉丝列表
-	followerIds, total, err := l.svcCtx.FollowCacheService.GetFansList(l.ctx, userId, int32(page), int32(size))
+	followerIds, total, err := l.svcCtx.FollowModel.CacheService().GetFansList(l.ctx, userId, int32(page), int32(size))
 	if err != nil {
 		l.Errorf("获取粉丝列表失败: %v", err)
 		return &social.ListResp{
@@ -92,13 +92,13 @@ func (l *FansListLogic) FansList(in *social.FansListReq) (*social.ListResp, erro
 		isMutual := false
 		if operatorId > 0 {
 			// 检查当前用户是否关注了该粉丝
-			attention, err := l.svcCtx.UserAttentionModel.FindOneByUserAndAttention(l.ctx, operatorId, followerId)
+			attention, err := l.svcCtx.FollowModel.UserAttentionModel().FindOneByUserAndAttention(l.ctx, operatorId, followerId)
 			if err == nil && attention != nil && attention.IsDel == 0 {
 				isFollow = true
 			}
 			// 检查是否互相关注（该粉丝是否也关注了当前用户）
 			if isFollow {
-				reverseAttention, err := l.svcCtx.UserAttentionModel.FindOneByUserAndAttention(l.ctx, followerId, operatorId)
+				reverseAttention, err := l.svcCtx.FollowModel.UserAttentionModel().FindOneByUserAndAttention(l.ctx, followerId, operatorId)
 				if err == nil && reverseAttention != nil && reverseAttention.IsDel == 0 {
 					isMutual = true
 				}

@@ -37,8 +37,8 @@ func (l *BloggerFollowLogic) BloggerFollow(in *social.FollowReq) (*social.Follow
 	}
 	if in.UserId <= 0 {
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "目标用户ID无效",
+			Code:    int32(errcode.SocialTargetUserIdInvalid.Code()),
+			Message: errcode.SocialTargetUserIdInvalid.Msg(),
 		}, nil
 	}
 
@@ -48,20 +48,20 @@ func (l *BloggerFollowLogic) BloggerFollow(in *social.FollowReq) (*social.Follow
 	// 3. 不能关注自己
 	if in.OperatorId == in.UserId {
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "不能关注自己",
+			Code:    int32(errcode.SocialFollowSelfError.Code()),
+			Message: errcode.SocialFollowSelfError.Msg(),
 		}, nil
 	}
 
 	l.Infof("博主关注，当前博主：%d，其他被关注博主：%d", operatorId, in.UserId)
 
 	// 4. 检查是否已经关注过（从缓存中检查）
-	exists, err := l.svcCtx.FollowCacheService.CheckFollowListContains(l.ctx, operatorId, in.UserId)
+	exists, err := l.svcCtx.FollowModel.CacheService().CheckFollowListContains(l.ctx, operatorId, in.UserId)
 	if err == nil && exists {
 		l.Infof("博主关注，其他被关注博主 uid：%d 已经存在列表中", in.UserId)
 		return &social.FollowResp{
-			Code:    int32(errcode.CommonParamError.Code()),
-			Message: "已经关注过该用户",
+			Code:    int32(errcode.SocialFollowAlreadyExists.Code()),
+			Message: errcode.SocialFollowAlreadyExists.Msg(),
 		}, nil
 	}
 
