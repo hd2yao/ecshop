@@ -748,6 +748,19 @@ func (c *RedisCache) LLen(ctx context.Context, key string) (int64, error) {
 	return int64(length), nil
 }
 
+// Eval 在 Redis 中执行 Lua 脚本
+// script: Lua 脚本内容
+// keys: 脚本要操作的 key 列表（会通过 keyBuilder 构造成真实 cache key）
+// args: 传递给脚本的参数
+func (c *RedisCache) Eval(ctx context.Context, script string, keys []string, args ...interface{}) (interface{}, error) {
+	cacheKeys := c.keyBuilder.BuildKeys(keys...)
+	result, err := c.client.EvalCtx(ctx, script, cacheKeys, args...)
+	if err != nil {
+		return nil, fmt.Errorf("执行 lua 脚本失败: %w", err)
+	}
+	return result, nil
+}
+
 // ==================== 私有辅助方法 ====================
 
 // getFromCache 从缓存读取数据（内部方法）

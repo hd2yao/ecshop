@@ -74,12 +74,16 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 			if err := l.userAttentionModel.UpsertAttention(ctx, e.OperatorId, e.TargetId); err != nil {
 				return err
 			}
+			if err := l.userFollowerModel.UpsertFollower(ctx, e.TargetId, e.OperatorId); err != nil {
+				return err
+			}
 			if err := l.userRelationModel.AddFollowCount(ctx, e.OperatorId, 1); err != nil {
 				return err
 			}
 			if err := l.userRelationModel.AddFollowerCount(ctx, e.TargetId, 1); err != nil {
 				return err
 			}
+
 			// 缓存：当前用户关注列表头插
 			_ = l.followCacheService.AddToFollowList(ctx, e.OperatorId, e.TargetId)
 			// 缓存：目标用户粉丝列表头插
@@ -88,12 +92,16 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 			if err := l.userAttentionModel.SoftDeleteAttention(ctx, e.OperatorId, e.TargetId); err != nil {
 				return err
 			}
+			if err := l.userFollowerModel.SoftDeleteFollower(ctx, e.TargetId, e.OperatorId); err != nil {
+				return err
+			}
 			if err := l.userRelationModel.AddFollowCount(ctx, e.OperatorId, -1); err != nil {
 				return err
 			}
 			if err := l.userRelationModel.AddFollowerCount(ctx, e.TargetId, -1); err != nil {
 				return err
 			}
+
 			// 取关时删除缓存，交给下次读重建
 			_ = l.followCacheService.RemoveFromFollowList(ctx, e.OperatorId)
 			_ = l.followCacheService.RemoveFromFansList(ctx, e.TargetId)
@@ -103,16 +111,23 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 			if err := l.userFollowerModel.UpsertFollower(ctx, e.TargetId, e.OperatorId); err != nil {
 				return err
 			}
+			if err := l.userAttentionModel.UpsertAttention(ctx, e.OperatorId, e.TargetId); err != nil {
+				return err
+			}
 			if err := l.userRelationModel.AddFollowerCount(ctx, e.TargetId, 1); err != nil {
 				return err
 			}
 			if err := l.userRelationModel.AddFollowCount(ctx, e.OperatorId, 1); err != nil {
 				return err
 			}
+
 			_ = l.followCacheService.AddToFansList(ctx, e.TargetId, e.OperatorId)
 			_ = l.followCacheService.AddToFollowList(ctx, e.OperatorId, e.TargetId)
 		} else {
 			if err := l.userFollowerModel.SoftDeleteFollower(ctx, e.TargetId, e.OperatorId); err != nil {
+				return err
+			}
+			if err := l.userAttentionModel.SoftDeleteAttention(ctx, e.OperatorId, e.TargetId); err != nil {
 				return err
 			}
 			if err := l.userRelationModel.AddFollowerCount(ctx, e.TargetId, -1); err != nil {
@@ -121,6 +136,7 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 			if err := l.userRelationModel.AddFollowCount(ctx, e.OperatorId, -1); err != nil {
 				return err
 			}
+
 			_ = l.followCacheService.RemoveFromFansList(ctx, e.TargetId)
 			_ = l.followCacheService.RemoveFromFollowList(ctx, e.OperatorId)
 		}
@@ -129,5 +145,3 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 	}
 	return nil
 }
-
-

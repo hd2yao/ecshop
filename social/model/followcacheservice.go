@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	redisPool "github.com/hd2yao/ecshop/common/redis"
 )
@@ -167,8 +168,13 @@ func (s *FollowCacheService) GetFansList(ctx context.Context, userId int64, page
 func (s *FollowCacheService) AddToFollowList(ctx context.Context, userId, targetId int64) error {
 	followListKey := fmt.Sprintf("follow_%d", userId)
 	targetIdStr := fmt.Sprintf("%d", targetId)
-	_, err := s.followListCache.LPush(ctx, followListKey, targetIdStr)
-	return err
+	_, err := s.followListCache.Eval(ctx, luaAttentions, []string{followListKey}, targetIdStr)
+	if err != nil {
+		// 回退到普通 LPUSH（兼容）
+		_, _ = s.followListCache.LPush(ctx, followListKey, targetIdStr)
+		return err
+	}
+	return nil
 }
 
 // RemoveFromFollowList 从关注列表缓存中删除（删除整个列表，交给下次读重建）
@@ -181,8 +187,13 @@ func (s *FollowCacheService) RemoveFromFollowList(ctx context.Context, userId in
 func (s *FollowCacheService) AddToFansList(ctx context.Context, userId, followerId int64) error {
 	fansListKey := fmt.Sprintf("fans_%d", userId)
 	followerIdStr := fmt.Sprintf("%d", followerId)
-	_, err := s.fansListCache.LPush(ctx, fansListKey, followerIdStr)
-	return err
+	_, err := s.fansListCache.Eval(ctx, luaFollowers, []string{fansListKey}, followerIdStr)
+	if err != nil {
+		// 回退到普通 LPUSH（兼容）
+		_, _ = s.fansListCache.LPush(ctx, fansListKey, followerIdStr)
+		return err
+	}
+	return nil
 }
 
 // RemoveFromFansList 从粉丝列表缓存中删除（删除整个列表，交给下次读重建）
@@ -223,8 +234,95 @@ func (s *FollowCacheService) CheckFansListContains(ctx context.Context, userId, 
 	return false, nil
 }
 
+// ---------------- ZSet 备用实现（可直接调用，不做自动切换） ----------------
+
+// AddToFollowListZSet 使用 ZSET 插入关注（去重、按时间戳排序），脚本负责截断
+func (s *FollowCacheService) AddToFollowListZSet(ctx context.Context, userId, targetId int64) error {
+	followListKey := fmt.Sprintf("follow_%d", userId)
+	member := fmt.Sprintf("%d", targetId)
+	_, err := s.followListCache.Eval(ctx, luaAttentionsZset, []string{followListKey}, member)
+	if err != nil {
+		// 回退到 ZAdd（兼容）: 使用当前时间戳作为 score
+		_ = s.followListCache.ZAdd(ctx, followListKey, time.Now().Unix(), member)
+		return err
+	}
+	return nil
+}
+
+// AddToFansListZSet 使用 ZSET 插入粉丝（去重、按时间戳排序），脚本负责截断
+func (s *FollowCacheService) AddToFansListZSet(ctx context.Context, userId, followerId int64) error {
+	fansListKey := fmt.Sprintf("fans_%d", userId)
+	member := fmt.Sprintf("%d", followerId)
+	_, err := s.fansListCache.Eval(ctx, luaFollowersZset, []string{fansListKey}, member)
+	if err != nil {
+		// 回退到 ZAdd（兼容）
+		_ = s.fansListCache.ZAdd(ctx, fansListKey, time.Now().Unix(), member)
+		return err
+	}
+	return nil
+}
+
+// RemoveFromFollowListZSet 从 ZSET 中删除指定 member
+func (s *FollowCacheService) RemoveFromFollowListZSet(ctx context.Context, userId, targetId int64) (int64, error) {
+	followListKey := fmt.Sprintf("follow_%d", userId)
+	return s.followListCache.ZRem(ctx, followListKey, fmt.Sprintf("%d", targetId))
+}
+
+// RemoveFromFansListZSet 从 ZSET 中删除指定 member
+func (s *FollowCacheService) RemoveFromFansListZSet(ctx context.Context, userId, followerId int64) (int64, error) {
+	fansListKey := fmt.Sprintf("fans_%d", userId)
+	return s.fansListCache.ZRem(ctx, fansListKey, fmt.Sprintf("%d", followerId))
+}
+
+// GetFollowListFromZSet 使用 ZREVRANGE 分页读取 ZSET（按时间倒序）
+func (s *FollowCacheService) GetFollowListFromZSet(ctx context.Context, userId int64, page, size int32) ([]int64, int64, error) {
+	followListKey := fmt.Sprintf("follow_%d", userId)
+	start := (page - 1) * size
+	stop := start + size - 1
+	values, err := s.followListCache.ZRevRange(ctx, followListKey, int64(start), int64(stop))
+	if err != nil {
+		return nil, 0, err
+	}
+	total, err := s.followListCache.ZCard(ctx, followListKey)
+	if err != nil {
+		return nil, 0, err
+	}
+	result := make([]int64, 0, len(values))
+	for _, v := range values {
+		n, err := parseInt64(v)
+		if err != nil {
+			continue
+		}
+		result = append(result, n)
+	}
+	return result, total, nil
+}
+
+// GetFansListFromZSet 使用 ZREVRANGE 分页读取 ZSET（按时间倒序）
+func (s *FollowCacheService) GetFansListFromZSet(ctx context.Context, userId int64, page, size int32) ([]int64, int64, error) {
+	fansListKey := fmt.Sprintf("fans_%d", userId)
+	start := (page - 1) * size
+	stop := start + size - 1
+	values, err := s.fansListCache.ZRevRange(ctx, fansListKey, int64(start), int64(stop))
+	if err != nil {
+		return nil, 0, err
+	}
+	total, err := s.fansListCache.ZCard(ctx, fansListKey)
+	if err != nil {
+		return nil, 0, err
+	}
+	result := make([]int64, 0, len(values))
+	for _, v := range values {
+		n, err := parseInt64(v)
+		if err != nil {
+			continue
+		}
+		result = append(result, n)
+	}
+	return result, total, nil
+}
+
 // parseInt64 解析字符串为 int64
 func parseInt64(s string) (int64, error) {
 	return strconv.ParseInt(s, 10, 64)
 }
-

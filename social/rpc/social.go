@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -35,6 +37,10 @@ func main() {
 			panic(fmt.Sprintf("初始化 RocketMQ 失败: %v", err))
 		}
 		fmt.Println("RocketMQ 初始化成功")
+		// 确保 Topic 存在（通过发送一条初始化消息）
+		if err := ensureTopicExists(c.RocketMQ); err != nil {
+			fmt.Printf("警告: 无法确保 Topic 存在: %v\n", err)
+		}
 
 		startRocketMQConsumer(ctx)
 	} else {
@@ -82,4 +88,34 @@ func startRocketMQConsumer(ctx *svc.ServiceContext) {
 	}
 
 	fmt.Println("RocketMQ 消费者启动成功，已订阅主题: social_follow")
+}
+
+// ensureTopicExists 通过发送一条初始化消息触发 Topic 自动创建（若 Broker 支持）
+func ensureTopicExists(config rocketmq.Config) error {
+	rmq := rocketmq.GetRocketMQ()
+
+	// 获取生产者（会触发创建和启动）
+	_, err := rmq.GetProducer()
+	if err != nil {
+		return fmt.Errorf("获取生产者失败: %w", err)
+	}
+
+	// 发送一条空消息来触发 Topic 的自动创建
+	initMsg := map[string]interface{}{
+		"type": "init",
+		"msg":  "topic_initialization",
+	}
+
+	_ = rmq.SendMessageAsync(context.Background(), model.MQTopicFollow, "init", initMsg, func(result *rocketmq.SendResult, err error) {
+		if err != nil {
+			fmt.Printf("Topic 初始化消息发送失败（可忽略）: %v\n", err)
+		} else {
+			fmt.Println("Topic 初始化消息发送成功，Topic 已创建")
+		}
+	})
+
+	// 等待一小段时间，让消息发送完成
+	time.Sleep(500 * time.Millisecond)
+
+	return nil
 }
