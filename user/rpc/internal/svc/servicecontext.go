@@ -110,7 +110,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 // 第一次从数据库读取，下次直接读缓存了，如果是热点用户会自动续期的
 func (s *ServiceContext) GetFollowStat(ctx context.Context, userId int64) (followCount, followerCount int64, err error) {
 	cacheOpt := redisPool.DefaultCacheOption()
-	cacheKey := fmt.Sprintf("user_id:%d", userId)
+	cacheKey := fmt.Sprintf("user_id_%d", userId)
 
 	type FollowStat struct {
 		FollowCount   int64 `json:"follow_count"`
