@@ -1,3 +1,3 @@
-FROM ibex/debian-mysql-server-5.7:latest
+FROM --platform=linux/amd64 mysql:5.7
 
 LABEL maintainer="Dysania <dysania@hd2yao>"
