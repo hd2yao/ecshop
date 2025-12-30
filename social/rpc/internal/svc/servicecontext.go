@@ -33,9 +33,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	// 初始化 Redis 缓存
 	followListCache := redisPool.NewRedisCache("social", "follow_list")
 	fansListCache := redisPool.NewRedisCache("social", "fans_list")
+	followStatCache := redisPool.NewRedisCache("user", "follow_stat")
 
 	// 初始化关注/粉丝业务模型（内部会初始化缓存服务）
-	followModel := model.NewFollowModel(conn, c.CacheRedis, followListCache, fansListCache)
+	followModel := model.NewFollowModel(conn, c.CacheRedis, followListCache, fansListCache, followStatCache)
 
 	// 初始化 User RPC 客户端
 	userRpc := userclient.NewUser(zrpc.MustNewClient(c.UserRpc))

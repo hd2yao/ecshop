@@ -23,6 +23,7 @@ func NewFollowModel(
 	c cache.CacheConf,
 	followListCache *redisPool.RedisCache,
 	fansListCache *redisPool.RedisCache,
+	followStatCache *redisPool.RedisCache,
 	opts ...cache.Option,
 ) *FollowModel {
 	// 初始化基础模型
@@ -36,6 +37,7 @@ func NewFollowModel(
 		userFollowerModel,
 		followListCache,
 		fansListCache,
+		followStatCache,
 	)
 
 	return &FollowModel{
@@ -65,4 +67,3 @@ func (m *FollowModel) UserRelationModel() UserRelationModel {
 func (m *FollowModel) CacheService() *FollowCacheService {
 	return m.cacheService
 }
-

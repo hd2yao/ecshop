@@ -16,6 +16,7 @@ type FollowCacheService struct {
 	userFollowerModel  UserFollowerModel
 	followListCache    *redisPool.RedisCache
 	fansListCache      *redisPool.RedisCache
+	followStatCache    *redisPool.RedisCache
 }
 
 // NewFollowCacheService 创建关注/粉丝列表缓存服务
@@ -25,6 +26,7 @@ func NewFollowCacheService(
 	userFollowerModel UserFollowerModel,
 	followListCache *redisPool.RedisCache,
 	fansListCache *redisPool.RedisCache,
+	followStatCache *redisPool.RedisCache,
 ) *FollowCacheService {
 	if followListCache == nil {
 		followListCache = redisPool.NewRedisCache("social", "follow_list")
@@ -32,146 +34,99 @@ func NewFollowCacheService(
 	if fansListCache == nil {
 		fansListCache = redisPool.NewRedisCache("social", "fans_list")
 	}
+	if followStatCache == nil {
+		followStatCache = redisPool.NewRedisCache("social", "follow_stat")
+	}
 	return &FollowCacheService{
 		userAttentionModel: userAttentionModel,
 		userFollowerModel:  userFollowerModel,
 		followListCache:    followListCache,
 		fansListCache:      fansListCache,
+		followStatCache:    followStatCache,
 	}
 }
 
 // GetFollowList 获取关注列表（带缓存）
 // 优先从 Redis list 读取，如果没有则从数据库加载并写入缓存
 func (s *FollowCacheService) GetFollowList(ctx context.Context, userId int64, page, size int32) ([]int64, int64, error) {
-	followListKey := fmt.Sprintf("follow_%d", userId)
+	// 优先使用 ZSet 实现（去重、按时间排序）
+	result, total, err := s.GetFollowListFromZSet(ctx, userId, page, size)
+	if err == nil && len(result) > 0 {
+		return result, total, nil
+	}
 
-	// 计算分页范围
-	start := (page - 1) * size
-	stop := start + size - 1
-
-	// 从 Redis list 读取
-	userIds, err := s.followListCache.LRange(ctx, followListKey, int64(start), int64(stop))
+	// 如果 ZSet 中没有数据或发生错误，从数据库读取并写入 ZSet（重建）
+	offset := (page - 1) * size
+	attentions, totalCnt, err := s.userAttentionModel.ListAttentions(ctx, userId, int64(offset), int64(size))
 	if err != nil {
-		// 忽略错误，继续从数据库查询
+		return nil, 0, err
+	}
+	if len(attentions) == 0 {
+		return []int64{}, totalCnt, nil
 	}
 
-	// 如果 Redis 中没有数据，从数据库读取并写入 Redis
-	if len(userIds) == 0 {
-		offset := (page - 1) * size
-		attentions, total, err := s.userAttentionModel.ListAttentions(ctx, userId, int64(offset), int64(size))
-		if err != nil {
-			return nil, 0, err
-		}
-
-		// 写入 Redis list（从左侧插入，保持时间倒序）
-		if total > 0 {
-			// 先清空列表（如果存在），然后重新构建
-			_ = s.followListCache.Delete(ctx, followListKey)
-			for i := total - 1; i >= 0; i-- {
-				attentionIdStr := fmt.Sprintf("%d", attentions[i].AttentionId)
-				_, _ = s.followListCache.LPush(ctx, followListKey, attentionIdStr)
-			}
-			// 重新读取当前页
-			userIds, _ = s.followListCache.LRange(ctx, followListKey, int64(start), int64(stop))
-		} else {
-			// 没有数据，返回空列表
-			return []int64{}, 0, nil
-		}
+	// 重建 ZSet：先删除原 key，再按顺序 ZADD（保证 score 随索引下降，使得 ZREVRANGE 得到时间倒序）
+	followListKey := fmt.Sprintf("follow_%d", userId)
+	_ = s.followListCache.Delete(ctx, followListKey)
+	base := time.Now().Unix()
+	for i := 0; i < len(attentions); i++ {
+		member := fmt.Sprintf("%d", attentions[i].AttentionId)
+		score := base + int64(len(attentions)-i)
+		_ = s.followListCache.ZAdd(ctx, followListKey, score, member)
 	}
 
-	// 获取总数（从 Redis list 长度或数据库）
-	total, err := s.followListCache.LLen(ctx, followListKey)
-	if err != nil || total == 0 {
-		// 如果 Redis 中没有总数，从数据库查询
-		_, total, err = s.userAttentionModel.ListAttentions(ctx, userId, 0, 1)
-		if err != nil {
-			total = int64(len(userIds))
-		}
-	}
-
-	// 转换为 int64 切片
-	result := make([]int64, 0, len(userIds))
-	for _, userIdStr := range userIds {
-		attentionId, err := parseInt64(userIdStr)
-		if err != nil {
-			continue
-		}
-		result = append(result, attentionId)
-	}
-
-	return result, total, nil
+	// 读取并返回指定页
+	return s.GetFollowListFromZSet(ctx, userId, page, size)
 }
 
 // GetFansList 获取粉丝列表（带缓存）
 // 优先从 Redis list 读取，如果没有则从数据库加载并写入缓存
 func (s *FollowCacheService) GetFansList(ctx context.Context, userId int64, page, size int32) ([]int64, int64, error) {
-	fansListKey := fmt.Sprintf("fans_%d", userId)
+	// 优先使用 ZSet 实现
+	result, total, err := s.GetFansListFromZSet(ctx, userId, page, size)
+	if err == nil && len(result) > 0 {
+		return result, total, nil
+	}
 
-	// 计算分页范围
-	start := (page - 1) * size
-	stop := start + size - 1
-
-	// 从 Redis list 读取
-	userIds, err := s.fansListCache.LRange(ctx, fansListKey, int64(start), int64(stop))
+	// 从数据库读取并写入 ZSet（重建）
+	offset := (page - 1) * size
+	followers, totalCnt, err := s.userFollowerModel.ListFollowers(ctx, userId, int64(offset), int64(size))
 	if err != nil {
-		// 忽略错误，继续从数据库查询
+		return nil, 0, err
+	}
+	if len(followers) == 0 {
+		return []int64{}, totalCnt, nil
 	}
 
-	// 如果 Redis 中没有数据，从数据库读取并写入 Redis
-	if len(userIds) == 0 {
-		offset := (page - 1) * size
-		followers, total, err := s.userFollowerModel.ListFollowers(ctx, userId, int64(offset), int64(size))
-		if err != nil {
-			return nil, 0, err
-		}
-
-		// 写入 Redis list（从左侧插入，保持时间倒序）
-		if len(followers) > 0 {
-			// 先清空列表（如果存在），然后重新构建
-			_ = s.fansListCache.Delete(ctx, fansListKey)
-			for i := len(followers) - 1; i >= 0; i-- {
-				followerIdStr := fmt.Sprintf("%d", followers[i].FollowerId)
-				_, _ = s.fansListCache.LPush(ctx, fansListKey, followerIdStr)
-			}
-			// 重新读取当前页
-			userIds, _ = s.fansListCache.LRange(ctx, fansListKey, int64(start), int64(stop))
-		} else {
-			// 没有数据，返回空列表
-			return []int64{}, total, nil
-		}
+	fansListKey := fmt.Sprintf("fans_%d", userId)
+	_ = s.fansListCache.Delete(ctx, fansListKey)
+	base := time.Now().Unix()
+	for i := 0; i < len(followers); i++ {
+		member := fmt.Sprintf("%d", followers[i].FollowerId)
+		score := base + int64(len(followers)-i)
+		_ = s.fansListCache.ZAdd(ctx, fansListKey, score, member)
 	}
 
-	// 获取总数（从 Redis list 长度或数据库）
-	total, err := s.fansListCache.LLen(ctx, fansListKey)
-	if err != nil || total == 0 {
-		// 如果 Redis 中没有总数，从数据库查询
-		_, total, err = s.userFollowerModel.ListFollowers(ctx, userId, 0, 1)
-		if err != nil {
-			total = int64(len(userIds))
-		}
-	}
-
-	// 转换为 int64 切片
-	result := make([]int64, 0, len(userIds))
-	for _, userIdStr := range userIds {
-		followerId, err := parseInt64(userIdStr)
-		if err != nil {
-			continue
-		}
-		result = append(result, followerId)
-	}
-
-	return result, total, nil
+	return s.GetFansListFromZSet(ctx, userId, page, size)
 }
 
 // AddToFollowList 添加用户到关注列表缓存（头插）
 func (s *FollowCacheService) AddToFollowList(ctx context.Context, userId, targetId int64) error {
 	followListKey := fmt.Sprintf("follow_%d", userId)
-	targetIdStr := fmt.Sprintf("%d", targetId)
-	_, err := s.followListCache.Eval(ctx, luaAttentions, []string{followListKey}, targetIdStr)
+	member := fmt.Sprintf("%d", targetId)
+	_, err := s.followListCache.Eval(ctx, luaAttentionsZset, []string{followListKey}, member)
 	if err != nil {
-		// 回退到普通 LPUSH（兼容）
-		_, _ = s.followListCache.LPush(ctx, followListKey, targetIdStr)
+		// 回退到 ZADD（兼容）
+		if addErr := s.followListCache.ZAdd(ctx, followListKey, time.Now().Unix(), member); addErr != nil {
+			return err
+		}
+		// 回退后补偿截断，保证长度不超过阈值
+		if size, scErr := s.followListCache.ZCard(ctx, followListKey); scErr == nil {
+			const maxLen = int64(2000)
+			if size > maxLen {
+				_, _ = s.followListCache.ZRemRangeByRank(ctx, followListKey, 0, size-maxLen-1)
+			}
+		}
 		return err
 	}
 	return nil
@@ -186,11 +141,20 @@ func (s *FollowCacheService) RemoveFromFollowList(ctx context.Context, userId in
 // AddToFansList 添加用户到粉丝列表缓存（头插）
 func (s *FollowCacheService) AddToFansList(ctx context.Context, userId, followerId int64) error {
 	fansListKey := fmt.Sprintf("fans_%d", userId)
-	followerIdStr := fmt.Sprintf("%d", followerId)
-	_, err := s.fansListCache.Eval(ctx, luaFollowers, []string{fansListKey}, followerIdStr)
+	member := fmt.Sprintf("%d", followerId)
+	_, err := s.fansListCache.Eval(ctx, luaFollowersZset, []string{fansListKey}, member)
 	if err != nil {
-		// 回退到普通 LPUSH（兼容）
-		_, _ = s.fansListCache.LPush(ctx, fansListKey, followerIdStr)
+		// 回退到 ZADD（兼容）
+		if addErr := s.fansListCache.ZAdd(ctx, fansListKey, time.Now().Unix(), member); addErr != nil {
+			return err
+		}
+		// 回退后补偿截断，保证长度不超过阈值
+		if size, scErr := s.fansListCache.ZCard(ctx, fansListKey); scErr == nil {
+			const maxLen = int64(10000)
+			if size > maxLen {
+				_, _ = s.fansListCache.ZRemRangeByRank(ctx, fansListKey, 0, size-maxLen-1)
+			}
+		}
 		return err
 	}
 	return nil
@@ -205,33 +169,23 @@ func (s *FollowCacheService) RemoveFromFansList(ctx context.Context, userId int6
 // CheckFollowListContains 检查关注列表缓存中是否包含指定用户
 func (s *FollowCacheService) CheckFollowListContains(ctx context.Context, userId, targetId int64) (bool, error) {
 	followListKey := fmt.Sprintf("follow_%d", userId)
-	targetIdStr := fmt.Sprintf("%d", targetId)
-	values, err := s.followListCache.LRange(ctx, followListKey, 0, -1)
+	member := fmt.Sprintf("%d", targetId)
+	rank, err := s.followListCache.ZRank(ctx, followListKey, member)
 	if err != nil {
 		return false, err
 	}
-	for _, v := range values {
-		if v == targetIdStr {
-			return true, nil
-		}
-	}
-	return false, nil
+	return rank >= 0, nil
 }
 
 // CheckFansListContains 检查粉丝列表缓存中是否包含指定用户
 func (s *FollowCacheService) CheckFansListContains(ctx context.Context, userId, followerId int64) (bool, error) {
 	fansListKey := fmt.Sprintf("fans_%d", userId)
-	followerIdStr := fmt.Sprintf("%d", followerId)
-	values, err := s.fansListCache.LRange(ctx, fansListKey, 0, -1)
+	member := fmt.Sprintf("%d", followerId)
+	rank, err := s.fansListCache.ZRank(ctx, fansListKey, member)
 	if err != nil {
 		return false, err
 	}
-	for _, v := range values {
-		if v == followerIdStr {
-			return true, nil
-		}
-	}
-	return false, nil
+	return rank >= 0, nil
 }
 
 // ---------------- ZSet 备用实现（可直接调用，不做自动切换） ----------------

@@ -16,6 +16,10 @@ type (
 		userRelationModel
 		AddFollowCount(ctx context.Context, userId int64, delta int64) error
 		AddFollowerCount(ctx context.Context, userId int64, delta int64) error
+		// CountAttention 返回用户关注数（user_attention 表计数）
+		CountAttention(ctx context.Context, userId int64) (int64, error)
+		// CountFollower 返回用户粉丝数（user_follower 表计数）
+		CountFollower(ctx context.Context, userId int64) (int64, error)
 	}
 
 	customUserRelationModel struct {
@@ -44,4 +48,24 @@ func (m *customUserRelationModel) AddFollowerCount(ctx context.Context, userId i
 		"on duplicate key update `follower_count`=GREATEST(0, `follower_count` + VALUES(`follower_count`))", m.table)
 	_, err := m.ExecNoCacheCtx(ctx, query, userId, delta)
 	return err
+}
+
+// CountAttention 返回用户关注数（直接从 user_attention 表统计，不使用缓存）
+func (m *customUserRelationModel) CountAttention(ctx context.Context, userId int64) (int64, error) {
+	countQuery := "select count(1) from user_attention where `user_id`=? and `is_del`=0"
+	var total int64
+	if err := m.QueryRowNoCacheCtx(ctx, &total, countQuery, userId); err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
+// CountFollower 返回用户粉丝数（直接从 user_follower 表统计，不使用缓存）
+func (m *customUserRelationModel) CountFollower(ctx context.Context, userId int64) (int64, error) {
+	countQuery := "select count(1) from user_follower where `user_id`=? and `is_del`=0"
+	var total int64
+	if err := m.QueryRowNoCacheCtx(ctx, &total, countQuery, userId); err != nil {
+		return 0, err
+	}
+	return total, nil
 }

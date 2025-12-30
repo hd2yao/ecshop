@@ -544,6 +544,32 @@ func (c *RedisCache) ZCard(ctx context.Context, key string) (int64, error) {
 	return int64(count), nil
 }
 
+// ZRemRangeByRank 删除有序集合指定排名区间的成员（按索引，正序，0为最小score）
+//
+// 使用场景：当需要按排名删除最旧的若干成员（如限制集合最大长度）时使用
+func (c *RedisCache) ZRemRangeByRank(ctx context.Context, key string, start, stop int64) (int64, error) {
+	cacheKey := c.keyBuilder.BuildKey(key)
+	count, err := c.client.ZremrangebyrankCtx(ctx, cacheKey, start, stop)
+	if err != nil {
+		return 0, fmt.Errorf("按排名范围删除ZSet成员失败: %w", err)
+	}
+	return int64(count), nil
+}
+
+// ZRank 获取指定 member 在有序集合中的排名（正序，0 为最小 score）-- 若 member 不存在，返回 -1 且不返回错误
+func (c *RedisCache) ZRank(ctx context.Context, key string, member string) (int64, error) {
+	cacheKey := c.keyBuilder.BuildKey(key)
+	rank, err := c.client.ZrankCtx(ctx, cacheKey, member)
+	if err != nil {
+		// 缺少成员时某些客户端返回 redis.Nil
+		if err == redis.Nil {
+			return -1, nil
+		}
+		return -1, fmt.Errorf("获取ZSet成员排名失败: %w", err)
+	}
+	return int64(rank), nil
+}
+
 // ==================== Hash 操作 ====================
 
 // HSet 设置 Hash 单个字段的值

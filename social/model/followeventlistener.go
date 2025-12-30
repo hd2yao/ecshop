@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
@@ -88,6 +89,9 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 			_ = l.followCacheService.AddToFollowList(ctx, e.OperatorId, e.TargetId)
 			// 缓存：目标用户粉丝列表头插
 			_ = l.followCacheService.AddToFansList(ctx, e.TargetId, e.OperatorId)
+			// 删除关注统计缓存，让下次读重新加载最新值
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.OperatorId))
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.TargetId))
 		} else {
 			if err := l.userAttentionModel.SoftDeleteAttention(ctx, e.OperatorId, e.TargetId); err != nil {
 				return err
@@ -105,6 +109,9 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 			// 取关时删除缓存，交给下次读重建
 			_ = l.followCacheService.RemoveFromFollowList(ctx, e.OperatorId)
 			_ = l.followCacheService.RemoveFromFansList(ctx, e.TargetId)
+			// 删除关注统计缓存，让下次读重新加载最新值
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.OperatorId))
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.TargetId))
 		}
 	case FollowRoleFollower:
 		if e.Action == FollowActionFollow {
@@ -123,6 +130,9 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 
 			_ = l.followCacheService.AddToFansList(ctx, e.TargetId, e.OperatorId)
 			_ = l.followCacheService.AddToFollowList(ctx, e.OperatorId, e.TargetId)
+			// 删除关注统计缓存，让下次读重新加载最新值
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.OperatorId))
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.TargetId))
 		} else {
 			if err := l.userFollowerModel.SoftDeleteFollower(ctx, e.TargetId, e.OperatorId); err != nil {
 				return err
@@ -139,6 +149,9 @@ func (l *FollowEventListener) handleEvent(ctx context.Context, e *FollowEvent) e
 
 			_ = l.followCacheService.RemoveFromFansList(ctx, e.TargetId)
 			_ = l.followCacheService.RemoveFromFollowList(ctx, e.OperatorId)
+			// 删除关注统计缓存，让下次读重新加载最新值
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.OperatorId))
+			_ = l.followCacheService.followStatCache.Delete(ctx, fmt.Sprintf("user_id_%d", e.TargetId))
 		}
 	default:
 		l.logger.Errorf("未知角色: %s", e.Role)
