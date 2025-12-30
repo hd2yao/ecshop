@@ -119,22 +119,19 @@ func (s *ServiceContext) GetFollowStat(ctx context.Context, userId int64) (follo
 
 	var stat FollowStat
 	err = s.FollowStatCache.GetWithLoader(ctx, cacheKey, &stat, func() (interface{}, error) {
-		// 从数据库加载关注统计数据
-		relation, err := s.UserRelationModel.FindOneByUserId(ctx, userId)
+		// 使用 model 提供的计数方法，避免直接操作 DbConn 与触发 go-zero 的 model 缓存
+		followCount, err := s.UserRelationModel.CountAttention(ctx, userId)
 		if err != nil {
-			if errors.Is(err, socialModel.ErrNotFound) {
-				// 用户没有关注关系记录，返回默认值
-				return &FollowStat{
-					FollowCount:   0,
-					FollowerCount: 0,
-				}, nil
-			}
-			return nil, err
+			return nil, fmt.Errorf("统计关注数失败: %w", err)
+		}
+		followerCount, err := s.UserRelationModel.CountFollower(ctx, userId)
+		if err != nil {
+			return nil, fmt.Errorf("统计粉丝数失败: %w", err)
 		}
 
 		return &FollowStat{
-			FollowCount:   relation.AttentionCount,
-			FollowerCount: relation.FollowerCount,
+			FollowCount:   followCount,
+			FollowerCount: followerCount,
 		}, nil
 	}, cacheOpt)
 
